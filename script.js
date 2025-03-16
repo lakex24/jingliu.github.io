@@ -1,13 +1,57 @@
+// Initialize all elements with config values
+function initializeConfig() {
+    if (typeof window.CONFIG === 'undefined') {
+        console.error('CONFIG is not defined');
+        return;
+    }
+
+    const config = window.CONFIG;
+    console.log('Initializing with config:', config);
+
+    // Direct assignments for critical elements
+    document.title = config.sitename;
+    document.getElementById('page-title').textContent = config.sitename;
+    document.getElementById('nav-name').textContent = config.name;
+    document.getElementById('footer-year').textContent = config.year;
+    document.getElementById('footer-name').textContent = config.name;
+}
+
+// Initialize video player
+function initializeVideoPlayer() {
+    const videoContainer = document.querySelector('.video-container');
+    if (!videoContainer) return;
+
+    const video = videoContainer.querySelector('video');
+    const playButton = videoContainer.querySelector('.play-button');
+    
+    video.load();
+    video.currentTime = 0.001;
+    
+    videoContainer.addEventListener('click', function() {
+        if (video.paused) {
+            video.play();
+            playButton.style.display = 'none';
+        } else {
+            video.pause();
+            playButton.style.display = 'block';
+        }
+    });
+    
+    video.addEventListener('ended', function() {
+        video.currentTime = 0.001;
+        playButton.style.display = 'block';
+    });
+    
+    video.addEventListener('pause', function() {
+        playButton.style.display = 'block';
+    });
+}
+
+// Main initialization
 document.addEventListener('DOMContentLoaded', function() {
-    // Populate configuration values
-    document.getElementById('page-title').textContent = `${CONFIG.name} - Research Portfolio`;
-    document.getElementById('nav-name').textContent = CONFIG.name;
-    document.getElementById('header-name').textContent = CONFIG.name;
-    document.getElementById('header-title').textContent = CONFIG.title;
-    document.getElementById('contact-email').textContent = CONFIG.email;
-    document.getElementById('contact-institution').textContent = CONFIG.institution;
-    document.getElementById('footer-year').textContent = CONFIG.year;
-    document.getElementById('footer-name').textContent = CONFIG.name;
+    console.log('DOM loaded, initializing...');
+    initializeConfig();
+    initializeVideoPlayer();
 
     // Set background image
     document.querySelector('.home-bg').style.backgroundImage = `url(${CONFIG.backgroundImage})`;

@@ -3,11 +3,10 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title id="page-title">Research Portfolio</title>
+    <title id="page-title">Homepage</title>
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
     <link href="styles.css" rel="stylesheet">
-    <script src="config.js?v=1"></script>
     <style>
         .product-description {
             min-height: 48px;  /* Adjust this value based on your needs */
@@ -104,9 +103,6 @@
         .navbar .nav-link:hover {
             color: #000;
         }
-        .navbar .dropdown-toggle:hover {
-            color: #000;
-        }
         
         /* Navbar dropdown styling */
         .navbar .dropdown-menu {
@@ -184,7 +180,7 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
         <div class="container">
-            <a class="navbar-brand" href="#home" id="nav-name">Your Name</a>
+            <a class="navbar-brand" href="#home" id="nav-name">Jing Liu</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
                 <span class="navbar-toggler-icon"></span>
             </button>
@@ -194,11 +190,11 @@
                         <a class="nav-link" href="#home">Home</a>
                     </li>
                     <li class="nav-item dropdown">
-                        <a class="nav-link dropdown-toggle" href="#career" id="workDropdown">
-                            Work
+                        <a class="nav-link dropdown-toggle" href="#roles" id="workDropdown">
+                            Career
                         </a>
                         <ul class="dropdown-menu" aria-labelledby="workDropdown">
-                            <li><a class="dropdown-item" href="#career">Roles</a></li>
+                            <li><a class="dropdown-item" href="#roles">Roles</a></li>
                             <li><a class="dropdown-item" href="#features">Shipped Features</a></li>
                         </ul>
                     </li>
@@ -223,12 +219,12 @@
                 <div class="row align-items-center">
                     <div class="col-lg-6">
                         <div class="home-content text-white">
-                            <h1 class="display-4 fw-bold mb-4" id="header-name">Your Name</h1>
-                            <h2 class="h4 mb-4" id="header-title">Your title</h2>
+                            <h1 class="display-4 fw-bold mb-4" id="header-name">Jing Liu</h1>
+                            <h2 class="h4 mb-4" id="header-title">Entrepreneur, Technnologist, Creator</h2>
                             <p class="lead">The Goal for Computer Graphics is to Create
                                 the Best Possible Tool for the Imagination.</p>
                             <div class="mt-4">
-                                <a href="#career" class="btn btn-outline-light me-2">View My Work</a>
+                                <a href="#features" class="btn btn-outline-light me-2">View My Work</a>
                                 <a href="#contact" class="btn btn-outline-light me-2">Contact Me</a>
                             </div>
                         </div>
@@ -237,13 +233,13 @@
             </div>
         </section>
 
-        <section id="career" class="py-5">
+        <section id="roles" class="py-5">
             <div class="container">
                 <h2 class="section-title">Roles</h2>
                 <div class="timeline">
                     <div class="timeline-item">
                         <div class="timeline-content">
-                            <h3>Tech Lead, Applied Research Scientist</h3>
+                            <h3>Tech Lead / Research Scientist</h3>
                             <p class="text-muted">TikTok (2019 - Present)</p>
                             <p>Personalized Generative Models for Image & Video Creation.</p>
                         </div>
@@ -287,7 +283,7 @@
                                 <h5 class="card-title">Ai Self</h5>
                                 <p class="card-text product-description">Let Ai Self unlock your viral potential 🚀</p>
                                 <img src="images/ai_self_01.jpg" class="img-fluid mb-3" alt="Ai Self Product">
-                                <a href="#" class="btn btn-primary">Learn More</a>
+                                <a href="blog-ai-self.html" class="btn btn-primary">Learn More</a>
                             </div>
                         </div>
                     </div>
@@ -389,10 +385,10 @@
                     <div class="col-md-4">
                         <div class="card h-100">
                             <div class="card-body">
-                                <h5 class="card-title">Blog Post Title</h5>
-                                <p class="card-text text-muted">Date</p>
-                                <p class="card-text">Brief excerpt from the blog post...</p>
-                                <a href="#" class="btn btn-outline-primary">Read More</a>
+                                <h5 class="card-title">Stories behind Ai Self</h5>
+                                <p class="card-text text-muted">June, 2024</p>
+                                <p class="card-text">How Ai Self started ...</p>
+                                <a href="blog-ai-self.html" class="btn btn-outline-primary">Read More</a>
                             </div>
                         </div>
                     </div>
@@ -409,12 +405,14 @@
                         <div class="card">
                             <div class="card-body">
                                 <div class="contact-info text-center">
-                                    <p><i class="bi bi-envelope"></i> <span id="contact-email">your.email@example.com</span></p>
-                                    <p><i class="bi bi-geo-alt"></i> <span id="contact-institution">Your Institution</span></p>
-                                    <div class="social-links mt-4">
-                                        <a href="https://www.linkedin.com/in/jingliu2024/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark me-2"><i class="bi bi-linkedin"></i></a>
-                                        <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark me-2"><i class="bi bi-twitter"></i></a>
-                                        <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark"><i class="bi bi-github"></i></a>
+                                    <!-- <p><i class="bi bi-envelope"></i> <span id="contact-email">your.email@example.com</span></p> -->
+                                    <div class="d-flex flex-column align-items-center justify-content-center">
+                                        <div class="social-links mb-3">
+                                            <a href="https://www.linkedin.com/in/jingliu2024/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark me-2"><i class="bi bi-linkedin"></i></a>
+                                            <a href="#" class="btn btn-outline-dark me-2 disabled-link" style="opacity: 0.5; cursor: default; pointer-events: none;"><i class="bi bi-twitter"></i></a>
+                                            <a href="#" class="btn btn-outline-dark disabled-link" style="opacity: 0.5; cursor: default; pointer-events: none;"><i class="bi bi-github"></i></a>
+                                        </div>
+                                        <p class="mb-0"><i class="bi bi-geo-alt"></i> <span id="contact-institution">Mind Pixels</span></p>
                                     </div>
                                 </div>
                             </div>
@@ -427,7 +425,7 @@
 
     <footer class="py-4 bg-dark text-white">
         <div class="container text-center">
-            <p class="mb-0"> 2025 <span id="footer-year"></span> <span id="footer-name">Your Name</span>. All rights reserved.</p>
+            <p class="mb-0"><span id="footer-year">2025</span> <span id="footer-name">Jing Liu</span>. All rights reserved.</p>
         </div>
     </footer>
 
@@ -472,7 +470,8 @@
         });
     </script>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="config.js?v=123456"></script>
     <script src="script.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>
