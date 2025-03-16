@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title id="page-title">Research Portfolio</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.7.2/font/bootstrap-icons.css">
+    <link href="styles.css" rel="stylesheet">
+    <script src="config.js?v=1"></script>
+    <style>
+        .product-description {
+            min-height: 48px;  /* Adjust this value based on your needs */
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        /* Feature cards styling */
+        #features .card-body {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+        }
+        #features .card-body > *:not(:last-child) {
+            flex: 0 0 auto;
+        }
+        #features .card-body > :last-child {
+            margin-top: auto;
+            width: 130px;
+            align-self: center;
+            text-align: center;
+        }
+        
+        /* Publication cards styling */
+        #publication .card-body {
+            height: 100%;
+        }
+        #publication .card-text {
+            text-align: justify;
+            hyphens: auto;
+            -webkit-hyphens: auto;
+            -ms-hyphens: auto;
+            word-spacing: -0.05em;
+            line-height: 1.6;
+        }
+        #publication .card-body .row {
+            height: 100%;
+        }
+        #publication .row .col-md-8 {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            justify-content: space-between;
+        }
+        #publication .card-text {
+            flex-grow: 1;
+            margin-bottom: 1.5rem;
+        }
+        #publication .btn {
+            align-self: flex-start;
+            margin-top: auto;
+            width: 130px;
+            text-align: center;
+        }
+        /* Navbar styling */
+        .navbar .nav-link {
+            padding: 0.5rem 1rem;
+            border-radius: 6px;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            margin: 0 2px;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .navbar .dropdown-menu {
+            margin-top: -2px;
+            display: none;
+            transition: all 0.2s ease;
+        }
+        .navbar .dropdown:hover .dropdown-menu {
+            display: block;
+            animation: dropdownFade 0.2s ease;
+        }
+        .navbar .dropdown-toggle::after {
+            display: none;
+        }
+        .navbar .nav-link::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f2f5;
+            transform: scaleY(0);
+            transform-origin: bottom;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+        .navbar .nav-link:hover::after {
+            transform: scaleY(1);
+        }
+        .navbar .nav-link:hover {
+            color: #000;
+        }
+        .navbar .dropdown-toggle:hover {
+            color: #000;
+        }
+        
+        /* Navbar dropdown styling */
+        .navbar .dropdown-menu {
+            border: none;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+            margin-top: 0;
+            padding: 0.5rem 0;
+            border-radius: 8px;
+            min-width: 160px;
+            animation: dropdownFade 0.2s ease;
+        }
+        @keyframes dropdownFade {
+            from {
+                opacity: 0;
+                transform: translateY(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        .navbar .dropdown-item {
+            padding: 0.5rem 1rem;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            position: relative;
+            overflow: hidden;
+        }
+        .navbar .dropdown-item::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #f0f2f5;
+            transform: scaleX(0);
+            transform-origin: left;
+            transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            z-index: -1;
+        }
+        .navbar .dropdown-item:hover::after {
+            transform: scaleX(1);
+        }
+        .navbar .dropdown-item:hover {
+            color: #000;
+        }
+        .navbar .dropdown-toggle::after {
+            transition: transform 0.2s;
+        }
+        .navbar .dropdown.show .dropdown-toggle::after {
+            transform: rotate(180deg);
+        }
+        
+        .video-container {
+            cursor: pointer;
+        }
+        .video-container video {
+            width: 100%;
+            height: auto;
+            object-fit: contain;
+            background: #000;
+        }
+        .play-button {
+            z-index: 1;
+            transition: transform 0.2s;
+        }
+        .play-button i {
+            filter: drop-shadow(0 0 3px rgba(0,0,0,0.5));
+        }
+        .video-container:hover .play-button {
+            transform: translate(-50%, -50%) scale(1.1);
+        }
+    </style>
+</head>
+<body>
+    <nav class="navbar navbar-expand-lg navbar-light fixed-top bg-white shadow-sm">
+        <div class="container">
+            <a class="navbar-brand" href="#home" id="nav-name">Your Name</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    <li class="nav-item">
+                        <a class="nav-link" href="#home">Home</a>
+                    </li>
+                    <li class="nav-item dropdown">
+                        <a class="nav-link dropdown-toggle" href="#career" id="workDropdown">
+                            Work
+                        </a>
+                        <ul class="dropdown-menu" aria-labelledby="workDropdown">
+                            <li><a class="dropdown-item" href="#career">Roles</a></li>
+                            <li><a class="dropdown-item" href="#features">Shipped Features</a></li>
+                        </ul>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#publication">Publication</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#blogs">Blog</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link" href="#contact">Contact</a>
+                    </li>
+                </ul>
+            </div>
+        </div>
+    </nav>
+
+    <main>
+        <section id="home" class="min-vh-100 d-flex align-items-center">
+            <div class="home-bg"></div>
+            <div class="container position-relative">
+                <div class="row align-items-center">
+                    <div class="col-lg-6">
+                        <div class="home-content text-white">
+                            <h1 class="display-4 fw-bold mb-4" id="header-name">Your Name</h1>
+                            <h2 class="h4 mb-4" id="header-title">Your title</h2>
+                            <p class="lead">The Goal for Computer Graphics is to Create
+                                the Best Possible Tool for the Imagination.</p>
+                            <div class="mt-4">
+                                <a href="#career" class="btn btn-outline-light me-2">View My Work</a>
+                                <a href="#contact" class="btn btn-outline-light me-2">Contact Me</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="career" class="py-5">
+            <div class="container">
+                <h2 class="section-title">Roles</h2>
+                <div class="timeline">
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>Tech Lead, Applied Research Scientist</h3>
+                            <p class="text-muted">TikTok (2019 - Present)</p>
+                            <p>Personalized Generative Models for Image & Video Creation.</p>
+                        </div>
+                    </div>
+                    <div class="timeline-item">
+                        <div class="timeline-content">
+                            <h3>Founding Engineer</h3>
+                            <p class="text-muted">Bellus3D (2015 - 2019) [Acquired by Meta]</p>
+                            <p>High fidelity 3D face scanning on mobile phones.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="py-5">
+            <div class="container">
+                <h2 class="section-title">Shipped Features</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Cooking 👨🏻‍🍳</h5>
+                                <p class="card-text product-description">Watch our technology in action</p>
+                                <div class="video-container position-relative mb-3">
+                                    <video class="img-fluid" preload="metadata">
+                                        <source src="videos/demo_reel.mp4" type="video/mp4">
+                                        Your browser does not support the video tag.
+                                    </video>
+                                    <div class="play-button position-absolute top-50 start-50 translate-middle">
+                                        <i class="bi bi-play-circle fs-1 text-white"></i>
+                                    </div>
+                                </div>
+                                <a href="#" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Ai Self</h5>
+                                <p class="card-text product-description">Let Ai Self unlock your viral potential 🚀</p>
+                                <img src="images/ai_self_01.jpg" class="img-fluid mb-3" alt="Ai Self Product">
+                                <a href="#" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Social Avatar</h5>
+                                <p class="card-text product-description">Create personalized avatars for your social media presence.</p>
+                                <img src="images/social_avatar_03.png" class="img-fluid mb-3" alt="Social Avatar Product">
+                                <a href="#" class="btn btn-primary">Learn More</a>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="publication" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="section-title">Publication</h2>
+                <div class="row g-4">
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="images/idpatch.jpg" class="img-fluid mb-3" alt="ID-Patch Paper">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5 class="card-title">ID-Patch: Robust ID Association for Group Photo Personalization</h5>
+                                        <p class="text-muted">CVPR 2025</p>
+                                        <p class="card-text">Generating personalized group photos is hard: Faces often end up misplaced, distorted, or unrecognizable. Our ID-Patch method fixes this with a novel approach that ensures perfect positioning and high resemblance, setting a new standard for AI-driven photo generation.</p>
+                                        <a href="https://byteaigc.github.io/ID-Patch/" target="_blank" class="btn btn-outline-primary">Read Paper</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="images/coap_3.jpg" class="img-fluid mb-3" alt="COAP Paper">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5 class="card-title">COAP: Memory-Efficient Training with Correlation-Aware Gradient Projection</h5>
+                                        <p class="text-muted">CVPR 2025</p>
+                                        <p class="card-text">Training large AI models is memory-intensive, and existing low-rank methods often slow down or degrade performance. Our method, COAP, optimizes memory while preserving speed and accuracy: achieving up to 81% memory savings and 4x faster fine-tuning without compromise.</p>
+                                        <a href="https://byteaigc.github.io/coap/" target="_blank" class="btn btn-outline-primary">Read Paper</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="images/teaser.gif" class="img-fluid mb-3" alt="AgileAvatar Paper">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5 class="card-title">AgileAvatar: Stylized 3D Avatar Creation via Cascaded Domain Bridging</h5>
+                                        <p class="text-muted">SIGGRAPH Asia 2022</p>
+                                        <p class="card-text">Creating stylized 3D avatars from selfie photos is challenging due to domain gaps and complex parameter tuning. Our self-supervised method bridges this gap, generating high-quality avatars that preserve identity, outperforming previous work and rivaling manual creation.</p>
+                                        <a href="https://ssangx.github.io/projects/agileavatar/index.html" target="_blank" class="btn btn-outline-primary">Read Paper</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-md-6">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <div class="row">
+                                    <div class="col-md-4">
+                                        <img src="images/agilegan-thumbnail.jpg" class="img-fluid mb-3" alt="AgileGAN Paper">
+                                    </div>
+                                    <div class="col-md-8">
+                                        <h5 class="card-title">AgileGAN: Stylizing Portraits by Inversion-Consistent Transfer Learning</h5>
+                                        <p class="text-muted">SIGGRAPH 2021</p>
+                                        <p class="card-text">Turning real photos into high-quality stylized portraits is tough, with existing methods often producing artifacts. Our AgileGAN framework overcomes this by learning style transfer more effectively, generating stunning 1024×1024 portraits with just ~100 examples and ~1 hour of training.</p>
+                                        <a href="https://guoxiansong.github.io/homepage/agilegan.html" target="_blank" class="btn btn-outline-primary">Read Paper</a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="blogs" class="py-5">
+            <div class="container">
+                <h2 class="section-title">Blog</h2>
+                <div class="row g-4">
+                    <div class="col-md-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">Blog Post Title</h5>
+                                <p class="card-text text-muted">Date</p>
+                                <p class="card-text">Brief excerpt from the blog post...</p>
+                                <a href="#" class="btn btn-outline-primary">Read More</a>
+                            </div>
+                        </div>
+                    </div>
+                    <!-- Add more blog post cards as needed -->
+                </div>
+            </div>
+        </section>
+
+        <section id="contact" class="py-5 bg-light">
+            <div class="container">
+                <h2 class="section-title">Contact</h2>
+                <div class="row justify-content-center">
+                    <div class="col-md-8">
+                        <div class="card">
+                            <div class="card-body">
+                                <div class="contact-info text-center">
+                                    <p><i class="bi bi-envelope"></i> <span id="contact-email">your.email@example.com</span></p>
+                                    <p><i class="bi bi-geo-alt"></i> <span id="contact-institution">Your Institution</span></p>
+                                    <div class="social-links mt-4">
+                                        <a href="https://www.linkedin.com/in/jingliu2024/" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark me-2"><i class="bi bi-linkedin"></i></a>
+                                        <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark me-2"><i class="bi bi-twitter"></i></a>
+                                        <a href="#" target="_blank" rel="noopener noreferrer" class="btn btn-outline-dark"><i class="bi bi-github"></i></a>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer class="py-4 bg-dark text-white">
+        <div class="container text-center">
+            <p class="mb-0"> 2025 <span id="footer-year"></span> <span id="footer-name">Your Name</span>. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Work dropdown functionality
+            const workDropdown = document.getElementById('workDropdown');
+            
+            workDropdown.addEventListener('click', function(e) {
+                e.preventDefault();
+                window.location.href = this.getAttribute('href');
+            });
+            
+            // Video player functionality
+            const videoContainer = document.querySelector('.video-container');
+            const video = videoContainer.querySelector('video');
+            const playButton = videoContainer.querySelector('.play-button');
+            
+            // Load video and seek to first frame
+            video.load();
+            video.currentTime = 0.001; // Seek to first frame
+            
+            videoContainer.addEventListener('click', function() {
+                if (video.paused) {
+                    video.play();
+                    playButton.style.display = 'none';
+                } else {
+                    video.pause();
+                    playButton.style.display = 'block';
+                }
+            });
+            
+            video.addEventListener('ended', function() {
+                video.currentTime = 0.001; // Return to first frame
+                playButton.style.display = 'block';
+            });
+            
+            // Handle pause event
+            video.addEventListener('pause', function() {
+                playButton.style.display = 'block';
+            });
+        });
+    </script>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
