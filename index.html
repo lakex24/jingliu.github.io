@@ -189,6 +189,7 @@
                     <li class="nav-item">
                         <a class="nav-link" href="#home">Home</a>
                     </li>
+
                     <li class="nav-item dropdown">
                         <a class="nav-link dropdown-toggle" href="#roles" id="workDropdown">
                             Career
@@ -216,17 +217,44 @@
         <section id="home" class="min-vh-100 d-flex align-items-center">
             <div class="home-bg"></div>
             <div class="container position-relative">
-                <div class="row align-items-center">
-                    <div class="col-lg-6">
-                        <div class="home-content text-white">
+                <div class="row home-row">
+                    <div class="col-lg-7 d-flex flex-column">
+                        <div class="home-content text-white mb-4">
                             <h1 class="display-4 fw-bold mb-4" id="header-name">Jing Liu</h1>
                             <h2 class="h4 mb-4" id="header-title">Entrepreneur, Technnologist, Creator</h2>
                             <p class="lead">The Goal for Computer Graphics is to Create
                                 the Best Possible Tool for the Imagination.</p>
-                            <div class="mt-4">
-                                <a href="#features" class="btn btn-outline-light me-2">View My Work</a>
-                                <a href="#contact" class="btn btn-outline-light me-2">Contact Me</a>
+                            <div class="d-flex flex-wrap mt-4">
+                                <a href="#features" class="btn btn-outline-light me-2 mb-2">View My Work</a>
+                                <a href="#contact" class="btn btn-outline-light me-2 mb-2">Contact Me</a>
                             </div>
+                        </div>
+                        
+                        <div class="news-highlights text-white mt-4 pt-3 ps-4 border-top border-light border-opacity-25">
+                            <h4 class="mb-3">Latest News</h4>
+                            <div class="d-flex flex-column">
+                                <div class="news-item mb-4">
+                                    <div class="news-date mb-1">
+                                        Feb 26, 2025
+                                    </div>
+                                    <p class="mb-2">Two papers accepted at CVPR 2025 !</p>
+                                    <ul class="paper-list ps-4 mb-0">
+                                        <li><a href="https://byteaigc.github.io/ID-Patch/" class="news-link" target="_blank" rel="noopener noreferrer">ID-Patch: Robust ID Association for Group Photo Personalization</a></li>
+                                        <li><a href="https://byteaigc.github.io/coap/" class="news-link" target="_blank" rel="noopener noreferrer">COAP: Memory-Efficient Training with Correlation-Aware Gradient Projection</a></li>
+                                    </ul>
+                                </div>
+                                <div class="news-item">
+                                    <div class="news-date mb-1">
+                                        Feb 1, 2025
+                                    </div>
+                                    <p class="mb-0">I gave a deep dive talk on DeepSeek Tech Reports: <a href="https://byteaigc.github.io/deepseek/" class="news-link" target="_blank" rel="noopener noreferrer">click here for the notes!</a></p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="col-lg-5 d-flex justify-content-end align-items-stretch">
+                        <div class="profile-picture-container d-flex h-100">
+                            <img src="images/profiles/jing-python.png" alt="Jing Liu" class="profile-picture img-fluid">
                         </div>
                     </div>
                 </div>

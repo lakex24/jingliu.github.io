@@ -5,10 +5,28 @@ body {
     padding-top: 76px;
 }
 
+a {
+    text-decoration: none !important;
+    color: #38b6ff;  /* Soft blue color to indicate clickable links */
+    transition: color 0.2s ease;
+}
+
+a:hover {
+    color: #00d4ff;  /* Brighter blue on hover */
+}
+
 /* Navigation */
 .navbar {
     backdrop-filter: blur(10px);
     background-color: rgba(255, 255, 255, 0.9) !important;
+}
+
+.navbar a {
+    color: #212529;  /* Dark color for navbar links */
+}
+
+.navbar a:hover {
+    color: #0d6efd;  /* Bootstrap primary blue on hover */
 }
 
 .navbar-brand {
@@ -40,6 +58,36 @@ section {
 #home {
     position: relative;
     overflow: hidden;
+}
+
+.home-row {
+    min-height: 700px;
+}
+
+.col-lg-7.d-flex.flex-column {
+    justify-content: space-between;
+}
+
+.profile-picture-container {
+    max-width: 450px;
+    margin: 0;
+    position: relative;
+    z-index: 1;
+    height: 100%;
+    display: flex;
+    align-items: flex-start;
+}
+
+.profile-picture {
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.3);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    max-height: 100%;
+    object-fit: contain;
+}
+
+.profile-picture:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 12px 35px rgba(0, 0, 0, 0.4);
 }
 
 .home-bg {
@@ -91,6 +139,66 @@ section {
 
 .timeline-item:hover {
     transform: translateY(-5px);
+}
+
+/* News Section */
+.news-highlights {
+    margin-top: 1.5rem;
+    padding: 0;
+}
+
+.news-item {
+    transition: transform 0.3s ease;
+    padding-left: 10px;
+    border-left: 2px solid transparent;
+}
+
+.news-item:hover {
+    border-left: 2px solid rgba(255, 255, 255, 0.3);
+}
+
+.news-date {
+    font-size: 0.85rem;
+    color: rgba(255, 255, 255, 0.7);
+    white-space: nowrap;
+    margin-bottom: 0.4rem;
+}
+
+.news-item p {
+    font-size: 1rem;
+    line-height: 1.4;
+}
+
+.news-item a {
+    text-decoration: none;
+    transition: color 0.2s ease;
+}
+
+.news-item a:hover {
+    color: #fff;
+}
+
+.news-link {
+    text-decoration: none !important;
+    transition: color 0.2s ease;
+    color: #7cd3fc;  /* Light blue that works well on dark backgrounds */
+    border-bottom: none !important;
+}
+
+.news-link:hover {
+    color: #00eeff;  /* Brighter cyan on hover */
+    text-decoration: none !important;
+    border-bottom: none !important;
+}
+
+.paper-list {
+    list-style-type: disc;
+    margin-top: 0.25rem;
+}
+
+.paper-list li {
+    margin-bottom: 0.25rem;
+    font-size: 0.95rem;
 }
 
 /* Cards */
