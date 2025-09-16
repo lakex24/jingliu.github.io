@@ -25,20 +25,57 @@ function initializeVideoPlayer() {
     const playButton = videoContainer.querySelector('.play-button');
     
     video.load();
-    video.currentTime = 0.001;
+    
+    // Add error handling
+    video.addEventListener('error', function(e) {
+        console.error('Video error:', e);
+        console.error('Video error code:', video.error ? video.error.code : 'unknown');
+    });
+    
+    // Wait for video metadata to load before seeking
+    video.addEventListener('loadedmetadata', function() {
+        console.log('Video metadata loaded successfully');
+        video.currentTime = 0.1;
+        // Ensure play button is visible initially
+        playButton.style.display = 'block';
+    });
+    
+    video.addEventListener('canplay', function() {
+        console.log('Video can start playing');
+    });
+    
+    video.addEventListener('play', function() {
+        console.log('Video play event fired');
+        playButton.style.display = 'none';
+    });
+    
+    video.addEventListener('playing', function() {
+        console.log('Video is actually playing');
+    });
+    
+    video.addEventListener('stalled', function() {
+        console.log('Video stalled');
+    });
+    
+    video.addEventListener('waiting', function() {
+        console.log('Video waiting for data');
+    });
     
     videoContainer.addEventListener('click', function() {
-        if (video.paused) {
-            video.play();
+        console.log('Video container clicked, video paused:', video.paused, 'currentTime:', video.currentTime, 'duration:', video.duration);
+        
+        // Reset video to beginning and play
+        video.currentTime = 0;
+        video.play().then(() => {
+            console.log('Video play started successfully');
             playButton.style.display = 'none';
-        } else {
-            video.pause();
-            playButton.style.display = 'block';
-        }
+        }).catch(error => {
+            console.error('Error playing video:', error);
+        });
     });
     
     video.addEventListener('ended', function() {
-        video.currentTime = 0.001;
+        video.currentTime = 0.1;
         playButton.style.display = 'block';
     });
     
