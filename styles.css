@@ -246,9 +246,17 @@ section {
 }
 
 .social-links a:hover {
-    background-color: #007bff;
-    color: white;
-    border-color: #007bff;
+    background-color: #007bff !important;
+    color: white !important;
+    border-color: #007bff !important;
+}
+
+.social-links a:hover i {
+    color: white !important;
+}
+
+.social-links a:hover svg {
+    fill: white !important;
 }
 
 /* Buttons */
