@@ -1,0 +1,7 @@
+---
+// A long thin arrow used in link labels; the CSS slides it on hover.
+const { class: className = '' } = Astro.props;
+---
+<svg class:list={['arrow', className]} viewBox="0 0 36 12" width="36" height="12" aria-hidden="true" focusable="false">
+  <path d="M1 6 H33 M26 1 L33 6 L26 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+</svg>

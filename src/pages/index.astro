@@ -3,6 +3,7 @@ import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Quote from '../components/Quote.astro';
 import Botanicals from '../components/Botanicals.astro';
+import Arrow from '../components/Arrow.astro';
 import { art } from '../data/art';
 import { site } from '../data/site';
 import startups from '../assets/tiles/startups.jpg';
@@ -58,7 +59,7 @@ const tiles = site.nav.map((n) => ({ ...n, ...photos[n.href as keyof typeof phot
               <Picture src={t.img} formats={['avif', 'webp']} widths={[320, 480, 640, 900]} sizes="(min-width: 900px) 25vw, 50vw" alt={t.alt} loading="eager" />
             </div>
             <span class="tile__text">
-              <span class="tile__title">{t.label} <span class="tile__arrow" aria-hidden="true">[ → ]</span></span>
+              <span class="tile__title">{t.label} <Arrow class="tile__arrow" /></span>
               <span class="tile__tag mono">{t.tagline}</span>
             </span>
           </a>
