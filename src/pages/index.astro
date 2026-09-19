@@ -54,11 +54,11 @@ const tiles = site.nav.map((n) => ({ ...n, ...photos[n.href as keyof typeof phot
       {tiles.map((t) => (
         <li>
           <a class="tile" href={t.href}>
+            <span class="tile__title">{t.label} <span class="tile__arrow" aria-hidden="true">[ → ]</span></span>
+            <span class="tile__tag mono">{t.tagline}</span>
             <div class="tile__img">
               <Picture src={t.img} formats={['avif', 'webp']} widths={[320, 480, 640, 900]} sizes="(min-width: 900px) 25vw, 50vw" alt={t.alt} loading="eager" />
             </div>
-            <span class="tile__title">{t.label} <span class="tile__arrow" aria-hidden="true">[ → ]</span></span>
-            <span class="tile__tag mono">{t.tagline}</span>
           </a>
         </li>
       ))}
