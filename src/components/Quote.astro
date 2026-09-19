@@ -13,7 +13,6 @@ const isLong = (t: string) => t.split('\n').length >= 10;
 const halves = (t: string) => {
   const lines = t.split('\n');
   let cut = Math.ceil(lines.length / 2);
-  if (cut % 2) cut -= 1; // keep couplets together; first column is the shorter one
   for (const c of [cut, cut + 1, cut - 1]) if (lines[c - 1] === '') { cut = c; break; }
   return [lines.slice(0, cut).join('\n').replace(/\n+$/, ''), lines.slice(cut).join('\n').replace(/^\n+/, '')];
 };
@@ -76,7 +75,6 @@ const payload = all.map((q) => ({ id: q.id, ...q.data }));
       const lines = String(q.text).split('\n');
       if (lines.length >= 10) {
         let cut = Math.ceil(lines.length / 2);
-        if (cut % 2) cut -= 1;
         for (const c of [cut, cut + 1, cut - 1]) if (lines[c - 1] === '') { cut = c; break; }
         text.replaceChildren(...[lines.slice(0, cut), lines.slice(cut)].map((part) => { const s = document.createElement('span'); s.className = 'quote__col'; s.textContent = part.join('\n').replace(/^\n+|\n+$/g, ''); return s; }));
       } else {
