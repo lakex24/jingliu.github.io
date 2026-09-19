@@ -264,6 +264,8 @@ p { margin: 0 0 1.1em; }
   .quote__text { padding: 0 1.5rem; }
   .quote--wide { max-width: 56rem; }
   .quote__text--columns { display: grid; grid-template-columns: 1fr 1fr; gap: 0 2.5rem; padding: 0; font-size: 1rem; line-height: 1.75; }
+}
+@media (min-width: 1240px) {
   .quote__col { white-space: pre; }
 }
 .quote__col { display: block; }
