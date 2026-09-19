@@ -256,8 +256,11 @@ p { margin: 0 0 1.1em; }
   .botanical--raster.botanical--floor { width: 130px; bottom: -8px; right: -6px; }
 }
 @media (max-width: 719px) {
-  .botanical--raster.botanical--left  { display: block; width: 58px; top: 6px; left: -4px; }
-  .botanical--raster.botanical--right { width: 66px; top: 2px; right: -8px; }
+  /* Let the corner art climb over the nav cells a little (art above the masthead on phones). */
+  .masthead { z-index: 0; }
+  .botanical--raster { z-index: 1; }
+  .botanical--raster.botanical--left  { display: block; width: 62px; top: -30px; left: -4px; }
+  .botanical--raster.botanical--right { width: 70px; top: -36px; right: -8px; }
   .botanical--raster.botanical--floor { width: 112px; bottom: -4px; right: -4px; }
   .hero { padding-top: 2.4rem; }
 }
@@ -274,7 +277,7 @@ p { margin: 0 0 1.1em; }
 .quote__author { display: block; font-family: var(--font-mono); font-size: 0.82rem; letter-spacing: 0.06em; color: var(--ink); }
 .quote__source { display: block; font-family: var(--font-mono); font-style: italic; font-size: 0.74rem; letter-spacing: 0.04em; color: var(--ink-mute); margin-top: 0.15rem; }
 .quote__text {
-  text-align: left; margin: 0 auto; white-space: pre-line;
+  text-align: left; margin: 0 auto; white-space: pre-line; text-wrap: pretty;
   font-family: var(--font-quote); font-style: italic; font-weight: 500;
   font-size: clamp(1.25rem, 1.2vw + 0.85rem, 1.45rem); line-height: 1.55;
   color: var(--ink-soft); mix-blend-mode: multiply;
@@ -288,7 +291,12 @@ p { margin: 0 0 1.1em; }
   .quote__col { white-space: pre; }
 }
 .quote__col { display: block; }
-.quote__text--solo { text-align: center; font-family: var(--font-quote); font-style: italic; font-weight: 500; font-size: clamp(1.9rem, 3.2vw, 2.7rem); line-height: 1.35; color: var(--ink); padding-top: 0.5rem; }
+@media (max-width: 430px) {
+  /* Scale with the viewport so the poem's longest lines fit whole on a phone. */
+  .quote__text { font-size: clamp(0.98rem, 4.45vw, 1.15rem); line-height: 1.5; margin-inline: -0.4rem; }
+  .quote__text--solo { font-size: 1.75rem; margin-inline: 0; }
+}
+.quote__text--solo { text-align: center; text-wrap: balance; font-family: var(--font-quote); font-style: italic; font-weight: 500; font-size: clamp(1.9rem, 3.2vw, 2.7rem); line-height: 1.35; color: var(--ink); padding-top: 0.5rem; }
 .quote__text--placeholder { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.65; color: var(--ink-mute); text-align: center; border: 1px dashed var(--line); padding: 1rem 1.2rem; border-radius: 6px; }
 
 /* ---- Photo tiles ---- */
