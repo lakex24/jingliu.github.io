@@ -5,9 +5,7 @@ const posts = (await getCollection('posts', ({ data }) => !data.draft)).sort((a,
 const fmt = (d: Date, lang: string) => d.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', timeZone: 'UTC' });
 ---
 <Base title="Blogs" description="Writing by Jing Liu — memories, photography, and notes from work." section="/blogs/" heading="Blogs">
-  <div class="page-head">
-    <p>Thoughts in the wild — an archive, newest first.</p>
-  </div>
+  <p slot="intro">Thoughts in the wild — an archive, newest first.</p>
   <ol class="post-list section" reversed>
     {posts.map((p) => (
       <li lang={p.data.lang}>

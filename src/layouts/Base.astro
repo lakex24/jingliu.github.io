@@ -48,21 +48,36 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="page">
-      <header class="masthead">
-        {home
-          ? <h1 class="welcome">{site.welcome}</h1>
-          : headingHref
-            ? <p class="masthead__title"><a href={headingHref}>{heading}</a></p>
-            : <h1 class="masthead__title">{heading}</h1>}
-        <nav class:list={['nav', { 'nav--home': home }]} aria-label="Primary">
-          <ul>
-            {site.nav.map((item) => (
-              <li><a href={item.href} aria-current={section === item.href ? 'page' : undefined}>{item.label}</a></li>
-            ))}
-          </ul>
-        </nav>
-      </header>
+      {home ? (
+        <header class="masthead">
+          <h1 class="welcome">{site.welcome}</h1>
+          <nav class="nav nav--home" aria-label="Primary">
+            <ul>
+              {site.nav.map((item) => (<li><a href={item.href}>{item.label}</a></li>))}
+            </ul>
+          </nav>
+        </header>
+      ) : (
+        <header class="masthead masthead--inner">
+          <a class="home-link mono" href="/">Home</a>
+          <nav class="nav" aria-label="Primary">
+            <ul>
+              {site.nav.map((item) => (
+                <li><a href={item.href} aria-current={section === item.href ? 'page' : undefined}>{item.label}</a></li>
+              ))}
+            </ul>
+          </nav>
+        </header>
+      )}
       <main id="main" tabindex="-1">
+        {!home && (
+          <div class="page-title">
+            {headingHref
+              ? <p class="crumb mono"><a href={headingHref}>{heading}</a></p>
+              : <h1>{heading}</h1>}
+            <slot name="intro" />
+          </div>
+        )}
         <slot />
       </main>
       <footer class="footer mono">
