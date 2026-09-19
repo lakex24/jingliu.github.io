@@ -103,6 +103,9 @@ p { margin: 0 0 1.1em; }
   line-height: 1.2;
 }
 .wordmark:hover { color: var(--ink); }
+.masthead__title { margin: 0; font-family: var(--font-display); font-weight: 400; font-size: clamp(2.1rem, 4.2vw, 3rem); line-height: 1.1; color: var(--violet-deep); }
+.masthead__title a { color: inherit; text-decoration: none; }
+.masthead__title a:hover { color: var(--violet); }
 .welcome {
   margin: 0; font-family: var(--font-display); font-style: italic; font-weight: 400;
   font-size: clamp(1.25rem, 2.2vw, 1.6rem); letter-spacing: 0.01em; color: var(--ink-soft);
@@ -250,7 +253,7 @@ p { margin: 0 0 1.1em; }
 .section { margin-top: clamp(2.5rem, 6vw, 4rem); }
 .section__title { display: flex; align-items: baseline; gap: 1rem; margin-bottom: 1.5rem; }
 .section__title::after { content: ''; flex: 1; height: 1px; background: var(--line); }
-.page-head { text-align: center; margin: clamp(1.5rem, 4vw, 3rem) auto 0; max-width: 40rem; }
+.page-head { text-align: center; margin: clamp(1rem, 2.5vw, 1.75rem) auto 0; max-width: 40rem; }
 .page-head h1 { color: var(--violet-deep); }
 .page-head p { color: var(--ink-soft); }
 

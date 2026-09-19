@@ -14,10 +14,14 @@ interface Props {
   /** Path of the current top-level section, e.g. "/career/" */
   section?: string;
   home?: boolean;
+  /** Masthead text on inner pages (the section name). Rendered as the page h1 unless headingHref is set. */
+  heading?: string;
+  /** When set, the masthead heading links there (e.g. an article page linking back to /blogs/). */
+  headingHref?: string;
   lang?: string;
   ogImage?: string;
 }
-const { title, description = site.description, section, home = false, lang = 'en', ogImage } = Astro.props;
+const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -47,7 +51,9 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       <header class="masthead">
         {home
           ? <h1 class="welcome">{site.welcome}</h1>
-          : <a class="wordmark" href="/" aria-label={`${site.name} — home`}>{site.wordmark}</a>}
+          : headingHref
+            ? <p class="masthead__title"><a href={headingHref}>{heading}</a></p>
+            : <h1 class="masthead__title">{heading}</h1>}
         <nav class:list={['nav', { 'nav--home': home }]} aria-label="Primary">
           <ul>
             {site.nav.map((item) => (
@@ -60,7 +66,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         <slot />
       </main>
       <footer class="footer mono">
-        <span>{site.footerLine} · {new Date().getFullYear()}</span>
+        <span><a href="/">{site.footerLine}</a> · {new Date().getFullYear()}</span>
         <span><a href={site.social.linkedin} rel="me noopener">LinkedIn</a> · <a href={site.social.scholar} rel="me noopener">Scholar</a> · <a href="/rss.xml">RSS</a></span>
       </footer>
     </div>

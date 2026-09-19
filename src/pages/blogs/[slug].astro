@@ -11,7 +11,7 @@ const { Content } = await render(post);
 const lang = post.data.lang;
 const dateText = post.data.date.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', timeZone: 'UTC' });
 ---
-<Base title={post.data.title} description={post.data.description} section="/blogs/" lang={lang}>
+<Base title={post.data.title} description={post.data.description} section="/blogs/" heading="Blogs" headingHref="/blogs/" lang={lang}>
   <article>
     <header class="article-head">
       <span class="mono">{dateText}</span>

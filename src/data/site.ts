@@ -8,8 +8,8 @@ export const site = {
   welcome: 'Welcome to Jing’s personal space', // home masthead line (replaces the wordmark)
   footerLine: 'Jing Liu', 
   nav: [
-    { href: '/startups/', label: 'Startups', tagline: 'Bolder tomorrows' }, // tagline PLACEHOLDER
     { href: '/career/', label: 'Career', tagline: 'A wider path' }, // tagline PLACEHOLDER
+    { href: '/startups/', label: 'Startups', tagline: 'Bolder tomorrows' }, // tagline PLACEHOLDER
     { href: '/blogs/', label: 'Blogs', tagline: 'Thoughts in the wild' }, // tagline PLACEHOLDER
     { href: '/goodies/', label: 'Goodies', tagline: 'Little joys, freely shared' }, // tagline PLACEHOLDER
   ],
