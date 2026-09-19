@@ -175,6 +175,26 @@ p { margin: 0 0 1.1em; }
   .botanical--right { width: 78px; top: -26px; right: -14px; }
   .botanical--floor { width: 104px; }
 }
+/* Raster (painted) variants carry their own washes: tone the CSS wash down and
+   let the art sit a little larger on desktop. On phones they become small
+   corner accents that never enter the text column (mobile rules come last so
+   they win over the desktop sizes at equal specificity). */
+.botanical--raster { height: auto; }
+.botanical--raster.botanical--left  { width: clamp(150px, 20vw, 250px); top: -4%; }
+.botanical--raster.botanical--right { width: clamp(150px, 19vw, 235px); top: -6%; }
+.botanical--raster.botanical--floor { width: clamp(180px, 24vw, 300px); bottom: -4%; }
+.hero:has(.botanical--raster) .hero__wash { opacity: 0.55; }
+@media (max-width: 899px) {
+  .botanical--raster.botanical--left  { width: 96px; top: -10px; left: -8px; }
+  .botanical--raster.botanical--right { width: 92px; top: -16px; right: -10px; }
+  .botanical--raster.botanical--floor { width: 130px; bottom: -8px; right: -6px; }
+}
+@media (max-width: 719px) {
+  .botanical--raster.botanical--left  { display: block; width: 58px; top: -22px; left: -4px; }
+  .botanical--raster.botanical--right { width: 66px; top: -30px; right: -8px; }
+  .botanical--raster.botanical--floor { width: 112px; bottom: -6px; right: -4px; }
+  .hero { padding-top: 2.4rem; }
+}
 
 /* ---- Quote ---- */
 .quote { position: relative; z-index: 1; margin: clamp(1.25rem, 4vw, 2.5rem) auto 0; max-width: var(--measure); text-align: center; }

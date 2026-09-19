@@ -2,23 +2,29 @@
 import { Picture } from 'astro:assets';
 import Base from '../layouts/Base.astro';
 import Quote from '../components/Quote.astro';
-import Stem from '../components/Stem.astro';
-import Fern from '../components/Fern.astro';
-import Floor from '../components/Floor.astro';
+import Botanicals from '../components/Botanicals.astro';
+import { art } from '../data/art';
 import { site } from '../data/site';
 import startups from '../assets/tiles/startups.jpg';
 import career from '../assets/tiles/career.jpg';
 import blogs from '../assets/tiles/blogs.jpg';
 import goodies from '../assets/tiles/goodies.jpg';
 
-// Tile photos are placeholders taken from Jing's own 2014 photo diary; swap
-// for final approved artwork (see docs/EXECUTION-PLAN.md, step 4).
-const tiles = [
-  { ...site.nav[0], img: startups, alt: 'Sunlight breaking through clouds over Lake Zurich' },
-  { ...site.nav[1], img: career, alt: 'Bone-like stone columns of Casa Batlló, Barcelona' },
-  { ...site.nav[2], img: blogs, alt: 'Birds nesting in the carved walls of the Alhambra' },
-  { ...site.nav[3], img: goodies, alt: 'A plate of fried fish in a plant-filled courtyard café' },
-];
+// Tile photos: the raster art variants ship the mockup-style nature shots;
+// the default variant falls back to Jing's own 2014 photo-diary shots.
+const tiles = art?.tiles.startups
+  ? [
+      { ...site.nav[0], img: art.tiles.startups!, alt: 'A seedling breaking through dark soil in morning light' },
+      { ...site.nav[1], img: art.tiles.career!, alt: 'A footpath winding through a sunlit pine forest' },
+      { ...site.nav[2], img: art.tiles.blogs!, alt: 'A luna moth resting among leaves and white blossoms' },
+      { ...site.nav[3], img: art.tiles.goodies!, alt: 'Small mushrooms in moss beside an open book' },
+    ]
+  : [
+      { ...site.nav[0], img: startups, alt: 'Sunlight breaking through clouds over Lake Zurich' },
+      { ...site.nav[1], img: career, alt: 'Bone-like stone columns of Casa Batlló, Barcelona' },
+      { ...site.nav[2], img: blogs, alt: 'Birds nesting in the carved walls of the Alhambra' },
+      { ...site.nav[3], img: goodies, alt: 'A plate of fried fish in a plant-filled courtyard café' },
+    ];
 ---
 <Base home section="/">
   <Fragment slot="head">
@@ -35,9 +41,7 @@ const tiles = [
   <section class="hero" aria-label="Welcome">
     <div class="hero__wash"></div>
     <div class="hero__grain"></div>
-    <Stem class="botanical botanical--left" />
-    <Fern class="botanical botanical--right" />
-    <Floor class="botanical botanical--floor" />
+    <Botanicals />
     <div class="hero__inner">
       <Quote />
     </div>
