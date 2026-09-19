@@ -7,17 +7,31 @@ import { getCollection } from 'astro:content';
 const all = (await getCollection('quotes')).filter((q) => q.data.enabled);
 const initial = all.find((q) => q.data.default) ?? all[0];
 const isPlaceholder = (t: string) => t.trim().startsWith('[');
+// Long poems flow into two balanced columns on wide screens to keep the hero short.
+const isLong = (t: string) => t.split('\n').length >= 10;
+// Split at the midpoint line (a stanza break there wins if one is within a line of it).
+const halves = (t: string) => {
+  const lines = t.split('\n');
+  let cut = Math.ceil(lines.length / 2);
+  if (cut % 2) cut -= 1; // keep couplets together; first column is the shorter one
+  for (const c of [cut, cut + 1, cut - 1]) if (lines[c - 1] === '') { cut = c; break; }
+  return [lines.slice(0, cut).join('\n').replace(/\n+$/, ''), lines.slice(cut).join('\n').replace(/^\n+/, '')];
+};
 const payload = all.map((q) => ({ id: q.id, ...q.data }));
 ---
 {initial ? (
-  <figure class="quote" id="quote" data-current={initial.id}>
+  <figure class:list={['quote', { 'quote--wide': isLong(initial.data.text) }]} id="quote" data-current={initial.id}>
     <blockquote>
       {initial.data.title && <p class="quote__title" id="quote-title">{initial.data.title}</p>}
+      <p class:list={['quote__text', { 'quote__text--placeholder': isPlaceholder(initial.data.text), 'quote__text--solo': !initial.data.title, 'quote__text--columns': isLong(initial.data.text) }]} id="quote-text">{
+        isLong(initial.data.text)
+          ? halves(initial.data.text).map((h) => <span class="quote__col">{h}</span>)
+          : initial.data.text
+      }</p>
       <p class="quote__meta" id="quote-meta" hidden={!initial.data.author && !initial.data.source}>
         <cite class="quote__author" id="quote-author" hidden={!initial.data.author}>{initial.data.author}</cite>
         <span class="quote__source" id="quote-source" hidden={!initial.data.source}>{initial.data.source}</span>
       </p>
-      <p class:list={['quote__text', { 'quote__text--placeholder': isPlaceholder(initial.data.text), 'quote__text--solo': !initial.data.title }]} id="quote-text">{initial.data.text}</p>
     </blockquote>
     <script type="application/json" id="quote-data" set:html={JSON.stringify(payload)} />
   </figure>
@@ -59,9 +73,20 @@ const payload = all.map((q) => ({ id: q.id, ...q.data }));
     if (source) { source.textContent = q.source || ''; source.hidden = !q.source; }
     if (meta) meta.hidden = !q.author && !q.source;
     if (text) {
-      text.textContent = q.text;
+      const lines = String(q.text).split('\n');
+      if (lines.length >= 10) {
+        let cut = Math.ceil(lines.length / 2);
+        if (cut % 2) cut -= 1;
+        for (const c of [cut, cut + 1, cut - 1]) if (lines[c - 1] === '') { cut = c; break; }
+        text.replaceChildren(...[lines.slice(0, cut), lines.slice(cut)].map((part) => { const s = document.createElement('span'); s.className = 'quote__col'; s.textContent = part.join('\n').replace(/^\n+|\n+$/g, ''); return s; }));
+      } else {
+        text.textContent = q.text;
+      }
       text.classList.toggle('quote__text--placeholder', String(q.text).trim().startsWith('['));
       text.classList.toggle('quote__text--solo', !q.title);
+      const long = String(q.text).split('\n').length >= 10;
+      text.classList.toggle('quote__text--columns', long);
+      fig.classList.toggle('quote--wide', long);
     }
     fig.dataset.current = chosen!;
   })();
