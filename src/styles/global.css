@@ -129,11 +129,17 @@ p { margin: 0 0 1.1em; }
 .masthead--inner .nav li:last-child a { padding-right: 0; }
 .home-link { display: inline-flex; align-items: center; min-height: var(--tap); text-decoration: none; color: var(--ink-soft); }
 .home-link:hover { color: var(--violet-deep); }
+.home-link__icon { display: none; }
 @media (max-width: 599px) {
-  .masthead--inner { flex-direction: column; align-items: stretch; gap: 0; }
-  .masthead--inner .nav ul { justify-content: space-between; }
-  .masthead--inner .nav a { padding: 0 0.4rem; }
-  .masthead--inner .nav li:first-child a { padding-left: 0; }
+  /* Phones: the Home link becomes a small back arrow so the four tabs stay on one row beside it. */
+  .masthead--inner { flex-wrap: nowrap; gap: 0.25rem; }
+  .home-link { flex: 0 0 auto; width: var(--tap); justify-content: center; margin-left: -0.6rem; }
+  .home-link__icon { display: block; }
+  .home-link__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .masthead--inner .nav { flex: 1 1 auto; min-width: 0; }
+  .masthead--inner .nav ul { justify-content: space-between; flex-wrap: nowrap; }
+  .masthead--inner .nav a { padding: 0 0.3rem; font-size: 0.66rem; letter-spacing: 0.1em; }
+  .masthead--inner .nav li:last-child a { padding-right: 0; }
 }
 .page-title { margin: clamp(1.75rem, 4vw, 2.75rem) 0 0; max-width: 40rem; }
 .page-title h1 { color: var(--violet-deep); margin-bottom: 0.35rem; }
