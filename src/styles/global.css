@@ -15,7 +15,7 @@
   --font-body: 'Source Serif 4 Variable', 'Source Serif 4', Georgia, 'Songti SC', 'Noto Serif CJK SC', serif;
   --font-mono: 'IBM Plex Mono', ui-monospace, 'SF Mono', Menlo, monospace;
   --font-quote-title: 'Parisienne', 'Snell Roundhand', 'Apple Chancery', cursive;
-  --font-quote: 'Dancing Script Variable', 'Dancing Script', 'Bradley Hand', 'Segoe Script', cursive;
+  --font-quote: 'Cormorant Variable', 'Cormorant', 'Cormorant Garamond', 'Iowan Old Style', Georgia, serif;
   --font-pixel: 'VT323', 'Courier New', monospace;
 
   --measure: 34rem;
@@ -258,8 +258,8 @@ p { margin: 0 0 1.1em; }
 .quote__source { display: block; font-family: var(--font-mono); font-style: italic; font-size: 0.74rem; letter-spacing: 0.04em; color: var(--ink-mute); margin-top: 0.15rem; }
 .quote__text {
   text-align: left; margin: 0 auto; white-space: pre-line;
-  font-family: var(--font-quote); font-weight: 500;
-  font-size: clamp(1.25rem, 1.2vw + 0.85rem, 1.5rem); line-height: 1.55;
+  font-family: var(--font-quote); font-style: italic; font-weight: 500;
+  font-size: clamp(1.25rem, 1.2vw + 0.85rem, 1.45rem); line-height: 1.55;
   color: var(--ink-soft); mix-blend-mode: multiply;
 }
 @media (min-width: 720px) {
@@ -271,7 +271,7 @@ p { margin: 0 0 1.1em; }
   .quote__col { white-space: pre; }
 }
 .quote__col { display: block; }
-.quote__text--solo { text-align: center; font-family: var(--font-quote); font-style: normal; font-weight: 500; font-size: clamp(1.9rem, 3.2vw, 2.7rem); line-height: 1.35; color: var(--ink); padding-top: 0.5rem; }
+.quote__text--solo { text-align: center; font-family: var(--font-quote); font-style: italic; font-weight: 500; font-size: clamp(1.9rem, 3.2vw, 2.7rem); line-height: 1.35; color: var(--ink); padding-top: 0.5rem; }
 .quote__text--placeholder { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.65; color: var(--ink-mute); text-align: center; border: 1px dashed var(--line); padding: 1rem 1.2rem; border-radius: 6px; }
 
 /* ---- Photo tiles ---- */
