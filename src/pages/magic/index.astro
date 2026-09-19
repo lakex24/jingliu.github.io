@@ -1,18 +1,20 @@
 ---
 import Base from '../../layouts/Base.astro';
 
-// Hidden behind the visitor-entrance code on the home page. Not in the sitemap, no-index.
+// Hidden behind the visitor-entrance code on the home page. Not in the sitemap, no-index. Dark by default.
 const changes = [
   { title: 'The fox opens its eyes', body: 'Hover over the sleeping fox on the home page and it wakes up — eyes open, maybe an ear twitch — and dozes off again when you leave.' },
   { title: 'A warmer fox', body: 'Regenerate the fox to match the original board: russet fur, curled tighter under the mushrooms.' },
   { title: 'Goodies, filled in', body: 'Favourite books and films, each with a line on why.' },
   { title: 'Notes for founders', body: 'Short practical notes on the Startups page, filed like the portfolio ledger.' },
-  { title: 'A quiet dark mode', body: 'Night paper, same botanicals, ink inverted with care. Off by default.' },
+  { title: 'A quiet dark mode', body: 'Night paper for the whole site, same botanicals, ink inverted with care. This page is the first draft of it.' },
+  { title: 'EN / 中文', body: 'A language switch: English and Chinese versions of the interface and, where they exist, of the writing.' },
+  { title: 'Get in touch', body: 'A way for people to reach Jing by email — without handing the address to every scraper on the internet.' },
   { title: 'Where that line is from', body: '“Was it possible that life had more to give us than we could ever take for ourselves?” still needs its author and source.' },
 ];
 ---
-<Base title="Ministry of Future Changes" description="Planned changes to this site." section="/ministry/" heading="Ministry of Future Changes" noindex>
-  <p slot="intro">You said the magic word. This is the department where planned changes to the site are filed — in no particular order, with no particular deadline.</p>
+<Base title="Magic" description="Planned changes to this site." section="/magic/" heading="Magic" noindex theme="dark">
+  <p slot="intro">You said the magic word. This is where planned changes to the site are filed — in no particular order, with no particular deadline.</p>
 
   <ol class="docket section">
     {changes.map((c, i) => (
@@ -23,7 +25,7 @@ const changes = [
       </li>
     ))}
   </ol>
-  <p class="mono docket__foot">Visitors are reminded that the lift is out of order.</p>
+  <p class="mono docket__foot">Visitors are reminded that the lift is out of order. Nox to leave.</p>
 </Base>
 
 <style>

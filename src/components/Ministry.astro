@@ -1,6 +1,6 @@
 ---
 // Easter egg: a small keypad glyph in the home footer opens a phone-style code pad.
-// The visitor-entrance code (6-2-4-4-2, "MAGIC") opens /ministry/.
+// The visitor-entrance code (6-2-4-4-2, "MAGIC") opens /magic/.
 const keys = [
   ['1', ''], ['2', 'ABC'], ['3', 'DEF'],
   ['4', 'GHI'], ['5', 'JKL'], ['6', 'MNO'],
@@ -64,9 +64,9 @@ const keys = [
     };
     const check = () => {
       if (entered === CODE) {
-        msg.textContent = 'Welcome to the Ministry.';
+        msg.textContent = 'Magic.';
         dlg.classList.add('pad--open');
-        setTimeout(() => { location.href = '/ministry/'; }, 650);
+        setTimeout(() => { location.href = '/magic/'; }, 650);
       } else {
         dlg.classList.add('pad--shake');
         msg.textContent = 'The Ministry does not recognise that code.';

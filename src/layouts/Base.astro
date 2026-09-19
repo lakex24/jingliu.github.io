@@ -27,13 +27,15 @@ interface Props {
   ogImage?: string;
   /** Keep search engines out (hidden pages). */
   noindex?: boolean;
+  /** Colour theme for this page; 'dark' switches the tokens (see global.css). */
+  theme?: 'light' | 'dark';
 }
-const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage, noindex = false } = Astro.props;
+const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage, noindex = false, theme = 'light' } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
-<html lang={lang}>
+<html lang={lang} data-theme={theme}>
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -43,7 +45,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" type="application/rss+xml" title={`${site.name} — Blogs`} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
-    <meta name="theme-color" content="#f4f0fa" />
+    <meta name="theme-color" content={theme === 'dark' ? '#17112a' : '#f4f0fa'} />
     {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta property="og:type" content={home ? 'website' : 'article'} />
     <meta property="og:title" content={fullTitle} />

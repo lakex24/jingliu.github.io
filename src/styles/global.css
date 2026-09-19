@@ -25,6 +25,18 @@
 
   color-scheme: light;
 }
+/* Dark theme (per page via <html data-theme="dark">; a site-wide toggle is on the docket). */
+:root[data-theme="dark"] {
+  --paper: #17112a;
+  --paper-deep: #211a3a;
+  --ink: #ece6f5;
+  --ink-soft: #cdc3e3;
+  --ink-mute: #9d92bb;
+  --violet-deep: #b79dff;
+  --violet: #cbb8ff;
+  --line: rgba(236, 230, 245, 0.16);
+  color-scheme: dark;
+}
 @media (min-width: 720px) { :root { --gutter: 32px; } }
 @media (min-width: 1100px) { :root { --gutter: 48px; } }
 
