@@ -30,4 +30,19 @@ const quotes = defineCollection({
   }),
 });
 
-export const collections = { posts, quotes };
+// Short practical notes for founders, listed on /startups/ and rendered at /startups/<slug>/.
+const notes = defineCollection({
+  loader: glob({ pattern: '*.md', base: './src/content/notes' }),
+  schema: z.object({
+    title: z.string(),
+    description: z.string(),
+    date: z.coerce.date(),
+    lang: z.enum(['en', 'zh']).default('zh'),
+    order: z.number().default(0),
+    // Drafted by an assistant for Jing to revise; shown as a note on the page until cleared.
+    aiDraft: z.boolean().default(false),
+    draft: z.boolean().default(false),
+  }),
+});
+
+export const collections = { posts, quotes, notes };
