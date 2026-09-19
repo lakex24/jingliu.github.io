@@ -4,14 +4,20 @@ import { art } from '../data/art';
 import Stem from './Stem.astro';
 import Fern from './Fern.astro';
 import Floor from './Floor.astro';
-// Decorative margins for the home hero. Raster variants (crop/gen) use keyed
-// PNGs with alpha; the default is generated SVG line art.
+// Decorative margins for the home hero. Raster variants use keyed PNGs with
+// alpha; the svg variant is generated line art. In the mix variant the fox is
+// interactive: hovering it cross-fades to the Gemini-painted fox.
 ---
 {art ? (
   <>
     {art.stem && <Image class="botanical botanical--left botanical--raster" src={art.stem} alt="" widths={[200, 320, 480]} sizes="(min-width: 900px) 240px, 100px" loading="eager" />}
     {art.fern && <Image class="botanical botanical--right botanical--raster" src={art.fern} alt="" widths={[200, 320, 480]} sizes="(min-width: 900px) 220px, 90px" loading="eager" />}
-    {art.fox && <Image class="botanical botanical--floor botanical--raster" src={art.fox} alt="" widths={[260, 400, 560]} sizes="(min-width: 900px) 280px, 130px" loading="eager" />}
+    {art.fox && (art.foxHover
+      ? <span class="botanical botanical--floor botanical--raster fox" aria-hidden="true">
+          <Image class="fox__a" src={art.fox} alt="" widths={[260, 400, 560]} sizes="(min-width: 900px) 280px, 130px" loading="eager" />
+          <Image class="fox__b" src={art.foxHover} alt="" widths={[260, 400, 560]} sizes="(min-width: 900px) 280px, 130px" loading="lazy" />
+        </span>
+      : <Image class="botanical botanical--floor botanical--raster" src={art.fox} alt="" widths={[260, 400, 560]} sizes="(min-width: 900px) 280px, 130px" loading="eager" />)}
   </>
 ) : (
   <>
@@ -20,3 +26,14 @@ import Floor from './Floor.astro';
     <Floor class="botanical botanical--floor" />
   </>
 )}
+
+<style>
+  /* The fox is the one piece of margin art that responds to the cursor. */
+  /* z-index lifts it above .hero__inner so the cursor can reach it; the box is
+     mostly clear of the text column, and transparent pixels paint nothing. */
+  .fox { display: block; pointer-events: auto; cursor: default; z-index: 2; }
+  .fox img { display: block; width: 100%; height: auto; transition: opacity 0.6s ease; }
+  .fox__b { position: absolute; left: 0; right: 0; bottom: 0; opacity: 0; }
+  .fox:hover .fox__a { opacity: 0; }
+  .fox:hover .fox__b { opacity: 1; }
+</style>
