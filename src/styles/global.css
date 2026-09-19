@@ -175,7 +175,8 @@ p { margin: 0 0 1.1em; }
   /* Phone home nav: 2×2 cells with the section photos behind, dimmed like the tiles below. */
   .nav--home ul { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 3px; margin-top: 1rem; }
   .nav--home li { display: flex; position: relative; overflow: hidden; border-radius: 3px; background: var(--ink); isolation: isolate; }
-  .nav__bg { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; filter: brightness(0.5) saturate(0.8); }
+  .nav__bg { display: block; position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; z-index: 0; filter: brightness(0.5) saturate(0.45); }
+  .nav--home li::after { content: ''; position: absolute; inset: 0; z-index: 0; background: rgba(36,26,56,0.28); }
   .nav--home a {
     position: relative; z-index: 1; flex: 1; justify-content: center; min-height: 3.2rem;
     font-family: var(--font-pixel); font-size: 1.7rem; text-transform: none; letter-spacing: 0.02em; color: var(--paper);
@@ -255,8 +256,8 @@ p { margin: 0 0 1.1em; }
   .botanical--raster.botanical--floor { width: 130px; bottom: -8px; right: -6px; }
 }
 @media (max-width: 719px) {
-  .botanical--raster.botanical--left  { display: block; width: 58px; top: -22px; left: -4px; }
-  .botanical--raster.botanical--right { width: 66px; top: -30px; right: -8px; }
+  .botanical--raster.botanical--left  { display: block; width: 58px; top: 6px; left: -4px; }
+  .botanical--raster.botanical--right { width: 66px; top: 2px; right: -8px; }
   .botanical--raster.botanical--floor { width: 112px; bottom: -4px; right: -4px; }
   .hero { padding-top: 2.4rem; }
 }
