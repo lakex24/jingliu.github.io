@@ -46,9 +46,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <div class="page">
       <header class="masthead">
         {home
-          ? <h1 class="wordmark-h"><a class="wordmark" href="/" aria-label={`${site.name} — home`}>{site.wordmark}</a></h1>
+          ? <h1 class="welcome">{site.welcome}</h1>
           : <a class="wordmark" href="/" aria-label={`${site.name} — home`}>{site.wordmark}</a>}
-        {home && <p class="kicker mono">{site.kicker}</p>}
         <nav class:list={['nav', { 'nav--home': home }]} aria-label="Primary">
           <ul>
             {site.nav.map((item) => (

@@ -5,7 +5,7 @@ export const site = {
   wordmark: 'JING LIU',
   url: 'https://jingliu.mind-pixels.com',
   description: 'Jing Liu — startups, career, writing and small joys.',
-  kicker: 'A moment to pause', // PLACEHOLDER (mockup copy)
+  welcome: 'Welcome to Jing’s personal space', // home masthead line (replaces the wordmark)
   footerLine: 'Jing Liu', 
   nav: [
     { href: '/startups/', label: 'Startups', tagline: 'Bolder tomorrows' }, // tagline PLACEHOLDER
