@@ -1,0 +1,37 @@
+---
+import Base from '../../layouts/Base.astro';
+
+// Hidden behind the visitor-entrance code on the home page. Not in the sitemap, no-index.
+const changes = [
+  { title: 'The fox opens its eyes', body: 'Hover over the sleeping fox on the home page and it wakes up — eyes open, maybe an ear twitch — and dozes off again when you leave.' },
+  { title: 'A warmer fox', body: 'Regenerate the fox to match the original board: russet fur, curled tighter under the mushrooms.' },
+  { title: 'Goodies, filled in', body: 'Favourite books and films, each with a line on why.' },
+  { title: 'Notes for founders', body: 'Short practical notes on the Startups page, filed like the portfolio ledger.' },
+  { title: 'A quiet dark mode', body: 'Night paper, same botanicals, ink inverted with care. Off by default.' },
+  { title: 'Where that line is from', body: '“Was it possible that life had more to give us than we could ever take for ourselves?” still needs its author and source.' },
+];
+---
+<Base title="Ministry of Future Changes" description="Planned changes to this site." section="/ministry/" heading="Ministry of Future Changes" noindex>
+  <p slot="intro">You said the magic word. This is the department where planned changes to the site are filed — in no particular order, with no particular deadline.</p>
+
+  <ol class="docket section">
+    {changes.map((c, i) => (
+      <li class="docket__item">
+        <span class="docket__no mono">Form {String(i + 1).padStart(3, '0')}</span>
+        <h2 class="docket__title">{c.title}</h2>
+        <p class="docket__body">{c.body}</p>
+      </li>
+    ))}
+  </ol>
+  <p class="mono docket__foot">Visitors are reminded that the lift is out of order.</p>
+</Base>
+
+<style>
+  .docket { list-style: none; margin: 0; padding: 0; display: grid; gap: 0; border-top: 1px solid var(--ink); max-width: 44rem; }
+  .docket__item { display: grid; grid-template-columns: 6.5rem minmax(0, 1fr); gap: 0.2rem 1.25rem; padding: 1.2rem 0.25rem 1.3rem; border-bottom: 1px solid var(--line); }
+  .docket__no { color: var(--ink-mute); padding-top: 0.5rem; }
+  .docket__title { margin: 0; font-size: 1.55rem; grid-column: 2; }
+  .docket__body { margin: 0; grid-column: 2; color: var(--ink-soft); }
+  .docket__foot { margin-top: 2rem; color: var(--ink-mute); }
+  @media (max-width: 599px) { .docket__item { grid-template-columns: 1fr; } .docket__title, .docket__body { grid-column: 1; } }
+</style>

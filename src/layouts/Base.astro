@@ -11,6 +11,7 @@ import '@fontsource-variable/cormorant/wght-italic.css';
 import '@fontsource/vt323/400.css';
 import '../styles/global.css';
 import { site } from '../data/site';
+import Ministry from '../components/Ministry.astro';
 
 interface Props {
   title?: string;
@@ -24,8 +25,10 @@ interface Props {
   headingHref?: string;
   lang?: string;
   ogImage?: string;
+  /** Keep search engines out (hidden pages). */
+  noindex?: boolean;
 }
-const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage } = Astro.props;
+const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage, noindex = false } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -41,6 +44,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <link rel="alternate" type="application/rss+xml" title={`${site.name} — Blogs`} href="/rss.xml" />
     <link rel="sitemap" href="/sitemap-index.xml" />
     <meta name="theme-color" content="#f4f0fa" />
+    {noindex && <meta name="robots" content="noindex, nofollow" />}
     <meta property="og:type" content={home ? 'website' : 'article'} />
     <meta property="og:title" content={fullTitle} />
     <meta property="og:description" content={description} />
@@ -86,7 +90,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       </main>
       <footer class:list={['footer', 'mono', { 'footer--home': home || section !== '/career/' }]}>
         {home
-          ? <span>{site.footerLine} · {new Date().getFullYear()}</span>
+          ? <span class="footer__home">{site.footerLine} · {new Date().getFullYear()} <Ministry /></span>
           : <>
               <span><a href="/">{site.footerLine}</a> · {new Date().getFullYear()}</span>
               {section === '/career/' && <span><a href={site.social.linkedin} rel="me noopener">LinkedIn</a> · <a href={site.social.scholar} rel="me noopener">Scholar</a> · <a href="/rss.xml">RSS</a></span>}

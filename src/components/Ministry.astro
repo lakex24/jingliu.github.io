@@ -1,0 +1,133 @@
+---
+// Easter egg: a small keypad glyph in the home footer opens a phone-style code pad.
+// The visitor-entrance code (6-2-4-4-2, "MAGIC") opens /ministry/.
+const keys = [
+  ['1', ''], ['2', 'ABC'], ['3', 'DEF'],
+  ['4', 'GHI'], ['5', 'JKL'], ['6', 'MNO'],
+  ['7', 'PQRS'], ['8', 'TUV'], ['9', 'WXYZ'],
+  ['*', ''], ['0', '+'], ['#', ''],
+];
+---
+<button class="ministry-glyph" type="button" id="ministry-open" aria-label="A visitor entrance" title="Visitor entrance">
+  <svg viewBox="0 0 14 18" width="14" height="18" aria-hidden="true">
+    <g fill="currentColor">
+      {[0, 1, 2].map((r) => [0, 1, 2].map((c) => <circle cx={2 + c * 5} cy={2 + r * 5} r="1.3" />))}
+      <circle cx="7" cy="16" r="1.3" />
+    </g>
+  </svg>
+</button>
+
+<dialog class="pad" id="ministry" aria-labelledby="pad-q">
+  <form method="dialog" class="pad__form">
+    <p class="pad__kicker mono">Ministry of Magic · Visitor entrance</p>
+    <p class="pad__q" id="pad-q">What is the code for the Ministry visitor entrance?</p>
+    <div class="pad__display" aria-live="polite">
+      <span class="pad__digits" id="pad-digits" aria-label="Entered code"></span>
+      <span class="pad__letters" id="pad-letters"></span>
+    </div>
+    <div class="pad__keys">
+      {keys.map(([d, l]) => (
+        <button type="button" class="pad__key" data-key={d} disabled={d === '*' || d === '#'}>
+          <span class="pad__num">{d}</span>
+          <span class="pad__abc">{l || ' '}</span>
+        </button>
+      ))}
+    </div>
+    <div class="pad__row">
+      <button type="button" class="pad__ctl" data-act="del">Delete</button>
+      <button type="submit" class="pad__ctl">Hang up</button>
+    </div>
+    <p class="pad__msg mono" id="pad-msg" role="status"></p>
+  </form>
+</dialog>
+
+<script>
+  (() => {
+    const open = document.getElementById('ministry-open');
+    const dlg = document.getElementById('ministry') as HTMLDialogElement | null;
+    if (!open || !dlg || typeof dlg.showModal !== 'function') return;
+    const digits = document.getElementById('pad-digits')!;
+    const letters = document.getElementById('pad-letters')!;
+    const msg = document.getElementById('pad-msg')!;
+    const CODE = '62442';
+    const MAP: Record<string, string> = { '2': 'ABC', '3': 'DEF', '4': 'GHI', '5': 'JKL', '6': 'MNO', '7': 'PQRS', '8': 'TUV', '9': 'WXYZ' };
+    let entered = '';
+
+    const render = () => {
+      digits.textContent = entered.padEnd(CODE.length, '·').split('').join(' ');
+      letters.textContent = entered.split('').map((d) => MAP[d] ?? '').join(' · ');
+    };
+    const press = (d: string) => {
+      if (entered.length >= CODE.length) return;
+      entered += d; msg.textContent = ''; render();
+      if (entered.length === CODE.length) check();
+    };
+    const check = () => {
+      if (entered === CODE) {
+        msg.textContent = 'Welcome to the Ministry.';
+        dlg.classList.add('pad--open');
+        setTimeout(() => { location.href = '/ministry/'; }, 650);
+      } else {
+        dlg.classList.add('pad--shake');
+        msg.textContent = 'The Ministry does not recognise that code.';
+        setTimeout(() => { dlg.classList.remove('pad--shake'); entered = ''; render(); }, 600);
+      }
+    };
+    open.addEventListener('click', () => { entered = ''; msg.textContent = ''; render(); dlg.showModal(); });
+    dlg.querySelectorAll<HTMLButtonElement>('.pad__key').forEach((k) => k.addEventListener('click', () => press(k.dataset.key!)));
+    dlg.querySelector('[data-act="del"]')!.addEventListener('click', () => { entered = entered.slice(0, -1); render(); });
+    dlg.addEventListener('keydown', (e) => {
+      if (/^[0-9]$/.test(e.key)) { e.preventDefault(); press(e.key); }
+      else if (e.key === 'Backspace') { e.preventDefault(); entered = entered.slice(0, -1); render(); }
+    });
+    dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
+  })();
+</script>
+
+<style>
+  .ministry-glyph {
+    display: inline-flex; align-items: center; justify-content: center; width: var(--tap); height: var(--tap);
+    margin: calc(-1 * (var(--tap) - 1rem) / 2) 0; background: none; border: 0; padding: 0; cursor: pointer;
+    color: var(--ink-mute); opacity: 0.45; transition: opacity 0.3s ease, color 0.3s ease, transform 0.3s ease;
+  }
+  .ministry-glyph:hover, .ministry-glyph:focus-visible { opacity: 1; color: var(--violet-deep); transform: rotate(8deg); }
+
+  .pad {
+    border: 0; padding: 0; margin: auto; width: min(22rem, calc(100vw - 2 * var(--gutter)));
+    background: #1b1428; color: var(--paper); border-radius: 14px;
+    font-family: var(--font-body); font-size: 1rem; text-transform: none; letter-spacing: normal; text-align: left;
+    box-shadow: 0 30px 80px rgba(20, 10, 40, 0.55), 0 0 0 1px rgba(124,77,255,0.35), 0 0 40px rgba(124,77,255,0.25);
+  }
+  .pad::backdrop { background: rgba(20, 12, 36, 0.7); backdrop-filter: blur(6px); }
+  .pad__form { padding: 1.4rem 1.4rem 1.2rem; display: grid; gap: 0.9rem; }
+  .pad__kicker { color: rgba(244,240,250,0.55); font-size: 0.62rem; }
+  .pad__q { margin: 0; font-family: var(--font-display); font-size: 1.35rem; line-height: 1.2; }
+  .pad__display {
+    display: grid; gap: 0.15rem; padding: 0.7rem 0.9rem; border-radius: 8px;
+    background: #0f0a1a; box-shadow: inset 0 0 0 1px rgba(124,77,255,0.35), inset 0 0 24px rgba(124,77,255,0.15);
+  }
+  .pad__digits { font-family: var(--font-pixel); font-size: 1.9rem; line-height: 1; color: #b79dff; letter-spacing: 0.1em; min-height: 1.9rem; }
+  .pad__letters { font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.14em; color: rgba(183,157,255,0.6); min-height: 1rem; }
+  .pad__keys { display: grid; grid-template-columns: repeat(3, 1fr); gap: 0.55rem; }
+  .pad__key {
+    display: grid; gap: 0.1rem; justify-items: center; min-height: 3.4rem; padding: 0.5rem 0;
+    background: linear-gradient(180deg, #2a2040, #201735); color: var(--paper); border: 0; border-radius: 10px; cursor: pointer;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 2px 0 #0f0a1a;
+    transition: transform 0.08s ease, box-shadow 0.08s ease, background 0.2s ease;
+  }
+  .pad__key:hover { background: linear-gradient(180deg, #34285a, #261c45); }
+  .pad__key:active { transform: translateY(2px); box-shadow: 0 1px 0 rgba(255,255,255,0.06) inset, 0 0 0 #0f0a1a; }
+  .pad__key:disabled { opacity: 0.3; cursor: default; }
+  .pad__num { font-family: var(--font-pixel); font-size: 1.6rem; line-height: 1; }
+  .pad__abc { font-family: var(--font-mono); font-size: 0.58rem; letter-spacing: 0.2em; color: rgba(244,240,250,0.55); }
+  .pad__row { display: flex; justify-content: space-between; gap: 0.5rem; }
+  .pad__ctl {
+    background: none; border: 1px solid rgba(244,240,250,0.25); color: rgba(244,240,250,0.8); border-radius: 6px; cursor: pointer;
+    font-family: var(--font-mono); font-size: 0.68rem; letter-spacing: 0.16em; text-transform: uppercase; padding: 0 0.9rem; min-height: 2.4rem;
+  }
+  .pad__ctl:hover { border-color: var(--violet); color: var(--paper); }
+  .pad__msg { min-height: 1.2rem; color: #b79dff; font-size: 0.66rem; text-transform: none; letter-spacing: 0.06em; }
+  .pad--shake { animation: pad-shake 0.5s ease; }
+  @keyframes pad-shake { 20%, 60% { transform: translateX(-6px); } 40%, 80% { transform: translateX(6px); } }
+  .pad--open { box-shadow: 0 30px 80px rgba(20, 10, 40, 0.55), 0 0 0 1px rgba(18,168,151,0.6), 0 0 60px rgba(18,168,151,0.45); }
+</style>
