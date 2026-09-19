@@ -28,3 +28,25 @@ export const art = ART === 'svg' ? null : {
     blogs: from(photos, 'blogs.jpg'), goodies: from(photos, 'goodies.jpg'),
   },
 };
+
+// Photos for the four section links (home tiles and the phone-size home nav),
+// keyed by route. Raster variants use the board-style nature shots; the svg
+// variant falls back to Jing's own 2014 photo-diary shots.
+import diaryStartups from '../assets/tiles/startups.jpg';
+import diaryCareer from '../assets/tiles/career.jpg';
+import diaryBlogs from '../assets/tiles/blogs.jpg';
+import diaryGoodies from '../assets/tiles/goodies.jpg';
+
+export const tilePhotos: Record<string, { img: Img; alt: string }> = art?.tiles.startups
+  ? {
+      '/startups/': { img: art.tiles.startups!, alt: 'A seedling breaking through dark soil in morning light' },
+      '/career/': { img: art.tiles.career!, alt: 'A footpath winding through a sunlit pine forest' },
+      '/blogs/': { img: art.tiles.blogs!, alt: 'A luna moth resting among leaves and white blossoms' },
+      '/goodies/': { img: art.tiles.goodies!, alt: 'Small mushrooms in moss beside an open book' },
+    }
+  : {
+      '/startups/': { img: diaryStartups, alt: 'Sunlight breaking through clouds over Lake Zurich' },
+      '/career/': { img: diaryCareer, alt: 'Bone-like stone columns of Casa Batlló, Barcelona' },
+      '/blogs/': { img: diaryBlogs, alt: 'Birds nesting in the carved walls of the Alhambra' },
+      '/goodies/': { img: diaryGoodies, alt: 'A plate of fried fish in a plant-filled courtyard café' },
+    };

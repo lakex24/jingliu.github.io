@@ -4,30 +4,11 @@ import Base from '../layouts/Base.astro';
 import Quote from '../components/Quote.astro';
 import Botanicals from '../components/Botanicals.astro';
 import Arrow from '../components/Arrow.astro';
-import { art } from '../data/art';
 import { site } from '../data/site';
-import startups from '../assets/tiles/startups.jpg';
-import career from '../assets/tiles/career.jpg';
-import blogs from '../assets/tiles/blogs.jpg';
-import goodies from '../assets/tiles/goodies.jpg';
+import { tilePhotos } from '../data/art';
 
-// Tile photos: the raster art variants ship the mockup-style nature shots;
-// the default variant falls back to Jing's own 2014 photo-diary shots.
-const photos = art?.tiles.startups
-  ? {
-      '/startups/': { img: art.tiles.startups!, alt: 'A seedling breaking through dark soil in morning light' },
-      '/career/': { img: art.tiles.career!, alt: 'A footpath winding through a sunlit pine forest' },
-      '/blogs/': { img: art.tiles.blogs!, alt: 'A luna moth resting among leaves and white blossoms' },
-      '/goodies/': { img: art.tiles.goodies!, alt: 'Small mushrooms in moss beside an open book' },
-    }
-  : {
-      '/startups/': { img: startups, alt: 'Sunlight breaking through clouds over Lake Zurich' },
-      '/career/': { img: career, alt: 'Bone-like stone columns of Casa Batlló, Barcelona' },
-      '/blogs/': { img: blogs, alt: 'Birds nesting in the carved walls of the Alhambra' },
-      '/goodies/': { img: goodies, alt: 'A plate of fried fish in a plant-filled courtyard café' },
-    };
-// Tiles follow the nav order in site.ts.
-const tiles = site.nav.map((n) => ({ ...n, ...photos[n.href as keyof typeof photos] }));
+// Tiles follow the nav order in site.ts; photos come from the art variant.
+const tiles = site.nav.map((n) => ({ ...n, ...tilePhotos[n.href] }));
 ---
 <Base home section="/">
   <Fragment slot="head">
