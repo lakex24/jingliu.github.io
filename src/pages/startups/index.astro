@@ -1,6 +1,8 @@
 ---
+import { Image } from 'astro:assets';
 import Base from '../../layouts/Base.astro';
 import Arrow from '../../components/Arrow.astro';
+import topmoon from '../../assets/startups/topmoon.jpg';
 
 // Public portfolio. Only companies Jing chooses to list appear here; descriptions
 // are taken from each company's own site. No private deal data.
@@ -10,80 +12,95 @@ const portfolio = [
     url: 'https://www.topmoon.ai/',
     domain: 'topmoon.ai',
     sector: 'Real estate · AI video',
+    img: topmoon,
+    alt: 'A sunlit brick house with a red deck — a frame from a Topmoon listing video',
     blurb: 'AI video production for real-estate listings: a Zillow link or property photos become a finished listing reel, with a Topmoon consultant checking quality before delivery.',
   },
 ];
+const placeholders = 2; // reserved squares, no invented names
 ---
 <Base title="Startups" description="Angel investments and notes for founders." section="/startups/" heading="Startups">
   <p slot="intro">A public portfolio of angel investments, and notes for people building things.</p>
 
-  <section class="section vc" id="portfolio">
-    <div class="vc__head">
-      <h2 class="section__title">Portfolio</h2>
-      <span class="mono vc__count">{portfolio.length} {portfolio.length === 1 ? 'company' : 'companies'}</span>
-    </div>
-    <ol class="ledger">
-      {portfolio.map((co, i) => (
-        <li class="ledger__row">
-          <span class="ledger__idx mono">{String(i + 1).padStart(2, '0')}</span>
-          <div class="ledger__main">
-            <a class="ledger__name" href={co.url} rel="noopener">{co.name} <Arrow /></a>
-            <p class="ledger__blurb">{co.blurb}</p>
+  <section class="section vc" aria-labelledby="portfolio-h">
+    <header class="vc__head">
+      <h2 id="portfolio-h">Portfolio</h2>
+      <span class="mono">{String(portfolio.length).padStart(2, '0')} {portfolio.length === 1 ? 'company' : 'companies'} · angel</span>
+    </header>
+    <ol class="vc__grid">
+      {portfolio.map((c, i) => (
+        <li class="vc__item">
+          <a class="vc__card" href={c.url} rel="noopener">
+            <Image class="vc__img" src={c.img} alt={c.alt} widths={[360, 540, 720]} sizes="(min-width: 1024px) 25vw, (min-width: 720px) 33vw, 50vw" />
+            <span class="vc__reveal">
+              <span class="vc__name">{c.name}</span>
+              <span class="vc__intro">{c.blurb}</span>
+              <span class="vc__visit mono">Visit {c.domain} <Arrow /></span>
+            </span>
+          </a>
+          <div class="vc__meta">
+            <span class="mono">{String(i + 1).padStart(2, '0')}</span>
+            <span class="vc__title">{c.name}</span>
+            <span class="vc__tags mono">{c.sector}</span>
           </div>
-          <dl class="ledger__meta mono">
-            <div><dt>Sector</dt><dd>{co.sector}</dd></div>
-            <div><dt>Site</dt><dd><a href={co.url} rel="noopener">{co.domain}</a></dd></div>
-          </dl>
+        </li>
+      ))}
+      {Array.from({ length: placeholders }, (_, i) => (
+        <li class="vc__item vc__item--soon" aria-hidden="true">
+          <div class="vc__card vc__card--soon"><span class="mono">In progress</span></div>
+          <div class="vc__meta"><span class="mono">{String(portfolio.length + i + 1).padStart(2, '0')}</span><span class="vc__title vc__title--soon">To be announced</span></div>
         </li>
       ))}
     </ol>
   </section>
 
-  <section class="section vc" id="notes">
-    <div class="vc__head">
-      <h2 class="section__title">Notes for founders</h2>
-      <span class="mono vc__count">0 notes</span>
+  <section class="section vc" aria-labelledby="notes-h">
+    <header class="vc__head">
+      <h2 id="notes-h">Notes for founders</h2>
+      <span class="mono">00 notes</span>
+    </header>
+    <div class="empty">
+      <span class="mono">Content pending</span>
+      Short, practical notes will live here once written.
     </div>
-    <ol class="ledger ledger--empty">
-      <li class="ledger__row">
-        <span class="ledger__idx mono">—</span>
-        <div class="ledger__main"><p class="ledger__blurb">Short, practical notes will be filed here as they are written.</p></div>
-      </li>
-    </ol>
   </section>
 </Base>
 
 <style>
-  /* Startups: a ledger, denser and more matter-of-fact than the rest of the site. */
-  .vc__head { display: flex; align-items: baseline; gap: 1rem; }
-  .vc__head .section__title { flex: 1; margin-bottom: 0.75rem; }
-  .vc__count { white-space: nowrap; color: var(--ink-mute); }
-  .ledger { list-style: none; margin: 0; padding: 0; border-top: 1px solid var(--ink); }
-  .ledger__row {
-    display: grid; grid-template-columns: 3rem minmax(0, 1fr) 15rem; gap: 0.5rem 1.5rem; align-items: start;
-    padding: 1.25rem 0.5rem 1.4rem; border-bottom: 1px solid var(--line);
-    transition: background-color 0.3s ease;
+  /* Startups: a tighter, ledger-like register than the rest of the site. */
+  .vc__head { display: flex; align-items: baseline; justify-content: space-between; gap: 1rem; border-bottom: 1px solid var(--ink); padding-bottom: 0.5rem; margin-bottom: 1.25rem; }
+  .vc__head h2 { margin: 0; font-size: clamp(1.5rem, 2.6vw, 2rem); }
+  .vc__grid { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1.5rem 1rem; }
+  @media (min-width: 720px) { .vc__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 1.75rem 1.25rem; } }
+  @media (min-width: 1024px) { .vc__grid { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .vc__card {
+    position: relative; display: block; aspect-ratio: 1 / 1; overflow: hidden; border-radius: 3px;
+    background: var(--ink); color: var(--paper); text-decoration: none; isolation: isolate;
   }
-  .ledger__row:hover { background: var(--paper-deep); }
-  .ledger__idx { color: var(--ink-mute); padding-top: 0.55rem; }
-  .ledger__name { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: clamp(1.5rem, 2.4vw, 1.9rem); line-height: 1.1; color: var(--ink); text-decoration: none; }
-  .ledger__name :global(.arrow) { width: 1.1em; height: 0.36em; color: var(--violet-deep); }
-  .ledger__name:hover { color: var(--violet-deep); }
-  .ledger__name:hover :global(.arrow) { transform: translateX(0.35em); }
-  .ledger__name:hover :global(.arrow__c) { animation: hud-chevron 0.9s ease-in-out infinite; }
-  .ledger__name:hover :global(.arrow__c2) { animation-delay: 0.15s; }
-  .ledger__name:hover :global(.arrow__c3) { animation-delay: 0.3s; }
-  .ledger__blurb { margin: 0.4rem 0 0; color: var(--ink-soft); max-width: 36rem; }
-  .ledger__meta { margin: 0; padding-top: 0.55rem; display: grid; gap: 0.5rem; }
-  .ledger__meta div { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0.5rem; }
-  .ledger__meta dt { color: var(--ink-mute); }
-  .ledger__meta dd { margin: 0; text-transform: none; letter-spacing: 0.04em; font-size: 0.78rem; color: var(--ink); }
-  .ledger__meta a { color: var(--violet-deep); text-decoration: none; }
-  .ledger__meta a:hover { text-decoration: underline; }
-  .ledger--empty .ledger__row { color: var(--ink-mute); }
-  .ledger--empty .ledger__row:hover { background: none; }
-  @media (max-width: 719px) {
-    .ledger__row { grid-template-columns: 2.25rem minmax(0, 1fr); padding-inline: 0; }
-    .ledger__meta { grid-column: 2; padding-top: 0; }
+  .vc__img { width: 100%; height: 100%; object-fit: cover; transition: transform 0.7s ease, filter 0.5s ease; }
+  /* Picture first; the intro slides up over it on hover / focus. */
+  .vc__reveal {
+    position: absolute; inset: 0; z-index: 1; display: flex; flex-direction: column; justify-content: flex-end; gap: 0.4rem;
+    padding: clamp(0.8rem, 1.6vw, 1.1rem);
+    background: linear-gradient(to top, rgba(36,26,56,0.92) 0%, rgba(36,26,56,0.75) 60%, rgba(36,26,56,0.35) 100%);
+    opacity: 0; transform: translateY(8px);
+    transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1);
   }
+  .vc__card:hover .vc__reveal, .vc__card:focus-visible .vc__reveal { opacity: 1; transform: translateY(0); }
+  .vc__card:hover .vc__img, .vc__card:focus-visible .vc__img { transform: scale(1.04); filter: saturate(0.7); }
+  .vc__name { font-family: var(--font-display); font-size: 1.5rem; line-height: 1.05; }
+  .vc__intro { font-size: 0.84rem; line-height: 1.5; color: rgba(244,240,250,0.9); }
+  .vc__visit { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--paper); margin-top: 0.2rem; font-size: 0.66rem; }
+  .vc__visit .arrow { width: 1.8rem; height: auto; }
+  .vc__meta { display: grid; grid-template-columns: auto 1fr; gap: 0.1rem 0.6rem; align-items: baseline; margin-top: 0.6rem; border-top: 1px solid var(--line); padding-top: 0.45rem; }
+  .vc__meta > .mono:first-child { color: var(--violet-deep); }
+  .vc__title { font-family: var(--font-display); font-size: 1.2rem; line-height: 1.1; }
+  .vc__tags { grid-column: 2; font-size: 0.62rem; color: var(--ink-mute); }
+  .vc__card--soon {
+    display: grid; place-items: center; background: transparent; color: var(--ink-mute);
+    border: 1px dashed var(--line); border-radius: 3px;
+    background-image: repeating-linear-gradient(135deg, transparent 0 14px, rgba(36,26,56,0.045) 14px 15px);
+  }
+  .vc__title--soon { color: var(--ink-mute); }
+  .vc__item--soon .vc__meta > .mono:first-child { color: var(--ink-mute); }
 </style>
