@@ -1,0 +1,42 @@
+---
+// Ground detail: a mushroom cluster with grass blades and small daisies.
+const { class: className } = Astro.props;
+const grass = Array.from({ length: 14 }, (_, i) => {
+  const x = 20 + i * 16 + (i % 3) * 3; const h = 26 + (i * 7) % 22; const lean = (i % 2 ? 1 : -1) * (6 + (i % 4) * 3);
+  return `M${x},150 q${lean * 0.3},${-h * 0.5} ${lean},${-h}`;
+});
+const daisies = [
+  { x: 40, y: 122 }, { x: 62, y: 108 }, { x: 205, y: 118 }, { x: 226, y: 132 },
+];
+---
+<svg class={className} viewBox="0 0 250 160" xmlns="http://www.w3.org/2000/svg" aria-hidden="true" focusable="false">
+  <g fill="none" stroke="currentColor" stroke-width="1" stroke-linecap="round" stroke-opacity="0.55">
+    {grass.map((d) => <path d={d} />)}
+  </g>
+  <!-- large mushroom -->
+  <g stroke="currentColor" stroke-width="1.1" stroke-linejoin="round" stroke-opacity="0.8">
+    <path d="M128,150 c-2,-16 -2,-32 0,-46 h10 c2,14 2,30 0,46 Z" fill="rgba(244,240,250,0.9)" />
+    <path d="M92,106 c6,-34 74,-34 82,0 c-6,5 -20,8 -41,8 c-21,0 -35,-3 -41,-8 Z" fill="rgba(124,77,255,0.22)" />
+    <path d="M96,106 c10,-4 60,-4 74,0" fill="none" stroke-opacity="0.45" />
+    <path d="M104,108 v3 M116,110 v4 M133,111 v4 M150,110 v4 M162,108 v3" fill="none" stroke-opacity="0.45" />
+  </g>
+  <!-- small mushrooms -->
+  <g stroke="currentColor" stroke-width="1" stroke-linejoin="round" stroke-opacity="0.8">
+    <path d="M176,150 c-1,-9 -1,-18 0,-26 h6 c1,8 1,17 0,26 Z" fill="rgba(244,240,250,0.9)" />
+    <path d="M160,126 c3,-20 36,-20 40,0 c-6,3 -14,4 -20,4 c-6,0 -14,-1 -20,-4 Z" fill="rgba(201,63,178,0.18)" />
+    <path d="M82,150 c-1,-7 -1,-14 0,-20 h5 c1,6 1,13 0,20 Z" fill="rgba(244,240,250,0.9)" />
+    <path d="M70,132 c3,-14 26,-14 29,0 c-4,2 -10,3 -14.5,3 c-4.5,0 -10.5,-1 -14.5,-3 Z" fill="rgba(124,77,255,0.2)" />
+  </g>
+  <g fill="rgba(244,240,250,0.95)" stroke="currentColor" stroke-width="0.8" stroke-opacity="0.6">
+    {daisies.map(({ x, y }) => (
+      <g>
+        <path d={`M${x},${y + 28} q2,-14 0,-28`} fill="none" />
+        {[0, 60, 120, 180, 240, 300].map((a) => {
+          const r = (a * Math.PI) / 180; const px = x + Math.cos(r) * 4; const py = y + Math.sin(r) * 4;
+          return <ellipse cx={px} cy={py} rx="2.6" ry="1.7" transform={`rotate(${a} ${px} ${py})`} />;
+        })}
+        <circle cx={x} cy={y} r="1.6" fill="rgba(124,77,255,0.5)" stroke="none" />
+      </g>
+    ))}
+  </g>
+</svg>

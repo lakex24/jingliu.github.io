@@ -1,0 +1,122 @@
+---
+import { Image } from 'astro:assets';
+import Base from '../../layouts/Base.astro';
+import { site } from '../../data/site';
+import portrait from '../../assets/career/jing-python.png';
+import aiSelf from '../../assets/career/ai_self_01.jpg';
+import socialAvatar from '../../assets/career/social_avatar_03.png';
+import idpatch from '../../assets/career/idpatch.jpg';
+import coap from '../../assets/career/coap_3.jpg';
+import agileAvatar from '../../assets/career/agileavatar-thumbnail.jpg';
+import agileGan from '../../assets/career/agilegan-thumbnail.jpg';
+
+// Content migrated 1:1 from the previous single-page homepage (commit 2359b00).
+const news = [
+  { when: 'Oct 2025', html: `<a href="https://byteaigc.github.io/Lynx/" rel="noopener">Lynx: Towards High-Fidelity Personalized Video Generation</a> — <a href="https://github.com/bytedance/lynx" rel="noopener">get the model</a>` },
+  { when: 'Feb 2025', html: `Two papers accepted at CVPR 2025:<ul><li><a href="https://byteaigc.github.io/ID-Patch/" rel="noopener">ID-Patch: Robust ID Association for Group Photo Personalization</a></li><li><a href="https://byteaigc.github.io/coap/" rel="noopener">COAP: Memory-Efficient Training with Correlation-Aware Gradient Projection</a></li></ul>` },
+];
+const roles = [
+  { title: 'Tech Lead / Research Scientist', org: 'TikTok', when: '2019 – present', text: 'Personalized generative models for image & video creation.' },
+  { title: 'Founding Engineer', org: 'Bellus3D (acquired by Meta)', when: '2015 – 2019', text: 'High-fidelity 3D face scanning on mobile phones.' },
+];
+const publications = [
+  { title: 'ID-Patch: Robust ID Association for Group Photo Personalization', venue: 'CVPR 2025', img: idpatch, alt: 'ID-Patch: group photo personalization results', href: 'https://byteaigc.github.io/ID-Patch/', text: 'Generating personalized group photos is hard: faces often end up misplaced, distorted, or unrecognizable. ID-Patch ensures correct positioning and high resemblance, setting a new standard for AI-driven photo generation.' },
+  { title: 'COAP: Memory-Efficient Training with Correlation-Aware Gradient Projection', venue: 'CVPR 2025', img: coap, alt: 'COAP: memory-efficient training diagram', href: 'https://byteaigc.github.io/coap/', text: 'Training large models is memory-intensive, and existing low-rank methods often slow down or degrade performance. COAP optimizes memory while preserving speed and accuracy: up to 81% memory savings and 4× faster fine-tuning.' },
+  { title: 'AgileAvatar: Stylized 3D Avatar Creation via Cascaded Domain Bridging', venue: 'SIGGRAPH Asia 2022', img: agileAvatar, alt: 'AgileAvatar: stylized 3D avatars generated from selfies', href: 'https://ssangx.github.io/projects/agileavatar/index.html', video: '/videos/agileavatar-teaser.mp4', text: 'Creating stylized 3D avatars from selfie photos is challenging due to domain gaps and complex parameter tuning. A self-supervised method bridges this gap, generating avatars that preserve identity and rival manual creation.' },
+  { title: 'AgileGAN: Stylizing Portraits by Inversion-Consistent Transfer Learning', venue: 'SIGGRAPH 2021', img: agileGan, alt: 'AgileGAN: stylized portrait examples', href: 'https://guoxiansong.github.io/homepage/agilegan.html', text: 'Turning real photos into high-quality stylized portraits is tough, with existing methods often producing artifacts. AgileGAN learns style transfer more effectively, generating 1024×1024 portraits with ~100 examples and ~1 hour of training.' },
+];
+---
+<Base title="Career" description="Jing Liu — entrepreneur, technologist, creator. Roles, shipped features, publications and contact." section="/career/">
+  <div class="page-head">
+    <h1>Career</h1>
+    <p>Entrepreneur, technologist, creator. <em>The goal for computer graphics is to create the best possible tool for the imagination.</em></p>
+  </div>
+
+  <section class="section" id="intro">
+    <div class="intro">
+      <div class="intro__portrait">
+        <Image src={portrait} alt="Jing Liu" widths={[320, 480, 720]} sizes="(min-width: 720px) 300px, 60vw" />
+      </div>
+      <div>
+        <h2 class="section__title">Latest news</h2>
+        <ul class="news">
+          {news.map((n) => (<li><span class="mono">{n.when}</span><div set:html={n.html} /></li>))}
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section class="section" id="roles">
+    <h2 class="section__title">Roles</h2>
+    <ol class="timeline">
+      {roles.map((r) => (
+        <li><h3>{r.title}</h3><p class="when">{r.org} · {r.when}</p><p>{r.text}</p></li>
+      ))}
+    </ol>
+  </section>
+
+  <section class="section" id="features">
+    <h2 class="section__title">Shipped features</h2>
+    <ul class="cards">
+      <li class="card">
+        <div class="card__media">
+          <video controls preload="metadata" playsinline muted aria-label="Lynx demo reel">
+            <source src="/videos/demo_reel.mp4" type="video/mp4" />
+          </video>
+        </div>
+        <h3>Lynx</h3>
+        <p>Towards high-fidelity personalized video generation.</p>
+        <div class="card__actions"><a class="button" href="https://byteaigc.github.io/Lynx/" rel="noopener">Learn more</a></div>
+      </li>
+      <li class="card">
+        <div class="card__media"><Image src={aiSelf} alt="Ai Self app screenshots" widths={[400, 640, 900]} sizes="(min-width: 900px) 33vw, 100vw" /></div>
+        <h3>Ai Self</h3>
+        <p>Let Ai Self unlock your viral potential.</p>
+        <div class="card__actions"><a class="button" href="/blogs/ai-self/">Read the story</a></div>
+      </li>
+      <li class="card">
+        <div class="card__media"><Image src={socialAvatar} alt="Social Avatar: personalized avatar examples" widths={[400, 640, 900]} sizes="(min-width: 900px) 33vw, 100vw" /></div>
+        <h3>Social Avatar</h3>
+        <p>Personalized avatars for your social media presence.</p>
+      </li>
+    </ul>
+  </section>
+
+  <section class="section" id="publication">
+    <h2 class="section__title">Publications</h2>
+    <ul class="cards cards--pubs">
+      {publications.map((p) => (
+        <li class="card">
+          <div class="card__media">
+            {p.video
+              ? <video autoplay loop muted playsinline preload="none" aria-label={p.alt}><source src={p.video} type="video/mp4" /></video>
+              : <Image src={p.img} alt={p.alt} widths={[400, 640, 900]} sizes="(min-width: 900px) 33vw, 100vw" />}
+          </div>
+          <h3>{p.title}</h3>
+          <p class="mono">{p.venue}</p>
+          <p>{p.text}</p>
+          <div class="card__actions"><a class="button" href={p.href} rel="noopener">Read paper</a></div>
+        </li>
+      ))}
+    </ul>
+  </section>
+
+  <section class="section" id="contact">
+    <h2 class="section__title">Contact</h2>
+    <p class="contact">
+      <a class="button" href={site.social.linkedin} rel="me noopener">LinkedIn</a>
+      <a class="button" href={site.social.scholar} rel="me noopener">Google Scholar</a>
+    </p>
+    <p class="mono mono--lower">Mind Pixels</p>
+  </section>
+</Base>
+
+<style>
+  .intro { display: grid; gap: 2rem; align-items: start; }
+  @media (min-width: 720px) { .intro { grid-template-columns: 300px 1fr; } }
+  .intro__portrait { max-width: 300px; margin: 0 auto; }
+  .intro__portrait img { border-radius: 4px; }
+  .cards--pubs { grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr)); }
+  .cards--pubs .card__media { aspect-ratio: 16 / 9; }
+  .cards--pubs .card__media img { object-fit: contain; }
+</style>

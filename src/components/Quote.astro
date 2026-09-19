@@ -1,0 +1,65 @@
+---
+import { getCollection } from 'astro:content';
+
+// Curated quote collection. The server renders the default entry so the page
+// is complete without JavaScript; a small script then picks one entry per
+// browser session and keeps it stable across internal navigation.
+const all = (await getCollection('quotes')).filter((q) => q.data.enabled);
+const initial = all.find((q) => q.data.default) ?? all[0];
+const isPlaceholder = (t: string) => t.trim().startsWith('[');
+const payload = all.map((q) => ({ id: q.id, ...q.data }));
+---
+{initial ? (
+  <figure class="quote" id="quote" data-current={initial.id}>
+    <blockquote>
+      {initial.data.title && <p class="quote__title" id="quote-title">{initial.data.title}</p>}
+      <p class="quote__meta">
+        <cite class="quote__author" id="quote-author">{initial.data.author}</cite>
+        <span class="quote__source" id="quote-source">{initial.data.source}</span>
+      </p>
+      <p class:list={['quote__text', { 'quote__text--placeholder': isPlaceholder(initial.data.text) }]} id="quote-text">{initial.data.text}</p>
+    </blockquote>
+    <script type="application/json" id="quote-data" set:html={JSON.stringify(payload)} />
+  </figure>
+) : (
+  <figure class="quote" id="quote">
+    <blockquote><p class="quote__text quote__text--placeholder">No quotes are enabled yet — add one under <code>src/content/quotes/</code>.</p></blockquote>
+  </figure>
+)}
+
+<script>
+  (() => {
+    const fig = document.getElementById('quote');
+    const dataEl = document.getElementById('quote-data');
+    if (!fig || !dataEl) return;
+    let entries: any[] = [];
+    try { entries = JSON.parse(dataEl.textContent || '[]'); } catch { return; }
+    if (entries.length < 2) return; // nothing to randomise
+
+    const KEY = 'quote:session';
+    let store: Storage | null = null;
+    try { store = window.sessionStorage; store.getItem(KEY); } catch { store = null; }
+
+    let chosen = store ? store.getItem(KEY) : null;
+    if (!chosen || !entries.some((e) => e.id === chosen)) {
+      chosen = entries[Math.floor(Math.random() * entries.length)].id;
+      try { store?.setItem(KEY, chosen!); } catch {}
+    }
+    if (chosen === fig.dataset.current) return;
+    const q = entries.find((e) => e.id === chosen);
+    if (!q) return;
+
+    const title = document.getElementById('quote-title');
+    const author = document.getElementById('quote-author');
+    const source = document.getElementById('quote-source');
+    const text = document.getElementById('quote-text');
+    if (title) { title.textContent = q.title || ''; title.hidden = !q.title; }
+    if (author) author.textContent = q.author;
+    if (source) { source.textContent = q.source || ''; source.hidden = !q.source; }
+    if (text) {
+      text.textContent = q.text;
+      text.classList.toggle('quote__text--placeholder', String(q.text).trim().startsWith('['));
+    }
+    fig.dataset.current = chosen!;
+  })();
+</script>
