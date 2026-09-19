@@ -13,11 +13,11 @@ const payload = all.map((q) => ({ id: q.id, ...q.data }));
   <figure class="quote" id="quote" data-current={initial.id}>
     <blockquote>
       {initial.data.title && <p class="quote__title" id="quote-title">{initial.data.title}</p>}
-      <p class="quote__meta">
-        <cite class="quote__author" id="quote-author">{initial.data.author}</cite>
-        <span class="quote__source" id="quote-source">{initial.data.source}</span>
+      <p class="quote__meta" id="quote-meta" hidden={!initial.data.author && !initial.data.source}>
+        <cite class="quote__author" id="quote-author" hidden={!initial.data.author}>{initial.data.author}</cite>
+        <span class="quote__source" id="quote-source" hidden={!initial.data.source}>{initial.data.source}</span>
       </p>
-      <p class:list={['quote__text', { 'quote__text--placeholder': isPlaceholder(initial.data.text) }]} id="quote-text">{initial.data.text}</p>
+      <p class:list={['quote__text', { 'quote__text--placeholder': isPlaceholder(initial.data.text), 'quote__text--solo': !initial.data.title }]} id="quote-text">{initial.data.text}</p>
     </blockquote>
     <script type="application/json" id="quote-data" set:html={JSON.stringify(payload)} />
   </figure>
@@ -54,11 +54,14 @@ const payload = all.map((q) => ({ id: q.id, ...q.data }));
     const source = document.getElementById('quote-source');
     const text = document.getElementById('quote-text');
     if (title) { title.textContent = q.title || ''; title.hidden = !q.title; }
-    if (author) author.textContent = q.author;
+    const meta = document.getElementById('quote-meta');
+    if (author) { author.textContent = q.author || ''; author.hidden = !q.author; }
     if (source) { source.textContent = q.source || ''; source.hidden = !q.source; }
+    if (meta) meta.hidden = !q.author && !q.source;
     if (text) {
       text.textContent = q.text;
       text.classList.toggle('quote__text--placeholder', String(q.text).trim().startsWith('['));
+      text.classList.toggle('quote__text--solo', !q.title);
     }
     fig.dataset.current = chosen!;
   })();

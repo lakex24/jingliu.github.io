@@ -20,7 +20,8 @@ const quotes = defineCollection({
   loader: glob({ pattern: '*.json', base: './src/content/quotes' }),
   schema: z.object({
     title: z.string().optional(),
-    author: z.string(),
+    // Leave author/source out when unknown; the page then shows the text alone.
+    author: z.string().optional(),
     source: z.string().optional(),
     text: z.string(),
     enabled: z.boolean().default(true),
