@@ -70,6 +70,9 @@ const portfolio = [
   .ledger__name :global(.arrow) { width: 1.1em; height: 0.36em; color: var(--violet-deep); }
   .ledger__name:hover { color: var(--violet-deep); }
   .ledger__name:hover :global(.arrow) { transform: translateX(0.35em); }
+  .ledger__name:hover :global(.arrow__c) { animation: hud-chevron 0.9s ease-in-out infinite; }
+  .ledger__name:hover :global(.arrow__c2) { animation-delay: 0.15s; }
+  .ledger__name:hover :global(.arrow__c3) { animation-delay: 0.3s; }
   .ledger__blurb { margin: 0.4rem 0 0; color: var(--ink-soft); max-width: 36rem; }
   .ledger__meta { margin: 0; padding-top: 0.55rem; display: grid; gap: 0.5rem; }
   .ledger__meta div { display: grid; grid-template-columns: 4.5rem 1fr; gap: 0.5rem; }

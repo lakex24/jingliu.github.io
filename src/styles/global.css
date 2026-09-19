@@ -273,7 +273,7 @@ p { margin: 0 0 1.1em; }
 .quote__text--placeholder { font-family: var(--font-mono); font-size: 0.85rem; line-height: 1.65; color: var(--ink-mute); text-align: center; border: 1px dashed var(--line); padding: 1rem 1.2rem; border-radius: 6px; }
 
 /* ---- Photo tiles ---- */
-.tiles { list-style: none; margin: clamp(0.5rem, 1.5vw, 1rem) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
+.tiles { list-style: none; margin: clamp(1.5rem, 2.5vw, 2.25rem) 0 0; padding: 0; display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 1rem; }
 @media (min-width: 900px) { .tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1.25rem; } }
 .tile {
   position: relative; display: block; border-radius: 4px;
@@ -296,27 +296,39 @@ p { margin: 0 0 1.1em; }
 .tile__text {
   position: absolute; left: 0; right: 0; top: 0; z-index: 2;
   display: flex; flex-direction: column; align-items: flex-start; gap: 0.1rem;
-  padding: clamp(0.7rem, 1.3vw, 1rem) clamp(0.7rem, 1.3vw, 1rem);
+  --tile-title: clamp(1.9rem, 2.8vw, 2.5rem);
+  padding: 0.45rem clamp(0.7rem, 1.3vw, 1rem);
   color: var(--paper);
+  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1);
 }
 .tile__title {
-  font-family: var(--font-display); font-size: clamp(1.6rem, 2.4vw, 2.1rem); line-height: 1.05; display: flex; align-items: baseline; gap: 0.5rem;
-  transition: transform 0.5s cubic-bezier(0.2, 0.7, 0.2, 1), color 0.4s ease;
+  font-family: var(--font-pixel); font-size: var(--tile-title); line-height: 1; display: flex; align-items: center; gap: 0.5rem;
+  letter-spacing: 0.02em;
+  transition: color 0.4s ease, text-shadow 0.4s ease;
 }
-.arrow { display: inline-block; width: 1.5em; height: 0.5em; vertical-align: baseline; overflow: visible; transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); }
-.arrow path { transition: d 0.45s ease; }
-.tile__arrow { width: 1.1em; height: 0.36em; opacity: 0.85; align-self: center; }
-.tile:hover .tile__arrow, .tile:focus-visible .tile__arrow { transform: translateX(0.35em); }
+.arrow { display: inline-block; width: 1.4em; height: 0.5em; vertical-align: middle; overflow: visible; transition: transform 0.45s cubic-bezier(0.2, 0.7, 0.2, 1); }
+.arrow__c1 { opacity: 0.35; } .arrow__c2 { opacity: 0.6; } .arrow__c3 { opacity: 1; }
+@keyframes hud-chevron { 0%, 100% { opacity: 0.25; } 30% { opacity: 1; } }
+.arrow--live .arrow__c { animation: hud-chevron 0.9s ease-in-out infinite; }
+.arrow--live .arrow__c1 { animation-delay: 0s; } .arrow--live .arrow__c2 { animation-delay: 0.15s; } .arrow--live .arrow__c3 { animation-delay: 0.3s; }
+.tile__arrow { width: 1.05em; height: 0.38em; align-self: center; }
+.tile:hover .tile__arrow, .tile:focus-visible .tile__arrow { transform: translateX(0.3em); }
+.tile:hover .tile__arrow .arrow__c, .tile:focus-visible .tile__arrow .arrow__c { animation: hud-chevron 0.9s ease-in-out infinite; }
+.tile:hover .tile__arrow .arrow__c2, .tile:focus-visible .tile__arrow .arrow__c2 { animation-delay: 0.15s; }
+.tile:hover .tile__arrow .arrow__c3, .tile:focus-visible .tile__arrow .arrow__c3 { animation-delay: 0.3s; }
 .tile__tag {
-  color: inherit; opacity: 0.85; background: rgba(244,240,250,0); padding: 0.28rem 0.5rem; margin-left: -0.5rem; border-radius: 2px; margin-top: 0.35rem;
-  white-space: nowrap; font-size: 0.62rem; letter-spacing: 0.1em;
+  font-family: var(--font-pixel); text-transform: none; font-size: 1.1rem; line-height: 1; letter-spacing: 0.03em;
+  color: inherit; opacity: 0.85; background: rgba(244,240,250,0); padding: 0.25rem 0.45rem; margin-left: -0.45rem; border-radius: 2px; margin-top: 0.3rem;
+  white-space: nowrap;
   transition: background-color 0.4s ease, color 0.4s ease, opacity 0.4s ease;
 }
 .tile:hover .tile__tag, .tile:focus-visible .tile__tag { color: var(--ink); opacity: 1; background: rgba(244,240,250,0.9); }
 .tile:hover .tile__img img, .tile:focus-visible .tile__img img { transform: scale(1.05); filter: brightness(1.12) saturate(1.05); }
 .tile:hover .tile__img::after, .tile:focus-visible .tile__img::after { opacity: 0; }
-/* On hover the title rises clear of the card's top edge and turns violet. */
-.tile:hover .tile__title, .tile:focus-visible .tile__title { transform: translateY(calc(-100% - clamp(0.7rem, 1.3vw, 1rem) - 0.15rem)); color: var(--violet-deep); }
+/* On hover the whole block rises by one title height: the title ends up above the
+   card's top edge (violet, with a paper glow) and the tagline takes its place. */
+.tile:hover .tile__text, .tile:focus-visible .tile__text { transform: translateY(calc(-1 * var(--tile-title) - 0.7rem)); }
+.tile:hover .tile__title, .tile:focus-visible .tile__title { color: var(--violet-deep); text-shadow: 0 0 6px var(--paper), 0 0 14px var(--paper); }
 .tile:focus-visible { outline: 2px solid var(--violet); outline-offset: 3px; }
 @media (max-width: 719px) { .tile__tag { display: none; } }
 

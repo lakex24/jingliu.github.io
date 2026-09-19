@@ -1,7 +1,12 @@
 ---
-// A long thin arrow used in link labels; the CSS slides it on hover.
+// HUD-style chevron arrow: three blocky chevrons brightening toward the tip.
+// On hover the parent's CSS runs the chevrons in sequence (see .arrow rules).
 const { class: className = '' } = Astro.props;
 ---
-<svg class:list={['arrow', className]} viewBox="0 0 36 12" width="36" height="12" aria-hidden="true" focusable="false">
-  <path d="M1 6 H33 M26 1 L33 6 L26 11" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round" />
+<svg class:list={['arrow', className]} viewBox="0 0 40 14" width="40" height="14" aria-hidden="true" focusable="false" shape-rendering="crispEdges">
+  <g fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="square" stroke-linejoin="miter">
+    <path class="arrow__c arrow__c1" d="M4 2 L9 7 L4 12" />
+    <path class="arrow__c arrow__c2" d="M16 2 L21 7 L16 12" />
+    <path class="arrow__c arrow__c3" d="M28 2 L33 7 L28 12" />
+  </g>
 </svg>
