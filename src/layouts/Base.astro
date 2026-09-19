@@ -90,7 +90,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       </main>
       <footer class:list={['footer', 'mono', { 'footer--home': home || section !== '/career/' }]}>
         {home
-          ? <span class="footer__home">{site.footerLine} · {new Date().getFullYear()} <Ministry /></span>
+          ? <span class="footer__home">{site.footerLine} <Ministry /> {new Date().getFullYear()}</span>
           : <>
               <span><a href="/">{site.footerLine}</a> · {new Date().getFullYear()}</span>
               {section === '/career/' && <span><a href={site.social.linkedin} rel="me noopener">LinkedIn</a> · <a href={site.social.scholar} rel="me noopener">Scholar</a> · <a href="/rss.xml">RSS</a></span>}
