@@ -380,6 +380,7 @@ const greekLetters = [
       const greekKeyboard = document.getElementById('greek-keyboard');
       const greekOutput = document.getElementById('greek-output');
       const greekLineKey = 'dori-greek-line';
+      const greekDoorCodes = new Set(['ΔΟΡΙΑΝΑ', 'ΝΤΟΡΙΑΝΑ']);
       let greekLine = localStorage.getItem(greekLineKey) || '';
 
       function renderGreekLine() {
@@ -391,6 +392,11 @@ const greekLetters = [
         greekLine = Array.from(nextLine).slice(0, 48).join('');
         localStorage.setItem(greekLineKey, greekLine);
         renderGreekLine();
+        const doorCode = greekLine.replace(/\s/g, '');
+        if (greekDoorCodes.has(doorCode)) {
+          localStorage.removeItem(greekLineKey);
+          window.setTimeout(() => window.location.assign('/doriana/'), 180);
+        }
       }
 
       function setGreekKeyboard(open) {
