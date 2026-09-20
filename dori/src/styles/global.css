@@ -31,6 +31,13 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .hero::before { content: ''; position: absolute; inset: 0; z-index: -2; pointer-events: none; opacity: 0; background: linear-gradient(180deg, rgba(104,183,238,.74), rgba(90,154,207,.4) 52%, rgba(255,220,162,.2)); mix-blend-mode: screen; transition: opacity 1.6s ease; }
 .hero[data-day="1"]::before { opacity: .92; }
 .hero__image { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center center; filter: brightness(.96) saturate(1); transition: filter 1.6s ease; animation: arrive 1.8s ease-out both; }
+.hero__sun { position: absolute; z-index: -2; left: 83.6%; top: 25.8%; width: clamp(108px, 8.7vw, 148px); aspect-ratio: 1; border-radius: 50%; opacity: 0; pointer-events: none; transform: translate(-50%, -50%) scale(.82); background: radial-gradient(circle, #fffef0 0 18%, #ffe9a0 29%, #f6c762 42%, rgba(244,180,57,.72) 53%, rgba(255,209,104,.2) 67%, transparent 74%); filter: drop-shadow(0 0 18px rgba(255,235,172,.82)) drop-shadow(0 0 52px rgba(246,188,72,.58)); transition: opacity 1.5s ease, transform 1.8s ease; }
+.hero__sun::before { content: ''; position: absolute; inset: -34%; border-radius: 50%; opacity: .52; background: repeating-conic-gradient(from 4deg, rgba(255,219,135,.48) 0 1deg, transparent 1.5deg 12deg); -webkit-mask: radial-gradient(circle, transparent 0 37%, #000 58%, transparent 73%); mask: radial-gradient(circle, transparent 0 37%, #000 58%, transparent 73%); animation: hero-sun-turn 32s linear infinite; }
+.hero[data-day="1"] .hero__sun { opacity: 1; transform: translate(-50%, -50%) scale(1); }
+.hero[data-day="1"][data-weather="cloudy"] .hero__sun { opacity: .58; filter: blur(.4px) drop-shadow(0 0 24px rgba(255,235,172,.58)); }
+.hero[data-day="1"][data-weather="rain"] .hero__sun { opacity: .34; filter: blur(1px) drop-shadow(0 0 25px rgba(255,235,172,.42)); }
+.hero[data-day="1"][data-weather="storm"] .hero__sun { opacity: .18; filter: blur(2px) drop-shadow(0 0 20px rgba(255,235,172,.28)); }
+.hero[data-day="1"][data-weather="fog"] .hero__sun { opacity: .42; filter: blur(3px) drop-shadow(0 0 28px rgba(255,235,172,.5)); }
 .hero__weather { position: absolute; inset: -8%; z-index: -2; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 1.4s ease, background 1.4s ease; }
 .hero__weather::before, .hero__weather::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
 .hero[data-weather="clear"][data-day="1"] .hero__image { filter: brightness(1.13) saturate(1.08) sepia(.08); }
@@ -58,6 +65,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 @keyframes hero-snow { to { transform: translate3d(36px, 137px, 0); } }
 @keyframes hero-fog { from { transform: translate3d(-2%, 0, 0) scale(1.04); } to { transform: translate3d(2%, 1%, 0) scale(1.08); } }
 @keyframes hero-lightning { 0%, 91%, 94%, 100% { filter: brightness(1); } 92%, 93% { filter: brightness(2.25); } }
+@keyframes hero-sun-turn { to { transform: rotate(360deg); } }
 .hero__shade { position: absolute; inset: 0; z-index: -2; background: linear-gradient(180deg, rgba(2,4,8,.58), transparent 26%, transparent 65%, rgba(2,4,8,.76)), linear-gradient(90deg, rgba(2,4,8,.38), transparent 26%, transparent 72%, rgba(2,4,8,.22)); }
 .hero[data-day="1"] .hero__shade { background: linear-gradient(180deg, rgba(9,35,57,.22), transparent 28%, transparent 68%, rgba(10,24,39,.48)), linear-gradient(90deg, rgba(10,28,44,.22), transparent 28% 72%, rgba(10,28,44,.14)); }
 .hero__grain { position: absolute; inset: 0; z-index: -1; opacity: .2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); mix-blend-mode: soft-light; }
@@ -343,6 +351,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 
 @media (max-width: 680px) {
   .hero__image { object-position: 53% center; }
+  .hero__sun { display: none; }
   .hero__shade { background: linear-gradient(180deg, rgba(2,4,8,.68), transparent 25%, transparent 63%, rgba(2,4,8,.82)); }
   .wordmark { top: 1.3rem; }
   .wordmark__name { font-size: 2.65rem; }
