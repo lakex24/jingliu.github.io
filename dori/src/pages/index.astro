@@ -107,10 +107,12 @@ const greekLetters = [
     <a class="skip-link" href="#main">Skip to Dori's world</a>
 
     <main id="main">
-      <section class="hero" id="home" aria-labelledby="site-title">
+      <section class="hero" id="home" aria-labelledby="site-title" data-weather="clear" data-day="0">
         <img class="hero__image" src="/sphinx-hero.webp" alt="A marble Greek sphinx with a woman's face, lion's body, and eagle wings beneath a moonlit sky" width="1672" height="940" />
+        <div class="hero__weather" aria-hidden="true"></div>
         <div class="hero__shade" aria-hidden="true"></div>
         <div class="hero__grain" aria-hidden="true"></div>
+        <p class="visually-hidden" id="weather-status" aria-live="polite">Showing the original moonlit sky.</p>
 
         <header class="wordmark">
           <p class="wordmark__name" id="site-title">Dori</p>
@@ -422,8 +424,49 @@ const greekLetters = [
 
     <script is:inline>
       const hero = document.getElementById('home');
+      const heroImage = hero.querySelector('.hero__image');
+      const weatherStatus = document.getElementById('weather-status');
       const realms = [...document.querySelectorAll('[data-realm]')];
       const portals = [...document.querySelectorAll('[data-open]')];
+
+      function weatherKind(code) {
+        if (code === 0) return ['clear', 'clear skies'];
+        if (code <= 3) return ['cloudy', code === 1 ? 'mostly clear skies' : 'cloudy skies'];
+        if (code === 45 || code === 48) return ['fog', 'misty weather'];
+        if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return ['rain', 'rainy weather'];
+        if ((code >= 71 && code <= 77) || code === 85 || code === 86) return ['snow', 'snowy weather'];
+        if (code >= 95) return ['storm', 'stormy weather'];
+        return ['cloudy', 'changing skies'];
+      }
+
+      async function setWeatherFromLocation(position) {
+        const latitude = Number(position.coords.latitude.toFixed(2));
+        const longitude = Number(position.coords.longitude.toFixed(2));
+        const endpoint = new URL('https://api.open-meteo.com/v1/forecast');
+        endpoint.searchParams.set('latitude', String(latitude));
+        endpoint.searchParams.set('longitude', String(longitude));
+        endpoint.searchParams.set('current', 'weather_code,is_day');
+        endpoint.searchParams.set('timezone', 'auto');
+
+        try {
+          const response = await fetch(endpoint, { cache: 'no-store' });
+          if (!response.ok) throw new Error('Weather unavailable');
+          const weather = (await response.json()).current;
+          const [kind, label] = weatherKind(Number(weather.weather_code));
+          hero.dataset.weather = kind;
+          hero.dataset.day = String(Number(weather.is_day));
+          heroImage.alt = `A marble Greek sphinx beneath ${label}`;
+          weatherStatus.textContent = `The sphinx scene is reflecting ${label} near you.`;
+        } catch {
+          weatherStatus.textContent = 'Live weather is unavailable, so the original moonlit sky is showing.';
+        }
+      }
+
+      if ('geolocation' in navigator) {
+        navigator.geolocation.getCurrentPosition(setWeatherFromLocation, () => {
+          weatherStatus.textContent = 'Location was not shared, so the original moonlit sky is showing.';
+        }, { enableHighAccuracy: false, maximumAge: 600000, timeout: 8000 });
+      }
 
       function openRealm(name, updateHistory = true) {
         const realm = document.querySelector(`[data-realm="${name}"]`);
