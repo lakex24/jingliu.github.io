@@ -219,6 +219,13 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .sticker-picker__choices button[data-sticker='moon'] { color: #dcecf7; text-shadow: 0 0 10px rgba(169,211,240,.55); }
 .sticker-picker__choices button[data-sticker='heart'] { color: #ef9db7; text-shadow: 0 0 10px rgba(239,157,183,.48); }
 .sticker-picker__choices button[data-sticker='flower'] { color: #d7b9ef; text-shadow: 0 0 10px rgba(215,185,239,.5); }
+.sticker-picker__choices button[data-sticker='butterfly'] { color: #b9a7ff; text-shadow: 0 0 10px rgba(185,167,255,.52); }
+.sticker-picker__choices button[data-sticker='bow'] { color: #f2b1cc; text-shadow: 0 0 10px rgba(242,177,204,.5); }
+.sticker-picker__choices button[data-sticker='music'] { color: #9fd8f7; text-shadow: 0 0 10px rgba(159,216,247,.5); }
+.sticker-picker__choices button[data-sticker='cloud'] { color: #dfeaf3; text-shadow: 0 0 10px rgba(223,234,243,.46); }
+.sticker-picker__choices button[data-sticker='lightning'], .sticker-picker__choices button[data-sticker='sun'] { color: #ffd86b; text-shadow: 0 0 10px rgba(255,216,107,.55); }
+.sticker-picker__choices button[data-sticker='diamond'] { color: #a6e8f0; text-shadow: 0 0 10px rgba(166,232,240,.52); }
+.sticker-picker__choices button[data-sticker='comet'] { color: #cbb4ff; text-shadow: 0 0 10px rgba(203,180,255,.52); }
 .sticker-picker__remove { min-height: 38px; border: 1px solid rgba(198,161,91,.38); background: transparent; color: var(--gold-bright); font-family: var(--mono); font-size: .5rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
 .sticker-picker__remove:disabled { opacity: .35; cursor: not-allowed; }
 .mood-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin: 0; padding: 0; border: 0; }

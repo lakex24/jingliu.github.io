@@ -324,6 +324,14 @@ const greekLetters = [
                 <button type="button" data-sticker="sparkle" aria-label="Add a bright sparkle sticker">✧</button>
                 <button type="button" data-sticker="flower" aria-label="Add a lavender flower sticker">❀</button>
                 <button type="button" data-sticker="crown" aria-label="Add a golden crown sticker">♕</button>
+                <button type="button" data-sticker="butterfly" aria-label="Add a butterfly sticker">🦋</button>
+                <button type="button" data-sticker="bow" aria-label="Add a pink bow sticker">୨୧</button>
+                <button type="button" data-sticker="music" aria-label="Add a music sticker">♫</button>
+                <button type="button" data-sticker="cloud" aria-label="Add a cloud sticker">☁</button>
+                <button type="button" data-sticker="lightning" aria-label="Add a lightning sticker">ϟ</button>
+                <button type="button" data-sticker="diamond" aria-label="Add a diamond sticker">♦</button>
+                <button type="button" data-sticker="sun" aria-label="Add a sun sticker">☼</button>
+                <button type="button" data-sticker="comet" aria-label="Add a comet sticker">☄</button>
               </div>
               <button class="sticker-picker__remove" id="remove-sticker" type="button" disabled>Remove selected sticker</button>
             </fieldset>
@@ -729,7 +737,15 @@ const greekLetters = [
         heart: { glyph: '♥', color: '#ef9db7', glow: 'rgba(239,157,183,.76)' },
         sparkle: { glyph: '✧', color: '#fff2c5', glow: 'rgba(255,242,197,.92)' },
         flower: { glyph: '❀', color: '#d7b9ef', glow: 'rgba(215,185,239,.78)' },
-        crown: { glyph: '♕', color: '#e9bd62', glow: 'rgba(233,189,98,.82)' }
+        crown: { glyph: '♕', color: '#e9bd62', glow: 'rgba(233,189,98,.82)' },
+        butterfly: { glyph: '🦋', color: '#b9a7ff', glow: 'rgba(185,167,255,.8)' },
+        bow: { glyph: '୨୧', color: '#f2b1cc', glow: 'rgba(242,177,204,.82)' },
+        music: { glyph: '♫', color: '#9fd8f7', glow: 'rgba(159,216,247,.82)' },
+        cloud: { glyph: '☁', color: '#dfeaf3', glow: 'rgba(223,234,243,.76)' },
+        lightning: { glyph: 'ϟ', color: '#ffd86b', glow: 'rgba(255,216,107,.9)' },
+        diamond: { glyph: '♦', color: '#a6e8f0', glow: 'rgba(166,232,240,.82)' },
+        sun: { glyph: '☼', color: '#f4c95d', glow: 'rgba(244,201,93,.88)' },
+        comet: { glyph: '☄', color: '#cbb4ff', glow: 'rgba(203,180,255,.84)' }
       };
 
       function matchBackgroundToSubject() {
@@ -774,7 +790,7 @@ const greekLetters = [
           const size = shortestSide * sticker.size;
           const x = sticker.x * canvas.width;
           const y = sticker.y * canvas.height;
-          context.font = `600 ${size}px Georgia, serif`;
+          context.font = `600 ${size}px Georgia, "Apple Color Emoji", "Segoe UI Emoji", serif`;
           context.fillStyle = style.color;
           context.shadowColor = style.glow;
           context.shadowBlur = size * .2;
