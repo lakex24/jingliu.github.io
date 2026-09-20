@@ -190,7 +190,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .library-intro { margin-inline: auto; text-align: center; }
 .library-intro > p:last-child { margin-inline: auto; }
 .library-room { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(260px, .48fr); gap: clamp(1.5rem, 3vw, 3.5rem); align-items: end; max-width: 1500px; margin: clamp(3rem, 6vw, 6rem) auto 0; }
-.bookshelf { position: relative; isolation: isolate; width: min(100%, 700px); min-height: 500px; justify-self: end; display: flex; align-items: flex-end; justify-content: center; gap: .2rem; margin-right: clamp(0rem, 2vw, 2rem); padding: 1.5rem 2% 2.5rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.bookshelf { position: relative; isolation: isolate; width: min(100%, 700px); min-height: 500px; justify-self: end; display: flex; align-items: flex-end; justify-content: center; gap: .2rem; margin-right: clamp(1.25rem, 3.5vw, 3.5rem); padding: 1.5rem 2% 2.5rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .bookshelf::before { display: none; }
 .bookshelf::after { display: none; }
 .shelf-edge { display: none; }
