@@ -185,6 +185,8 @@ const greekLetters = [
           </div>
         </section>
 
+        <span class="golden-notes-star" aria-hidden="true">✦</span>
+
         <div class="realm-intro diary-intro">
           <p class="kicker">Words worth keeping</p>
           <h1 id="diary-title">My constellation<br />of thoughts</h1>
@@ -395,6 +397,7 @@ const greekLetters = [
       const greekKeyboard = document.getElementById('greek-keyboard');
       const greekOutput = document.getElementById('greek-output');
       const showGreekPassword = document.getElementById('show-greek-password');
+      const diaryRealm = document.querySelector('.realm--diary');
       const greekLineKey = 'dori-greek-line';
       const greekDoorCodes = new Set(['ΔΟΡΙΑΝΑ', 'ΝΤΟΡΙΑΝΑ']);
       let greekLine = localStorage.getItem(greekLineKey) || '';
@@ -425,7 +428,7 @@ const greekLetters = [
         greekKeyButton.setAttribute('aria-expanded', String(open));
         greekKeyButton.setAttribute('aria-label', open ? 'Close the Greek writing room' : 'Open the Greek writing room');
         greekKeyButton.title = open ? 'Close the Greek writing room' : 'Open the Greek writing room';
-        document.querySelector('.realm--diary').classList.toggle('is-greek-room', open);
+        diaryRealm.classList.toggle('is-greek-room', open);
         if (open) {
           greekOutput.classList.remove('is-unlocked');
           showGreekPassword.checked = false;
@@ -463,7 +466,8 @@ const greekLetters = [
         document.querySelectorAll('[data-board-card]').forEach((card) => {
           card.hidden = card.dataset.boardCard !== board;
         });
-        document.querySelector('.realm--diary').classList.toggle('is-dreamscape', board === 'dream');
+        diaryRealm.classList.toggle('is-dreamscape', board === 'dream');
+        diaryRealm.classList.toggle('is-golden-notes', board === 'gold');
         document.getElementById('gold-font-switcher').hidden = board !== 'gold';
       }));
 
