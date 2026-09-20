@@ -28,6 +28,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 
 /* Home */
 .hero { position: relative; min-height: 100svh; overflow: hidden; isolation: isolate; background: var(--night); }
+.hero::before { content: ''; position: absolute; inset: 0; z-index: -2; pointer-events: none; opacity: 0; background: linear-gradient(180deg, rgba(104,183,238,.74), rgba(90,154,207,.4) 52%, rgba(255,220,162,.2)); mix-blend-mode: screen; transition: opacity 1.6s ease; }
+.hero[data-day="1"]::before { opacity: .92; }
 .hero__image { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center center; filter: brightness(.96) saturate(1); transition: filter 1.6s ease; animation: arrive 1.8s ease-out both; }
 .hero__weather { position: absolute; inset: -8%; z-index: -2; overflow: hidden; pointer-events: none; opacity: 0; transition: opacity 1.4s ease, background 1.4s ease; }
 .hero__weather::before, .hero__weather::after { content: ''; position: absolute; inset: 0; pointer-events: none; }
@@ -47,11 +49,17 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .hero[data-weather="snow"] .hero__weather::after { opacity: .55; filter: blur(1px); animation-duration: 15s; transform: scale(1.25); }
 .hero[data-weather="fog"] .hero__image { filter: brightness(.88) saturate(.48) contrast(.82); }
 .hero[data-weather="fog"] .hero__weather { opacity: .9; background: linear-gradient(180deg, rgba(179,199,216,.18), rgba(178,199,215,.38) 46%, rgba(142,166,187,.16) 78%, transparent); filter: blur(16px); animation: hero-fog 9s ease-in-out infinite alternate; }
+.hero[data-weather="cloudy"][data-day="1"] .hero__image { filter: brightness(.98) saturate(.78) contrast(1.02); }
+.hero[data-weather="rain"][data-day="1"] .hero__image { filter: brightness(.88) saturate(.7) contrast(1.06) hue-rotate(4deg); }
+.hero[data-weather="storm"][data-day="1"] .hero__image { filter: brightness(.76) saturate(.68) contrast(1.12) hue-rotate(7deg); }
+.hero[data-weather="snow"][data-day="1"] .hero__image { filter: brightness(1.1) saturate(.6) contrast(.94) hue-rotate(7deg); }
+.hero[data-weather="fog"][data-day="1"] .hero__image { filter: brightness(.98) saturate(.55) contrast(.82); }
 @keyframes hero-rain { to { transform: translate3d(-42px, 150px, 0); } }
 @keyframes hero-snow { to { transform: translate3d(36px, 137px, 0); } }
 @keyframes hero-fog { from { transform: translate3d(-2%, 0, 0) scale(1.04); } to { transform: translate3d(2%, 1%, 0) scale(1.08); } }
 @keyframes hero-lightning { 0%, 91%, 94%, 100% { filter: brightness(1); } 92%, 93% { filter: brightness(2.25); } }
 .hero__shade { position: absolute; inset: 0; z-index: -2; background: linear-gradient(180deg, rgba(2,4,8,.58), transparent 26%, transparent 65%, rgba(2,4,8,.76)), linear-gradient(90deg, rgba(2,4,8,.38), transparent 26%, transparent 72%, rgba(2,4,8,.22)); }
+.hero[data-day="1"] .hero__shade { background: linear-gradient(180deg, rgba(9,35,57,.22), transparent 28%, transparent 68%, rgba(10,24,39,.48)), linear-gradient(90deg, rgba(10,28,44,.22), transparent 28% 72%, rgba(10,28,44,.14)); }
 .hero__grain { position: absolute; inset: 0; z-index: -1; opacity: .2; pointer-events: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); mix-blend-mode: soft-light; }
 .visually-hidden { position: absolute !important; width: 1px !important; height: 1px !important; padding: 0 !important; margin: -1px !important; overflow: hidden !important; clip: rect(0,0,0,0) !important; white-space: nowrap !important; border: 0 !important; }
 @keyframes arrive { from { opacity: 0; transform: scale(1.035); } to { opacity: 1; transform: scale(1); } }

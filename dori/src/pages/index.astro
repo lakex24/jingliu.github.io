@@ -430,8 +430,8 @@ const greekLetters = [
       const portals = [...document.querySelectorAll('[data-open]')];
 
       function weatherKind(code) {
-        if (code === 0) return ['clear', 'clear skies'];
-        if (code <= 3) return ['cloudy', code === 1 ? 'mostly clear skies' : 'cloudy skies'];
+        if (code <= 1) return ['clear', code === 0 ? 'clear skies' : 'mostly clear skies'];
+        if (code <= 3) return ['cloudy', code === 2 ? 'partly cloudy skies' : 'cloudy skies'];
         if (code === 45 || code === 48) return ['fog', 'misty weather'];
         if ((code >= 51 && code <= 67) || (code >= 80 && code <= 82)) return ['rain', 'rainy weather'];
         if ((code >= 71 && code <= 77) || code === 85 || code === 86) return ['snow', 'snowy weather'];
