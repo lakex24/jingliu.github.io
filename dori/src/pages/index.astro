@@ -148,6 +148,12 @@ const pinterestQuotes = [
           <button type="button" data-board="gold" aria-pressed="false">Golden notes</button>
         </div>
 
+        <div class="font-switcher" id="gold-font-switcher" role="group" aria-label="Golden Notes font" hidden>
+          <span>Lettering</span>
+          <button type="button" class="is-active" data-gold-font="classic" aria-pressed="true">Classic</button>
+          <button type="button" data-gold-font="cursive" aria-pressed="false">Cursive</button>
+        </div>
+
         <div class="quote-grid" id="quote-grid">
           {pinterestQuotes.map((quote, index) => (
             <article
@@ -330,6 +336,7 @@ const pinterestQuotes = [
         document.querySelectorAll('[data-board-card]').forEach((card) => {
           card.hidden = card.dataset.boardCard !== board;
         });
+        document.getElementById('gold-font-switcher').hidden = board !== 'gold';
       }));
 
       const diaryForm = document.getElementById('diary-form');
@@ -342,10 +349,30 @@ const pinterestQuotes = [
         localStorage.setItem(diaryMergeKey, '1');
       }
       const boardNames = { dream: 'Dreamscapes', gold: 'Golden notes' };
+      const goldFontButtons = [...document.querySelectorAll('[data-gold-font]')];
+      let goldFont = localStorage.getItem('dori-golden-notes-font') || 'classic';
+
+      function applyGoldFont() {
+        document.querySelectorAll('[data-board-card="gold"]').forEach((card) => {
+          card.classList.toggle('quote-card--cursive', goldFont === 'cursive');
+        });
+        goldFontButtons.forEach((button) => {
+          const active = button.dataset.goldFont === goldFont;
+          button.classList.toggle('is-active', active);
+          button.setAttribute('aria-pressed', String(active));
+        });
+      }
+
+      goldFontButtons.forEach((button) => button.addEventListener('click', () => {
+        goldFont = button.dataset.goldFont;
+        localStorage.setItem('dori-golden-notes-font', goldFont);
+        applyGoldFont();
+      }));
 
       function addThoughtCard(thought) {
         const card = document.createElement('article');
         card.className = `quote-card ${thought.board === 'dream' ? 'quote-card--blue' : ''}`;
+        if (thought.board === 'gold' && goldFont === 'cursive') card.classList.add('quote-card--cursive');
         card.dataset.boardCard = thought.board;
         const label = document.createElement('p');
         label.className = 'quote-card__board';
@@ -359,6 +386,7 @@ const pinterestQuotes = [
         quoteGrid.prepend(card);
       }
       savedThoughts.forEach(addThoughtCard);
+      applyGoldFont();
 
       diaryForm.addEventListener('submit', (event) => {
         event.preventDefault();
