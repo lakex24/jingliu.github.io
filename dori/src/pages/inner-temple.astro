@@ -65,7 +65,7 @@ import '@fontsource/ibm-plex-mono/400.css';
     </main>
 
     <script>
-      const questions = [
+      const questionBank = [
         {
           story: 'Orpheus & Eurydice',
           question: 'Who did Orpheus journey into the Underworld to bring home?',
@@ -119,8 +119,138 @@ import '@fontsource/ibm-plex-mono/400.css';
           fact: 'Niobe boasted that she had more children than Leto, forgetting that pride can anger the gods.',
           image: '/eye-tragedy-niobe-v1.webp',
           accent: '#a9b7d5'
+        },
+        {
+          story: 'Orpheus & Eurydice',
+          question: 'Which instrument made Orpheus’s music so enchanting?',
+          answers: ['A lyre', 'A trumpet', 'A drum'],
+          correct: 0,
+          fact: 'Orpheus played the lyre so beautifully that people, animals, trees, and even stones were said to listen.',
+          image: '/eye-tragedy-orpheus-v1.webp',
+          accent: '#9fc7e4'
+        },
+        {
+          story: 'Orpheus & Eurydice',
+          question: 'What rule did Orpheus have to follow while leaving the Underworld?',
+          answers: ['He could not speak', 'He could not look back', 'He could not play music'],
+          correct: 1,
+          fact: 'Orpheus had to walk ahead without looking back at Eurydice until they both reached the upper world.',
+          image: '/eye-tragedy-orpheus-v1.webp',
+          accent: '#9fc7e4'
+        },
+        {
+          story: 'The Flight of Icarus',
+          question: 'Who designed the wings that Icarus used to escape?',
+          answers: ['His father, Daedalus', 'The god Hermes', 'King Minos'],
+          correct: 0,
+          fact: 'Daedalus was a brilliant inventor who built wings for himself and his son Icarus.',
+          image: '/eye-tragedy-icarus-v1.webp',
+          accent: '#f3ce71'
+        },
+        {
+          story: 'The Flight of Icarus',
+          question: 'What held the feathers of Icarus’s wings together?',
+          answers: ['Golden thread', 'Tree sap', 'Wax'],
+          correct: 2,
+          fact: 'The wings were made from feathers fastened with thread and wax, which softened in the sun’s heat.',
+          image: '/eye-tragedy-icarus-v1.webp',
+          accent: '#f3ce71'
+        },
+        {
+          story: 'Antigone of Thebes',
+          question: 'In which ancient Greek city is Antigone’s story set?',
+          answers: ['Athens', 'Thebes', 'Sparta'],
+          correct: 1,
+          fact: 'Antigone belonged to the royal family of Thebes, a city with many famous legends.',
+          image: '/eye-tragedy-antigone-v1.webp',
+          accent: '#e49a76'
+        },
+        {
+          story: 'Antigone of Thebes',
+          question: 'Who was the king whose order Antigone refused to obey?',
+          answers: ['Creon', 'Odysseus', 'Agamemnon'],
+          correct: 0,
+          fact: 'King Creon ruled Thebes and ordered that Antigone’s brother should not receive burial honors.',
+          image: '/eye-tragedy-antigone-v1.webp',
+          accent: '#e49a76'
+        },
+        {
+          story: 'Cassandra of Troy',
+          question: 'Which city did Cassandra try to warn about its coming danger?',
+          answers: ['Troy', 'Corinth', 'Delphi'],
+          correct: 0,
+          fact: 'Cassandra was a princess of Troy who warned her people about the disaster approaching their city.',
+          image: '/eye-tragedy-cassandra-v1.webp',
+          accent: '#e8a052'
+        },
+        {
+          story: 'Cassandra of Troy',
+          question: 'Which god gave Cassandra the gift of prophecy?',
+          answers: ['Poseidon', 'Apollo', 'Ares'],
+          correct: 1,
+          fact: 'Apollo gave Cassandra the power to see the future, but her gift became a lonely curse.',
+          image: '/eye-tragedy-cassandra-v1.webp',
+          accent: '#e8a052'
+        },
+        {
+          story: 'The Golden Touch',
+          question: 'Which god granted King Midas his golden wish?',
+          answers: ['Dionysus', 'Zeus', 'Hephaestus'],
+          correct: 0,
+          fact: 'Dionysus rewarded Midas with one wish, and the king chose the power to turn things into gold.',
+          image: '/eye-tragedy-midas-v1.webp',
+          accent: '#eccf72'
+        },
+        {
+          story: 'The Golden Touch',
+          question: 'Where did Midas wash away the power of the golden touch?',
+          answers: ['The River Styx', 'The Aegean Sea', 'The Pactolus River'],
+          correct: 2,
+          fact: 'Midas washed in the Pactolus River, which legends said carried golden sand afterward.',
+          image: '/eye-tragedy-midas-v1.webp',
+          accent: '#eccf72'
+        },
+        {
+          story: 'Niobe’s Pride',
+          question: 'Which character flaw is at the heart of Niobe’s story?',
+          answers: ['Forgetfulness', 'Excessive pride', 'Impatience'],
+          correct: 1,
+          fact: 'Niobe’s excessive pride, called hubris by the ancient Greeks, caused her to disrespect the gods.',
+          image: '/eye-tragedy-niobe-v1.webp',
+          accent: '#a9b7d5'
+        },
+        {
+          story: 'Niobe’s Pride',
+          question: 'Leto was the mother of which two Olympian gods?',
+          answers: ['Apollo and Artemis', 'Ares and Athena', 'Hermes and Dionysus'],
+          correct: 0,
+          fact: 'The twins Apollo and Artemis were Leto’s children, and both were powerful Olympian gods.',
+          image: '/eye-tragedy-niobe-v1.webp',
+          accent: '#a9b7d5'
         }
       ];
+
+      function shuffle(items) {
+        const shuffledItems = [...items];
+        for (let index = shuffledItems.length - 1; index > 0; index -= 1) {
+          const swapIndex = Math.floor(Math.random() * (index + 1));
+          [shuffledItems[index], shuffledItems[swapIndex]] = [shuffledItems[swapIndex], shuffledItems[index]];
+        }
+        return shuffledItems;
+      }
+
+      function createRound() {
+        const groups = new Map();
+        questionBank.forEach((item) => {
+          const group = groups.get(item.image) ?? [];
+          group.push(item);
+          groups.set(item.image, group);
+        });
+        const guaranteedVariety = [...groups.values()].map((group) => shuffle(group)[0]);
+        const chosen = new Set(guaranteedVariety);
+        const remaining = shuffle(questionBank.filter((item) => !chosen.has(item)));
+        return shuffle([...guaranteedVariety, ...remaining.slice(0, 10 - guaranteedVariety.length)]);
+      }
 
       const quiz = document.querySelector('.myth-quiz');
       const sceneBlur = document.querySelector('.quiz-scene__blur');
@@ -138,6 +268,7 @@ import '@fontsource/ibm-plex-mono/400.css';
       const resultScore = document.querySelector('[data-result-score]');
       const resultMessage = document.querySelector('[data-result-message]');
       const restartButton = document.querySelector('[data-restart]');
+      let questions = createRound();
       let questionIndex = 0;
       let score = 0;
 
@@ -194,13 +325,14 @@ import '@fontsource/ibm-plex-mono/400.css';
       }
 
       function showResult() {
+        const strongScore = Math.ceil(questions.length * .7);
         if (questionView instanceof HTMLElement) questionView.hidden = true;
         if (resultView instanceof HTMLElement) resultView.hidden = false;
-        if (resultTitle) resultTitle.textContent = score === questions.length ? 'A Perfect Prophecy' : score >= 4 ? 'Favored by Athena' : 'A Brave Beginning';
+        if (resultTitle) resultTitle.textContent = score === questions.length ? 'A Perfect Prophecy' : score >= strongScore ? 'Favored by Athena' : 'A Brave Beginning';
         if (resultScore) resultScore.textContent = `${score} of ${questions.length}`;
         if (resultMessage) resultMessage.textContent = score === questions.length
           ? 'Every answer was worthy of the oracle.'
-          : score >= 4
+          : score >= strongScore
             ? 'Your knowledge of the old stories shines brightly.'
             : 'Even heroes learn by beginning the journey again.';
         restartButton?.focus();
@@ -216,6 +348,7 @@ import '@fontsource/ibm-plex-mono/400.css';
       });
 
       restartButton?.addEventListener('click', () => {
+        questions = createRound();
         questionIndex = 0;
         score = 0;
         if (resultView instanceof HTMLElement) resultView.hidden = true;
