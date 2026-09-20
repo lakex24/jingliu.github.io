@@ -216,6 +216,7 @@ const greekLetters = [
                 pinterestQuotes.findIndex((item) => item.board === quote.board) === index && 'quote-card--feature'
               ]}
               data-board-card={quote.board}
+              style={`--dream-bg: url('/dreamscapes/quote-${String(index + 1).padStart(2, '0')}.webp')`}
             >
               <p class="quote-card__board">
                 Dreamscapes · {String(

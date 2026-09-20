@@ -106,8 +106,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .realm--diary.is-greek-room .font-switcher,
 .realm--diary.is-greek-room .quote-grid,
 .realm--diary.is-greek-room .diary-composer { display: none !important; }
-.realm--diary.is-dreamscape .quote-card { border-color: rgba(169,201,232,.24); background: linear-gradient(145deg, rgba(14,25,40,.82), rgba(5,8,14,.72)); box-shadow: 0 18px 48px rgba(0,0,0,.22); backdrop-filter: blur(5px); }
-.realm--diary.is-dreamscape .quote-card--feature { border-color: rgba(198,161,91,.44); background: radial-gradient(circle at 50% 34%, rgba(169,201,232,.14), transparent 55%), rgba(6,10,17,.78); }
+.realm--diary.is-dreamscape .quote-card { overflow: hidden; border-color: rgba(169,201,232,.32); background: linear-gradient(145deg, rgba(4,8,14,.82), rgba(5,10,18,.62)), var(--dream-bg) center / cover no-repeat; box-shadow: 0 18px 48px rgba(0,0,0,.3); backdrop-filter: blur(2px); }
+.realm--diary.is-dreamscape .quote-card--feature { border-color: rgba(198,161,91,.5); background: linear-gradient(145deg, rgba(5,9,15,.76), rgba(4,8,14,.54)), var(--dream-bg) center / cover no-repeat; }
+.realm--diary.is-dreamscape .quote-card blockquote { color: #fffaf0; text-shadow: 0 2px 12px rgba(0,0,0,.92), 0 0 28px rgba(0,0,0,.62); }
+.realm--diary.is-dreamscape .quote-card__board,
+.realm--diary.is-dreamscape .quote-card__note { color: rgba(219,234,250,.86); text-shadow: 0 1px 7px rgba(0,0,0,.95); }
 .golden-notes-galaxy { display: none; position: fixed; z-index: 0; inset: -6%; pointer-events: none; background: radial-gradient(ellipse 26% 18% at 18% 10%, rgba(185,133,255,.5), transparent 74%), radial-gradient(ellipse 28% 20% at 39% 19%, rgba(165,224,255,.42), transparent 74%), radial-gradient(ellipse 25% 18% at 58% 30%, rgba(255,240,176,.4), transparent 72%), radial-gradient(ellipse 28% 20% at 76% 40%, rgba(187,137,255,.45), transparent 74%), radial-gradient(ellipse 26% 19% at 93% 53%, rgba(172,226,255,.38), transparent 72%); mix-blend-mode: screen; filter: blur(18px) saturate(1.15); animation: golden-galaxy-drift 9s ease-in-out infinite; }
 .realm--diary.is-golden-notes:not(.is-greek-room) .golden-notes-galaxy { display: block; }
 @keyframes golden-galaxy-drift { 0%, 100% { opacity: .74; transform: translate3d(0, 0, 0) scale(1); } 50% { opacity: 1; transform: translate3d(-.6%, .4%, 0) scale(1.025); } }
