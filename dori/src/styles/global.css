@@ -104,9 +104,17 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .realm--diary.is-greek-room .diary-composer { display: none !important; }
 .realm--diary.is-dreamscape .quote-card { border-color: rgba(169,201,232,.24); background: linear-gradient(145deg, rgba(14,25,40,.82), rgba(5,8,14,.72)); box-shadow: 0 18px 48px rgba(0,0,0,.22); backdrop-filter: blur(5px); }
 .realm--diary.is-dreamscape .quote-card--feature { border-color: rgba(198,161,91,.44); background: radial-gradient(circle at 50% 34%, rgba(169,201,232,.14), transparent 55%), rgba(6,10,17,.78); }
-.golden-notes-star { display: none; position: fixed; z-index: 2; top: clamp(6.25rem, 10vw, 8.5rem); right: clamp(1.2rem, 5vw, 5rem); color: #ffdc7d; font-size: clamp(3.75rem, 7vw, 6.75rem); line-height: 1; pointer-events: none; text-shadow: 0 0 8px rgba(255,239,187,.95), 0 0 26px rgba(234,211,153,.78), 0 0 60px rgba(198,161,91,.5); animation: golden-star-pulse 3s ease-in-out infinite; }
+.golden-notes-star { display: none; position: fixed; z-index: 2; top: clamp(5.75rem, 9vw, 8rem); right: clamp(1rem, 4vw, 4.5rem); width: clamp(6rem, 10vw, 9rem); aspect-ratio: 1; border-radius: 50%; pointer-events: none; filter: drop-shadow(0 0 24px rgba(234,211,153,.48)); animation: golden-star-drift 5.2s ease-in-out infinite; }
 .realm--diary.is-golden-notes:not(.is-greek-room) .golden-notes-star { display: block; }
-@keyframes golden-star-pulse { 0%, 100% { opacity: .8; transform: scale(.94) rotate(-4deg); } 50% { opacity: 1; transform: scale(1.05) rotate(3deg); } }
+.golden-notes-star::before { content: ''; position: absolute; inset: 22%; border-radius: 50%; background: radial-gradient(circle at 38% 32%, #fff 0 5%, #fff8d7 9%, #ffe18a 20%, #efb83f 38%, #c47a17 56%, rgba(179,101,15,.28) 67%, transparent 72%); box-shadow: 0 0 8px #fff8d7, 0 0 20px rgba(255,220,125,.95), 0 0 52px rgba(234,177,62,.72), 0 0 90px rgba(198,122,23,.4); animation: golden-star-breathe 2.6s ease-in-out infinite; }
+.golden-notes-star::after { content: ''; position: absolute; inset: 0; border-radius: 50%; background: linear-gradient(90deg, transparent 0 47%, rgba(255,228,150,.06) 48%, #fff5ca 49.7% 50.3%, rgba(255,228,150,.06) 52%, transparent 53%), linear-gradient(transparent 0 47%, rgba(255,228,150,.05) 48%, #fff5ca 49.7% 50.3%, rgba(255,228,150,.05) 52%, transparent 53%); opacity: .82; filter: blur(.35px); animation: golden-star-rays 4.2s ease-in-out infinite; }
+.golden-notes-star__core { position: absolute; inset: 5%; border-radius: 50%; background: linear-gradient(45deg, transparent 0 47.8%, rgba(255,225,137,.08) 49%, rgba(255,247,210,.92) 49.8% 50.2%, rgba(255,225,137,.08) 51%, transparent 52.2%), linear-gradient(-45deg, transparent 0 47.8%, rgba(255,225,137,.08) 49%, rgba(255,247,210,.92) 49.8% 50.2%, rgba(255,225,137,.08) 51%, transparent 52.2%); animation: golden-star-turn 12s linear infinite; }
+.golden-notes-star__core::after { content: ''; position: absolute; inset: 22%; border: 1px solid rgba(255,225,137,.34); border-radius: 50%; box-shadow: 0 0 22px rgba(255,217,116,.3), inset 0 0 18px rgba(255,239,187,.2); animation: golden-star-halo 2.6s ease-out infinite; }
+@keyframes golden-star-drift { 0%, 100% { transform: translate3d(0, 0, 0) rotate(-2deg); } 38% { transform: translate3d(-10px, 6px, 0) rotate(2deg); } 72% { transform: translate3d(4px, -8px, 0) rotate(-1deg); } }
+@keyframes golden-star-breathe { 0%, 100% { opacity: .86; transform: scale(.92); } 50% { opacity: 1; transform: scale(1.08); } }
+@keyframes golden-star-rays { 0%, 100% { opacity: .58; transform: scale(.9); } 50% { opacity: .96; transform: scale(1.08); } }
+@keyframes golden-star-turn { to { transform: rotate(360deg); } }
+@keyframes golden-star-halo { 0% { opacity: .8; transform: scale(.7); } 70%, 100% { opacity: 0; transform: scale(1.75); } }
 .greek-key-button { width: 46px; height: 46px; display: grid; flex: 0 0 auto; place-items: center; padding: 0; border: 1px solid rgba(198,161,91,.34); border-radius: 50%; background: rgba(198,161,91,.04); color: var(--gold-bright); cursor: pointer; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
 .greek-key-button svg { width: 31px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgba(234,211,153,.34)); }
 .greek-key-button:hover, .greek-key-button.is-active { border-color: var(--gold-bright); background: rgba(198,161,91,.1); box-shadow: 0 0 22px rgba(198,161,91,.12); }
@@ -191,11 +199,13 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 
 /* Library */
 .realm--library::before { background: linear-gradient(180deg, rgba(3,5,9,.3), rgba(3,5,9,.58)), linear-gradient(90deg, rgba(3,5,9,.42), transparent 27% 73%, rgba(3,5,9,.42)), url('/library-background-bright-book-v4.webp') center / cover no-repeat; }
-.medusa-door { position: fixed; z-index: 5; left: calc(50vw + 51.1vh); top: 34.7vh; width: 44px; height: 64px; border: 0; background: transparent; cursor: pointer; transform: translate(-50%, -50%); }
-.medusa-door span { position: absolute; left: 50%; top: 50%; width: 18px; height: 52px; border: 1px solid transparent; border-radius: 2px; transform: translate(-50%, -50%); transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, filter .2s ease; }
-.medusa-door:hover span, .medusa-door:focus-visible span { border-color: rgba(255,225,154,.72); background: linear-gradient(90deg, rgba(95,54,11,.18), rgba(255,216,121,.2), rgba(78,43,8,.18)); box-shadow: 0 0 10px rgba(234,211,153,.5), 0 0 24px rgba(198,161,91,.3); filter: brightness(1.2); }
+.medusa-door { position: fixed; z-index: 5; left: calc(50vw + 51.1vh); top: 34.3vh; width: 44px; height: 64px; border: 0; background: transparent; cursor: pointer; transform: translate(-50%, -50%); }
+.medusa-door span { position: absolute; left: 50%; top: 50%; width: 1.05vh; height: 4.6vh; border: 0; border-radius: 1px; background: linear-gradient(90deg, rgba(255,211,109,.06), rgba(255,236,174,.15) 48%, rgba(255,204,91,.05)); box-shadow: 0 0 5px rgba(234,195,109,.18); mix-blend-mode: screen; transform: translate(-50%, -50%); transition: background .2s ease, box-shadow .2s ease, filter .2s ease; }
+.medusa-door:hover span, .medusa-door:focus-visible span { background: linear-gradient(90deg, rgba(255,211,109,.11), rgba(255,239,183,.25) 48%, rgba(255,204,91,.09)); box-shadow: 0 0 7px rgba(234,195,109,.34); filter: brightness(1.08); }
+.medusa-door:focus-visible { outline: 1px solid rgba(255,225,154,.7); outline-offset: 2px; }
 @media (min-aspect-ratio: 16 / 9) {
-  .medusa-door { left: 78.8vw; top: calc(50vh - 8.7vw); }
+  .medusa-door { left: 78.8vw; top: calc(50vh - 8.8vw); }
+  .medusa-door span { width: .62vw; height: 2.6vw; }
 }
 .library-intro { margin-inline: auto; text-align: center; }
 .library-intro > p:last-child { margin-inline: auto; }
@@ -275,7 +285,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .realm-header { min-height: 68px; }
   .realm--diary .realm-header > p { display: none; }
   .realm--diary .realm-header__actions { width: 100%; justify-content: space-between; }
-  .golden-notes-star { top: 5.2rem; right: 1rem; font-size: 3.5rem; }
+  .golden-notes-star { top: 4.8rem; right: .45rem; width: 5.5rem; }
   .greek-keyboard { margin-top: .8rem; padding: 1rem; }
   .realm--diary.is-greek-room .greek-keyboard { margin-top: 1.5rem; }
   .greek-cubes { grid-template-columns: repeat(6, minmax(38px, 1fr)); gap: .55rem; }
@@ -288,8 +298,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .composer-row { grid-template-columns: minmax(0, 1fr); }
   .photo-studio { margin-top: 2.5rem; }
   .photo-stage { aspect-ratio: 3 / 4; }
-  .medusa-door { left: auto; right: .45rem; top: 34vh; width: 44px; height: 64px; transform: none; }
-  .medusa-door span { width: 18px; height: 54px; border-color: rgba(255,225,154,.6); background: linear-gradient(90deg, #70420f, #d5a94f 45%, #7c4d16); box-shadow: inset 2px 0 rgba(255,239,194,.28), inset -3px 0 rgba(32,17,4,.4), 0 0 15px rgba(198,161,91,.28); }
+  .realm--library::before { background-position: center, center, 78.8% center; }
+  .medusa-door { left: 78.8vw; top: 34.3vh; width: 44px; height: 64px; transform: translate(-50%, -50%); }
   .bookshelf { min-height: 360px; gap: .12rem; padding: 1rem 2% 1.75rem; }
   .book { min-width: 34px; height: 244px; padding: 2.4rem .28rem 2.1rem; }
   .book--tall { height: 290px; }
