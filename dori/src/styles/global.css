@@ -198,10 +198,10 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .save-photo:disabled { opacity: .35; cursor: not-allowed; }
 
 /* Library */
-.realm--library::before { background: linear-gradient(180deg, rgba(3,5,9,.3), rgba(3,5,9,.58)), linear-gradient(90deg, rgba(3,5,9,.42), transparent 27% 73%, rgba(3,5,9,.42)), url('/library-background-bright-book-v4.webp') center / cover no-repeat; }
+.realm--library::before { background: linear-gradient(180deg, rgba(3,5,9,.3), rgba(3,5,9,.58)), linear-gradient(90deg, rgba(3,5,9,.42), transparent 27% 73%, rgba(3,5,9,.42)), url('/library-background-no-highlight-v5.webp') center / cover no-repeat; }
 .medusa-door { position: fixed; z-index: 5; left: calc(50vw + 51.1vh); top: 34.3vh; width: 44px; height: 64px; border: 0; background: transparent; cursor: pointer; transform: translate(-50%, -50%); }
-.medusa-door span { position: absolute; left: 50%; top: 50%; width: 1.05vh; height: 4.6vh; border: 0; border-radius: 1px; background: linear-gradient(90deg, rgba(255,211,109,.06), rgba(255,236,174,.15) 48%, rgba(255,204,91,.05)); box-shadow: 0 0 5px rgba(234,195,109,.18); mix-blend-mode: screen; transform: translate(-50%, -50%); transition: background .2s ease, box-shadow .2s ease, filter .2s ease; }
-.medusa-door:hover span, .medusa-door:focus-visible span { background: linear-gradient(90deg, rgba(255,211,109,.11), rgba(255,239,183,.25) 48%, rgba(255,204,91,.09)); box-shadow: 0 0 7px rgba(234,195,109,.34); filter: brightness(1.08); }
+.medusa-door span { position: absolute; left: 50%; top: 50%; width: 1.05vh; height: 4.6vh; border: 1px solid rgba(244,211,136,.48); border-radius: 1px; background: linear-gradient(90deg, #4b290c 0%, #b77b27 24%, #d9a84c 48%, #8c5519 76%, #3b210b 100%); box-shadow: inset 1px 0 rgba(255,235,181,.24), inset -1px 0 rgba(27,13,3,.55), 0 0 5px rgba(219,170,75,.24); transform: translate(-50%, -50%); transition: background .2s ease, box-shadow .2s ease, filter .2s ease; }
+.medusa-door:hover span, .medusa-door:focus-visible span { background: linear-gradient(90deg, #59310d 0%, #ca8c31 24%, #e8bb61 48%, #9e641f 76%, #45260c 100%); box-shadow: inset 1px 0 rgba(255,242,200,.34), inset -1px 0 rgba(27,13,3,.5), 0 0 7px rgba(234,195,109,.38); filter: brightness(1.08); }
 .medusa-door:focus-visible { outline: 1px solid rgba(255,225,154,.7); outline-offset: 2px; }
 @media (min-aspect-ratio: 16 / 9) {
   .medusa-door { left: 78.8vw; top: calc(50vh - 8.8vw); }
