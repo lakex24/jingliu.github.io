@@ -253,31 +253,33 @@ const pinterestQuotes = [
 
         <div class="library-room">
           <div class="bookshelf" aria-label="Dori's books">
-            <button class="book book--navy is-selected" type="button" data-book="wild" aria-pressed="true">
-              <span class="book__label">Reading</span><span class="book__title">The Wild Robot</span>
+            <button class="book book--navy is-selected" type="button" data-book="wild" aria-label="Untitled book · Reading" aria-pressed="true">
+              <span class="book__label">Reading</span><span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--gold book--short" type="button" data-book="wrinkle" aria-pressed="false">
-              <span class="book__label">Discuss</span><span class="book__title">A Wrinkle in Time</span>
+            <button class="book book--gold book--short" type="button" data-book="wrinkle" aria-label="Untitled book · Discuss" aria-pressed="false">
+              <span class="book__label">Discuss</span><span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--black book--tall" type="button" data-book="moon" aria-pressed="false">
-              <span class="book__label">Favorite</span><span class="book__title">The Girl Who Drank the Moon</span>
+            <button class="book book--black book--tall" type="button" data-book="moon" aria-label="Untitled book · Favorite" aria-pressed="false">
+              <span class="book__label">Favorite</span><span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--mist book--short" type="button" data-book="garden" aria-pressed="false">
-              <span class="book__label">Return Tue</span><span class="book__title">The Secret Garden</span>
+            <button class="book book--mist book--short" type="button" data-book="garden" aria-label="Untitled book · Return Tuesday" aria-pressed="false">
+              <span class="book__label">Return Tue</span><span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--navy book--thin" type="button" data-book="reach" aria-pressed="false">
-              <span class="book__label">Wish list</span><span class="book__title">When You Reach Me</span>
+            <button class="book book--navy book--thin" type="button" data-book="reach" aria-label="Untitled book · Wish list" aria-pressed="false">
+              <span class="book__label">Wish list</span><span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--gold" type="button" data-book="anne" aria-pressed="false">
-              <span class="book__label">Next</span><span class="book__title">Anne of Green Gables</span>
+            <button class="book book--gold" type="button" data-book="anne" aria-label="Untitled book · Next" aria-pressed="false">
+              <span class="book__label">Next</span><span class="book__title" aria-hidden="true"></span>
             </button>
             <span class="shelf-edge" aria-hidden="true"></span>
           </div>
 
           <aside class="book-note" aria-live="polite">
             <p class="book-note__kicker">A note tucked inside</p>
-            <h2 id="book-title">The Wild Robot</h2>
-            <p id="book-copy">Continue at chapter 23. Roz is learning what it means to belong.</p>
+            <h2 id="book-title">Untitled volume</h2>
+            <label class="book-title-editor" for="book-title-input">Write on the spine</label>
+            <input id="book-title-input" type="text" maxlength="42" autocomplete="off" placeholder="Type a book title…" />
+            <p id="book-copy">Continue at chapter 23. A new adventure is waiting.</p>
             <button type="button" id="book-reminder">Mark for tonight</button>
           </aside>
         </div>
@@ -506,15 +508,28 @@ const pinterestQuotes = [
       });
 
       const books = {
-        wild: ['The Wild Robot', 'Continue at chapter 23. Roz is learning what it means to belong.'],
-        wrinkle: ['A Wrinkle in Time', 'Ask Mom about the tesseract after chapter 5.'],
-        moon: ['The Girl Who Drank the Moon', 'Favorite line saved on the Moonlight board.'],
-        garden: ['The Secret Garden', 'Return this one to the library on Tuesday.'],
-        reach: ['When You Reach Me', 'Look for this one on the next library visit.'],
-        anne: ['Anne of Green Gables', 'This is next after The Wild Robot.']
+        wild: 'Continue at chapter 23. A new adventure is waiting.',
+        wrinkle: 'Ask Mom about the strange idea after chapter 5.',
+        moon: 'Favorite line saved on the Moonlight board.',
+        garden: 'Return this one to the library on Tuesday.',
+        reach: 'Look for this one on the next library visit.',
+        anne: 'This one is next on the reading list.'
       };
       let selectedBook = 'wild';
       const reminderButton = document.getElementById('book-reminder');
+      const bookTitleInput = document.getElementById('book-title-input');
+      const bookTitles = JSON.parse(localStorage.getItem('dori-book-titles') || '{}');
+
+      function applyBookTitle(key) {
+        const book = document.querySelector(`[data-book="${key}"]`);
+        const title = (bookTitles[key] || '').trim();
+        const label = book.querySelector('.book__label').textContent;
+        book.querySelector('.book__title').textContent = title;
+        book.setAttribute('aria-label', `${title || 'Untitled book'} · ${label}`);
+        if (selectedBook === key) document.getElementById('book-title').textContent = title || 'Untitled volume';
+      }
+
+      Object.keys(books).forEach(applyBookTitle);
 
       function showBook(key) {
         selectedBook = key;
@@ -523,13 +538,21 @@ const pinterestQuotes = [
           item.classList.toggle('is-selected', active);
           item.setAttribute('aria-pressed', String(active));
         });
-        document.getElementById('book-title').textContent = books[key][0];
-        document.getElementById('book-copy').textContent = books[key][1];
+        applyBookTitle(key);
+        bookTitleInput.value = bookTitles[key] || '';
+        document.getElementById('book-copy').textContent = books[key];
         const reminders = JSON.parse(localStorage.getItem('dori-book-reminders') || '{}');
         reminderButton.textContent = reminders[key] ? 'Marked for tonight ✓' : 'Mark for tonight';
         reminderButton.classList.toggle('is-marked', Boolean(reminders[key]));
       }
       document.querySelectorAll('[data-book]').forEach((book) => book.addEventListener('click', () => showBook(book.dataset.book)));
+      bookTitleInput.addEventListener('input', () => {
+        const title = bookTitleInput.value;
+        if (title.trim()) bookTitles[selectedBook] = title;
+        else delete bookTitles[selectedBook];
+        localStorage.setItem('dori-book-titles', JSON.stringify(bookTitles));
+        applyBookTitle(selectedBook);
+      });
       reminderButton.addEventListener('click', () => {
         const reminders = JSON.parse(localStorage.getItem('dori-book-reminders') || '{}');
         reminders[selectedBook] = !reminders[selectedBook];
