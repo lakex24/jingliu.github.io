@@ -27,7 +27,7 @@ import '@fontsource/ibm-plex-mono/400.css';
       <header class="gallery-heading">
         <p>My private collection</p>
         <h1 id="gallery-title">The Picture Gallery</h1>
-        <span>Tap an empty frame to add a photo, or a filled frame to adjust it.</span>
+        <span>Tap an empty frame to add a photo. Drag a filled photo to position it.</span>
       </header>
 
       <section class="gallery-wall" aria-label="Six picture frames">
@@ -116,6 +116,7 @@ import '@fontsource/ibm-plex-mono/400.css';
       };
       const adjustments = {};
       let activeFrame = null;
+      let dragState = null;
 
       function defaultAdjustment() {
         return { zoom: 100, x: 50, y: 50 };
@@ -164,6 +165,17 @@ import '@fontsource/ibm-plex-mono/400.css';
         adjustmentOutputs.y.value = describePosition(adjustment.y, 'up', 'down');
       }
 
+      function saveAdjustment(frame) {
+        const frameNumber = frame.dataset.galleryFrame;
+        try {
+          localStorage.setItem(`${adjustmentPrefix}${frameNumber}`, JSON.stringify(loadAdjustment(frame)));
+          return true;
+        } catch (error) {
+          status.textContent = 'The adjustment works now, but this browser could not save it.';
+          return false;
+        }
+      }
+
       function resetAdjustment(frame) {
         const frameNumber = frame.dataset.galleryFrame;
         adjustments[frameNumber] = defaultAdjustment();
@@ -179,6 +191,7 @@ import '@fontsource/ibm-plex-mono/400.css';
         const image = frame.querySelector('img');
         const empty = frame.querySelector('.gallery-frame__empty');
         image.src = source;
+        image.draggable = false;
         image.hidden = false;
         empty.hidden = true;
         frame.classList.add('has-photo');
@@ -205,7 +218,7 @@ import '@fontsource/ibm-plex-mono/400.css';
         adjustmentsPanel.hidden = !hasPhoto;
         if (hasPhoto) {
           syncAdjustmentControls(frame);
-          status.textContent = 'Use the sliders to adjust this photo, or choose another one.';
+          status.textContent = 'Drag the photo to position it, or use the sliders for fine adjustments.';
         } else {
           status.textContent = 'Choose a photo for this empty frame.';
         }
@@ -250,6 +263,51 @@ import '@fontsource/ibm-plex-mono/400.css';
           selectFrame(frame);
           if (!frame.classList.contains('has-photo')) choosePhoto();
         });
+
+        frame.addEventListener('pointerdown', (event) => {
+          if (!frame.classList.contains('has-photo') || (event.pointerType === 'mouse' && event.button !== 0)) return;
+          selectFrame(frame);
+          const adjustment = loadAdjustment(frame);
+          dragState = {
+            frame,
+            pointerId: event.pointerId,
+            startX: event.clientX,
+            startY: event.clientY,
+            adjustmentX: adjustment.x,
+            adjustmentY: adjustment.y,
+            moved: false,
+          };
+          frame.classList.add('is-dragging');
+          frame.setPointerCapture(event.pointerId);
+          event.preventDefault();
+        });
+
+        frame.addEventListener('pointermove', (event) => {
+          if (!dragState || dragState.frame !== frame || dragState.pointerId !== event.pointerId) return;
+          const inner = frame.querySelector('.gallery-frame__inner');
+          const deltaX = event.clientX - dragState.startX;
+          const deltaY = event.clientY - dragState.startY;
+          if (Math.abs(deltaX) + Math.abs(deltaY) > 2) dragState.moved = true;
+          const adjustment = loadAdjustment(frame);
+          adjustment.x = Math.round(Math.min(100, Math.max(0, dragState.adjustmentX - (deltaX / inner.clientWidth) * 100)));
+          adjustment.y = Math.round(Math.min(100, Math.max(0, dragState.adjustmentY - (deltaY / inner.clientHeight) * 100)));
+          applyAdjustment(frame);
+          syncAdjustmentControls(frame);
+          event.preventDefault();
+        });
+
+        function finishDragging(event) {
+          if (!dragState || dragState.frame !== frame || dragState.pointerId !== event.pointerId) return;
+          const photoMoved = dragState.moved;
+          frame.classList.remove('is-dragging');
+          if (frame.hasPointerCapture(event.pointerId)) frame.releasePointerCapture(event.pointerId);
+          dragState = null;
+          if (photoMoved && saveAdjustment(frame)) status.textContent = 'Photo position saved on this device.';
+        }
+
+        frame.addEventListener('pointerup', finishDragging);
+        frame.addEventListener('pointercancel', finishDragging);
+        frame.addEventListener('dragstart', (event) => event.preventDefault());
       });
 
       changeButton.addEventListener('click', choosePhoto);
@@ -257,16 +315,11 @@ import '@fontsource/ibm-plex-mono/400.css';
       Object.entries(adjustmentInputs).forEach(([property, input]) => {
         input.addEventListener('input', () => {
           if (!activeFrame || !activeFrame.classList.contains('has-photo')) return;
-          const frameNumber = activeFrame.dataset.galleryFrame;
           const adjustment = loadAdjustment(activeFrame);
           adjustment[property] = Number(input.value);
           applyAdjustment(activeFrame);
           syncAdjustmentControls(activeFrame);
-          try {
-            localStorage.setItem(`${adjustmentPrefix}${frameNumber}`, JSON.stringify(adjustment));
-          } catch (error) {
-            status.textContent = 'The adjustment works now, but this browser could not save it.';
-          }
+          saveAdjustment(activeFrame);
         });
       });
 
@@ -350,6 +403,10 @@ import '@fontsource/ibm-plex-mono/400.css';
   .gallery-frame__empty { display: grid; justify-items: center; gap: .2rem; color: rgba(217,234,247,.8); font-family: 'IBM Plex Mono', monospace; font-size: .48rem; letter-spacing: .12em; text-transform: uppercase; }
   .gallery-frame__empty b { color: #e5c879; font-family: Georgia, serif; font-size: 2rem; font-weight: 400; line-height: 1; text-shadow: 0 0 14px rgba(215,189,112,.55); }
   .gallery-frame.has-photo .gallery-frame__inner { background: #05070b; }
+  .gallery-frame.has-photo { cursor: grab; touch-action: none; }
+  .gallery-frame.has-photo.is-dragging { cursor: grabbing; }
+  .gallery-frame.has-photo.is-dragging .gallery-frame__inner img { transition: none; }
+  .gallery-frame__inner img { pointer-events: none; user-select: none; }
 
   .gallery-tools { position: absolute; z-index: 3; left: 50%; bottom: clamp(1.2rem, 3vh, 2.2rem); width: min(92vw, 52rem); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .65rem 1rem; padding: .75rem 1rem; border: 1px solid rgba(220,232,241,.24); background: rgba(4,7,11,.72); box-shadow: 0 10px 30px rgba(0,0,0,.34); backdrop-filter: blur(12px); transform: translateX(-50%); }
   .gallery-tools p { margin: 0; color: rgba(228,239,247,.82); font-family: 'IBM Plex Mono', monospace; font-size: .55rem; letter-spacing: .04em; line-height: 1.45; }
