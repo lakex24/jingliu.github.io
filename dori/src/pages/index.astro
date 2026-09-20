@@ -319,6 +319,11 @@ const greekLetters = [
               <button type="button" class="is-active" data-mood="blue" aria-pressed="true"><span class="swatch swatch--blue"></span> Blue Hour</button>
               <button type="button" data-mood="gold" aria-pressed="false"><span class="swatch swatch--gold"></span> Golden Film</button>
               <button type="button" data-mood="dream" aria-pressed="false"><span class="swatch swatch--dream"></span> Dream Bloom</button>
+              <button type="button" data-mood="rose" aria-pressed="false"><span class="swatch swatch--rose"></span> Rose Haze</button>
+              <button type="button" data-mood="neon" aria-pressed="false"><span class="swatch swatch--neon"></span> Neon Dream</button>
+              <button type="button" data-mood="noir" aria-pressed="false"><span class="swatch swatch--noir"></span> Silver Noir</button>
+              <button type="button" data-mood="retro" aria-pressed="false"><span class="swatch swatch--retro"></span> Retro Reel</button>
+              <button type="button" data-mood="frost" aria-pressed="false"><span class="swatch swatch--frost"></span> Icy Moon</button>
             </fieldset>
 
             <button class="save-photo" id="save-photo" type="button" disabled>Save styled photo</button>
@@ -687,7 +692,12 @@ const greekLetters = [
       const moods = {
         blue: { filter: 'contrast(1.13) saturate(.72) hue-rotate(8deg) brightness(.92)', caption: 'BLUE HOUR · 00:17', color: 'rgba(54, 107, 160, .18)' },
         gold: { filter: 'sepia(.34) saturate(1.16) contrast(1.05) brightness(1.03)', caption: 'GOLDEN FILM · TAKE 03', color: 'rgba(188, 121, 34, .15)' },
-        dream: { filter: 'saturate(.8) contrast(.92) brightness(1.08) hue-rotate(18deg)', caption: 'DREAM BLOOM · SCENE 09', color: 'rgba(147, 106, 190, .16)' }
+        dream: { filter: 'saturate(.8) contrast(.92) brightness(1.08) hue-rotate(18deg)', caption: 'DREAM BLOOM · SCENE 09', color: 'rgba(147, 106, 190, .16)' },
+        rose: { filter: 'sepia(.16) saturate(1.28) hue-rotate(306deg) brightness(1.06) contrast(.94)', caption: 'ROSE HAZE · 19:42', color: 'rgba(226, 119, 162, .17)' },
+        neon: { filter: 'saturate(1.75) contrast(1.18) hue-rotate(18deg) brightness(.96)', caption: 'NEON DREAM · AFTER DARK', color: 'rgba(125, 48, 225, .16)' },
+        noir: { filter: 'grayscale(1) contrast(1.3) brightness(.9)', caption: 'SILVER NOIR · FRAME 11', color: 'rgba(213, 225, 239, .1)' },
+        retro: { filter: 'sepia(.5) saturate(.85) contrast(1.08) brightness(.94)', caption: 'RETRO REEL · 1997', color: 'rgba(182, 108, 50, .15)' },
+        frost: { filter: 'saturate(.62) hue-rotate(168deg) contrast(1.04) brightness(1.08)', caption: 'ICY MOON · 02:26', color: 'rgba(118, 204, 235, .17)' }
       };
 
       function renderPhoto() {

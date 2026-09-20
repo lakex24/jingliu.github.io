@@ -206,13 +206,18 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .photo-adjustment input[type='range'] { width: 100%; margin: 0; accent-color: var(--gold); cursor: ew-resize; }
 .photo-adjustments button { min-height: 38px; border: 1px solid rgba(198,161,91,.44); background: transparent; color: var(--gold-bright); font-family: var(--mono); font-size: .52rem; letter-spacing: .09em; text-transform: uppercase; cursor: pointer; }
 .photo-adjustments button:hover { border-color: var(--gold-bright); background: rgba(198,161,91,.08); }
-.mood-picker { display: grid; gap: .5rem; margin: 0; padding: 0; border: 0; }
+.mood-picker { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .5rem; margin: 0; padding: 0; border: 0; }
 .mood-picker legend { margin-bottom: .65rem; }
 .mood-picker button { min-height: 48px; display: flex; align-items: center; gap: .75rem; padding: .55rem .7rem; border: 1px solid rgba(169,201,232,.17); background: transparent; color: #aab3c0; text-align: left; cursor: pointer; }
 .mood-picker button:hover, .mood-picker button.is-active { border-color: var(--gold); color: var(--gold-bright); background: rgba(198,161,91,.07); }
 .swatch { width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%; background: linear-gradient(135deg, #9fc4e8, #183050); }
 .swatch--gold { background: linear-gradient(135deg, #efd99f, #714716); }
 .swatch--dream { background: linear-gradient(135deg, #d2b8eb, #536f9a); }
+.swatch--rose { background: linear-gradient(135deg, #ffd0dc, #a6466d); }
+.swatch--neon { background: linear-gradient(135deg, #38d9ff, #8b35d6 58%, #ff4fa0); }
+.swatch--noir { background: linear-gradient(135deg, #f1f4f7, #20252d); }
+.swatch--retro { background: linear-gradient(135deg, #e7c481, #81452c); }
+.swatch--frost { background: linear-gradient(135deg, #e0fbff, #5188ae); }
 .save-photo { min-height: 48px; border: 1px solid var(--ghost); background: transparent; color: var(--ghost-bright); font-family: var(--mono); font-size: .61rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .save-photo:disabled { opacity: .35; cursor: not-allowed; }
 
