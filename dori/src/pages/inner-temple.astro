@@ -1,5 +1,6 @@
 ---
 import '@fontsource-variable/cormorant/wght.css';
+import '@fontsource-variable/cormorant/wght-italic.css';
 import '@fontsource/ibm-plex-mono/400.css';
 ---
 
@@ -8,10 +9,10 @@ import '@fontsource/ibm-plex-mono/400.css';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Inner Temple — Dori</title>
-    <meta name="description" content="Dori’s quiet inner temple." />
+    <title>The Oracle’s Quiz — Dori</title>
+    <meta name="description" content="A changing Greek mythology quiz hidden beyond Medusa’s temple." />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="theme-color" content="#04070b" />
+    <meta name="theme-color" content="#05080d" />
     <link rel="icon" href="data:," />
     <script is:inline>
       if (sessionStorage.getItem('dori-inner-temple-unlocked') !== 'true') {
@@ -20,25 +21,283 @@ import '@fontsource/ibm-plex-mono/400.css';
     </script>
   </head>
   <body>
-    <main class="inner-temple" aria-labelledby="inner-temple-title">
-      <h1 id="inner-temple-title">Inner Temple</h1>
-      <a class="inner-temple__return" href="/" aria-label="Return to the home page">
+    <main class="myth-quiz" aria-labelledby="quiz-title">
+      <div class="quiz-scene" aria-hidden="true">
+        <img class="quiz-scene__blur" alt="" draggable="false" />
+        <img class="quiz-scene__focus" alt="" draggable="false" />
+        <div class="quiz-scene__shade"></div>
+        <div class="quiz-scene__grain"></div>
+      </div>
+
+      <a class="quiz-home" href="/" aria-label="Return to the home page">
         <span aria-hidden="true">←</span>
         <span>Home</span>
       </a>
+
+      <section class="quiz-card" aria-live="polite">
+        <div class="quiz-card__question" data-question-view>
+          <header class="quiz-card__header">
+            <div>
+              <p class="quiz-card__eyebrow">The Oracle’s Challenge</p>
+              <p class="quiz-card__story" data-story></p>
+            </div>
+            <p class="quiz-card__count" data-count></p>
+          </header>
+
+          <div class="quiz-progress" aria-hidden="true">
+            <span data-progress></span>
+          </div>
+
+          <h1 id="quiz-title" data-question></h1>
+          <div class="quiz-options" data-options aria-label="Choose an answer"></div>
+          <p class="quiz-feedback" data-feedback aria-live="polite"></p>
+          <button class="quiz-next" type="button" data-next hidden>Next question <span aria-hidden="true">→</span></button>
+        </div>
+
+        <div class="quiz-card__result" data-result hidden>
+          <p class="quiz-card__eyebrow">The Oracle Has Spoken</p>
+          <h1 data-result-title></h1>
+          <p class="quiz-result__score" data-result-score></p>
+          <p class="quiz-result__message" data-result-message></p>
+          <button class="quiz-restart" type="button" data-restart>Ask the oracle again</button>
+        </div>
+      </section>
     </main>
+
+    <script>
+      const questions = [
+        {
+          story: 'Orpheus & Eurydice',
+          question: 'Who did Orpheus journey into the Underworld to bring home?',
+          answers: ['Eurydice', 'Athena', 'Ariadne'],
+          correct: 0,
+          fact: 'Orpheus hoped his music could lead his beloved Eurydice back into the sunlight.',
+          image: '/eye-tragedy-orpheus-v1.webp',
+          accent: '#9fc7e4'
+        },
+        {
+          story: 'The Flight of Icarus',
+          question: 'Why did Icarus fall from the sky?',
+          answers: ['A storm tore his wings', 'The sun melted the wax in his wings', 'Zeus took away the wind'],
+          correct: 1,
+          fact: 'Icarus flew too close to the sun, even after Daedalus warned him to follow the middle path.',
+          image: '/eye-tragedy-icarus-v1.webp',
+          accent: '#f3ce71'
+        },
+        {
+          story: 'Antigone of Thebes',
+          question: 'Why did Antigone defy King Creon’s command?',
+          answers: ['To bury her brother with honor', 'To leave Thebes forever', 'To become queen'],
+          correct: 0,
+          fact: 'Antigone believed honoring her brother was more important than obeying the king’s unjust order.',
+          image: '/eye-tragedy-antigone-v1.webp',
+          accent: '#e49a76'
+        },
+        {
+          story: 'Cassandra of Troy',
+          question: 'What made Cassandra’s true prophecies so tragic?',
+          answers: ['She forgot them immediately', 'They only came to her in dreams', 'No one believed her warnings'],
+          correct: 2,
+          fact: 'Cassandra could see what was coming, but she was cursed so that nobody would believe her.',
+          image: '/eye-tragedy-cassandra-v1.webp',
+          accent: '#e8a052'
+        },
+        {
+          story: 'The Golden Touch',
+          question: 'What happened after King Midas made his famous wish?',
+          answers: ['Everything he touched turned to gold', 'He could speak to animals', 'His palace disappeared'],
+          correct: 0,
+          fact: 'Midas soon discovered that a wish that sounded wonderful could become a terrible burden.',
+          image: '/eye-tragedy-midas-v1.webp',
+          accent: '#eccf72'
+        },
+        {
+          story: 'Niobe’s Pride',
+          question: 'Which goddess did Niobe boast she was greater than?',
+          answers: ['Hera', 'Leto', 'Artemis'],
+          correct: 1,
+          fact: 'Niobe boasted that she had more children than Leto, forgetting that pride can anger the gods.',
+          image: '/eye-tragedy-niobe-v1.webp',
+          accent: '#a9b7d5'
+        }
+      ];
+
+      const quiz = document.querySelector('.myth-quiz');
+      const sceneBlur = document.querySelector('.quiz-scene__blur');
+      const sceneFocus = document.querySelector('.quiz-scene__focus');
+      const questionView = document.querySelector('[data-question-view]');
+      const resultView = document.querySelector('[data-result]');
+      const story = document.querySelector('[data-story]');
+      const count = document.querySelector('[data-count]');
+      const progress = document.querySelector('[data-progress]');
+      const question = document.querySelector('[data-question]');
+      const options = document.querySelector('[data-options]');
+      const feedback = document.querySelector('[data-feedback]');
+      const nextButton = document.querySelector('[data-next]');
+      const resultTitle = document.querySelector('[data-result-title]');
+      const resultScore = document.querySelector('[data-result-score]');
+      const resultMessage = document.querySelector('[data-result-message]');
+      const restartButton = document.querySelector('[data-restart]');
+      let questionIndex = 0;
+      let score = 0;
+
+      function setScene(item) {
+        if (sceneBlur instanceof HTMLImageElement) sceneBlur.src = item.image;
+        if (sceneFocus instanceof HTMLImageElement) sceneFocus.src = item.image;
+        quiz?.style.setProperty('--quiz-accent', item.accent);
+      }
+
+      function showQuestion() {
+        const item = questions[questionIndex];
+        setScene(item);
+        if (story) story.textContent = item.story;
+        if (count) count.textContent = `${questionIndex + 1} / ${questions.length}`;
+        if (progress instanceof HTMLElement) progress.style.width = `${((questionIndex + 1) / questions.length) * 100}%`;
+        if (question) question.textContent = item.question;
+        if (feedback) feedback.textContent = '';
+        if (nextButton instanceof HTMLButtonElement) nextButton.hidden = true;
+        if (!options) return;
+        options.replaceChildren();
+
+        item.answers.forEach((answer, answerIndex) => {
+          const button = document.createElement('button');
+          button.type = 'button';
+          button.className = 'quiz-answer';
+          button.textContent = answer;
+          button.addEventListener('click', () => chooseAnswer(answerIndex));
+          options.append(button);
+        });
+      }
+
+      function chooseAnswer(answerIndex) {
+        const item = questions[questionIndex];
+        const answerButtons = [...document.querySelectorAll('.quiz-answer')];
+        answerButtons.forEach((button, index) => {
+          button.disabled = true;
+          if (index === item.correct) button.classList.add('is-correct');
+          if (index === answerIndex && index !== item.correct) button.classList.add('is-wrong');
+        });
+
+        if (answerIndex === item.correct) {
+          score += 1;
+          quiz?.classList.add('is-correct');
+          if (feedback) feedback.textContent = `Correct. ${item.fact}`;
+        } else if (feedback) {
+          feedback.textContent = `Not this time. ${item.fact}`;
+        }
+        window.setTimeout(() => quiz?.classList.remove('is-correct'), 650);
+        if (nextButton instanceof HTMLButtonElement) {
+          nextButton.hidden = false;
+          nextButton.textContent = questionIndex === questions.length - 1 ? 'See my result →' : 'Next question →';
+          nextButton.focus();
+        }
+      }
+
+      function showResult() {
+        if (questionView instanceof HTMLElement) questionView.hidden = true;
+        if (resultView instanceof HTMLElement) resultView.hidden = false;
+        if (resultTitle) resultTitle.textContent = score === questions.length ? 'A Perfect Prophecy' : score >= 4 ? 'Favored by Athena' : 'A Brave Beginning';
+        if (resultScore) resultScore.textContent = `${score} of ${questions.length}`;
+        if (resultMessage) resultMessage.textContent = score === questions.length
+          ? 'Every answer was worthy of the oracle.'
+          : score >= 4
+            ? 'Your knowledge of the old stories shines brightly.'
+            : 'Even heroes learn by beginning the journey again.';
+        restartButton?.focus();
+      }
+
+      nextButton?.addEventListener('click', () => {
+        questionIndex += 1;
+        if (questionIndex >= questions.length) {
+          showResult();
+          return;
+        }
+        showQuestion();
+      });
+
+      restartButton?.addEventListener('click', () => {
+        questionIndex = 0;
+        score = 0;
+        if (resultView instanceof HTMLElement) resultView.hidden = true;
+        if (questionView instanceof HTMLElement) questionView.hidden = false;
+        showQuestion();
+      });
+
+      showQuestion();
+    </script>
   </body>
 </html>
 
 <style is:global>
-  :root { --night: #04070b; --gold: #e7ca7f; --ghost: #bcd4e9; }
+  :root { --night: #04070b; --gold: #e7ca7f; --ghost: #c4d9eb; }
   * { box-sizing: border-box; }
   html, body { min-width: 320px; min-height: 100%; margin: 0; background: var(--night); }
-  body { color: var(--ghost); font-family: 'Cormorant Variable', 'Cormorant Garamond', Georgia, serif; }
-  .inner-temple { min-height: 100svh; position: relative; overflow: hidden; background: radial-gradient(circle at 50% 48%, rgba(34,59,75,.18), transparent 34%), linear-gradient(145deg, #060b12, #020305 72%); }
-  .inner-temple::before { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .26; background: linear-gradient(90deg, transparent 0 49.9%, rgba(231,202,127,.16) 50%, transparent 50.1%), linear-gradient(transparent 0 49.9%, rgba(188,212,233,.08) 50%, transparent 50.1%); }
-  #inner-temple-title { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
-  .inner-temple__return { position: absolute; top: clamp(1rem, 3vw, 2.5rem); left: clamp(1rem, 3vw, 2.5rem); display: inline-flex; align-items: center; gap: .7rem; min-height: 46px; padding: .6rem .9rem; border: 1px solid rgba(231,202,127,.48); border-radius: 999px; background: rgba(4,7,11,.5); color: var(--gold); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .62rem; letter-spacing: .15em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
-  .inner-temple__return:hover { border-color: var(--gold); box-shadow: 0 0 22px rgba(231,202,127,.18); transform: translateX(-2px); }
-  .inner-temple__return:focus-visible { outline: 2px solid var(--ghost); outline-offset: 4px; }
+  body { color: #f5efe3; font-family: 'Cormorant Variable', 'Cormorant Garamond', Georgia, serif; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+  button { font: inherit; }
+  [hidden] { display: none !important; }
+
+  .myth-quiz { --quiz-accent: var(--gold); position: relative; isolation: isolate; display: grid; min-height: 100svh; overflow: hidden; place-items: center start; padding: clamp(5.5rem, 10vw, 8rem) clamp(1.1rem, 7vw, 7rem) clamp(2rem, 6vw, 5rem); }
+  .myth-quiz::after { content: ''; position: absolute; inset: 0; z-index: 5; pointer-events: none; opacity: 0; background: radial-gradient(circle at 36% 50%, color-mix(in srgb, var(--quiz-accent) 64%, transparent), transparent 56%); mix-blend-mode: screen; }
+  .myth-quiz.is-correct::after { animation: oracle-glow .65s ease-out; }
+
+  .quiz-scene { position: absolute; z-index: -1; inset: 0; overflow: hidden; background: #05080d; }
+  .quiz-scene__blur { position: absolute; inset: -6%; width: 112%; height: 112%; object-fit: cover; filter: blur(26px) brightness(.5) saturate(1.35); transform: scale(1.04); transition: opacity .35s ease; }
+  .quiz-scene__focus { position: absolute; top: 0; right: 0; width: 66%; height: 100%; object-fit: contain; object-position: center; filter: saturate(1.08) contrast(1.03) brightness(.78); opacity: .92; transition: opacity .35s ease; -webkit-mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 88%, transparent 100%); mask-image: linear-gradient(90deg, transparent 0, #000 16%, #000 88%, transparent 100%); }
+  .quiz-scene__shade { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(3,6,10,.96) 0, rgba(3,6,10,.77) 35%, rgba(3,6,10,.22) 70%, rgba(3,6,10,.58) 100%), linear-gradient(180deg, rgba(2,4,8,.58), transparent 28% 70%, rgba(2,4,8,.75)); }
+  .quiz-scene__grain { position: absolute; inset: 0; opacity: .13; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); }
+
+  .quiz-home { position: absolute; z-index: 6; top: clamp(1rem, 3vw, 2.4rem); left: clamp(1rem, 3vw, 2.8rem); display: inline-flex; align-items: center; gap: .7rem; min-height: 44px; padding: .55rem .85rem; border: 1px solid rgba(231,202,127,.48); border-radius: 999px; background: rgba(4,7,11,.52); color: var(--gold); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .62rem; letter-spacing: .15em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .quiz-home:hover { border-color: var(--gold); box-shadow: 0 0 22px rgba(231,202,127,.2); transform: translateX(-2px); }
+  .quiz-home:focus-visible { outline: 2px solid var(--ghost); outline-offset: 4px; }
+
+  .quiz-card { position: relative; z-index: 2; width: min(100%, 670px); min-height: 520px; padding: clamp(1.5rem, 4vw, 3.4rem); border: 1px solid color-mix(in srgb, var(--quiz-accent) 38%, transparent); border-radius: 1.4rem; background: linear-gradient(145deg, rgba(5,9,15,.9), rgba(7,13,20,.74)); box-shadow: 0 28px 90px rgba(0,0,0,.44), 0 0 42px color-mix(in srgb, var(--quiz-accent) 10%, transparent), inset 0 1px 0 rgba(255,255,255,.06); backdrop-filter: blur(18px); }
+  .quiz-card__header { display: flex; align-items: flex-start; justify-content: space-between; gap: 1rem; }
+  .quiz-card__eyebrow, .quiz-card__story, .quiz-card__count { margin: 0; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; text-transform: uppercase; }
+  .quiz-card__eyebrow { color: var(--gold); font-size: .63rem; letter-spacing: .22em; }
+  .quiz-card__story { margin-top: .55rem; color: color-mix(in srgb, var(--quiz-accent) 86%, white); font-size: .67rem; letter-spacing: .12em; }
+  .quiz-card__count { color: rgba(221,231,238,.62); font-size: .67rem; letter-spacing: .12em; white-space: nowrap; }
+
+  .quiz-progress { height: 2px; margin: 1.4rem 0 clamp(1.8rem, 4vw, 3rem); overflow: hidden; background: rgba(255,255,255,.12); }
+  .quiz-progress span { display: block; width: 0; height: 100%; background: var(--quiz-accent); box-shadow: 0 0 10px var(--quiz-accent); transition: width .35s ease; }
+  #quiz-title, .quiz-card__result h1 { max-width: 13ch; margin: 0; color: #f5ead0; font-size: clamp(2rem, 4.3vw, 4rem); font-weight: 450; letter-spacing: -.02em; line-height: .98; text-wrap: balance; text-shadow: 0 3px 24px rgba(0,0,0,.62); }
+
+  .quiz-options { display: grid; gap: .72rem; margin-top: clamp(1.7rem, 4vw, 2.7rem); }
+  .quiz-answer { width: 100%; min-height: 50px; padding: .78rem 1rem; border: 1px solid rgba(204,222,235,.24); border-radius: .75rem; background: rgba(7,13,20,.58); color: #edf2f5; font-size: clamp(1.05rem, 1.8vw, 1.28rem); text-align: left; cursor: pointer; transition: border-color .18s ease, background .18s ease, color .18s ease, transform .18s ease; }
+  .quiz-answer:hover:not(:disabled) { border-color: var(--quiz-accent); background: color-mix(in srgb, var(--quiz-accent) 10%, rgba(7,13,20,.72)); transform: translateX(3px); }
+  .quiz-answer:focus-visible, .quiz-next:focus-visible, .quiz-restart:focus-visible { outline: 2px solid var(--ghost); outline-offset: 3px; }
+  .quiz-answer:disabled { cursor: default; }
+  .quiz-answer.is-correct { border-color: #e8cf83; background: rgba(151,117,42,.28); color: #fff0bd; box-shadow: inset 0 0 20px rgba(232,207,131,.08); }
+  .quiz-answer.is-wrong { border-color: rgba(190,103,95,.68); background: rgba(92,35,36,.33); color: #efc5bd; }
+
+  .quiz-feedback { min-height: 3.2rem; margin: 1.15rem 0 0; color: rgba(226,235,241,.8); font-size: 1.05rem; font-style: italic; line-height: 1.4; }
+  .quiz-next, .quiz-restart { margin-top: 1rem; min-height: 46px; padding: .7rem 1.15rem; border: 1px solid color-mix(in srgb, var(--quiz-accent) 58%, transparent); border-radius: 999px; background: rgba(5,9,15,.68); color: #f2ddb0; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .67rem; letter-spacing: .12em; text-transform: uppercase; cursor: pointer; transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .quiz-next:hover, .quiz-restart:hover { border-color: var(--quiz-accent); box-shadow: 0 0 22px color-mix(in srgb, var(--quiz-accent) 22%, transparent); transform: translateY(-2px); }
+
+  .quiz-card__result { display: flex; min-height: 440px; flex-direction: column; align-items: flex-start; justify-content: center; }
+  .quiz-card__result h1 { margin-top: 1.2rem; }
+  .quiz-result__score { margin: 1.8rem 0 .5rem; color: var(--quiz-accent); font-size: clamp(3.5rem, 8vw, 6.5rem); line-height: .8; }
+  .quiz-result__message { max-width: 34ch; margin: .8rem 0 1rem; color: rgba(226,235,241,.78); font-size: 1.15rem; font-style: italic; line-height: 1.45; }
+
+  @keyframes oracle-glow {
+    0% { opacity: 0; }
+    30% { opacity: .75; }
+    100% { opacity: 0; }
+  }
+
+  @media (max-width: 760px) {
+    .myth-quiz { align-items: end; padding: 5.4rem 1rem 1rem; }
+    .quiz-scene__focus { inset: 0; width: 100%; height: 62%; object-position: center top; opacity: .8; -webkit-mask-image: linear-gradient(180deg, #000 0, #000 68%, transparent 100%); mask-image: linear-gradient(180deg, #000 0, #000 68%, transparent 100%); }
+    .quiz-scene__shade { background: linear-gradient(180deg, rgba(2,4,8,.2), rgba(2,4,8,.68) 40%, rgba(2,4,8,.96) 72%); }
+    .quiz-card { min-height: 0; max-height: calc(100svh - 6.4rem); overflow-y: auto; padding: 1.35rem; border-radius: 1.1rem; }
+    #quiz-title, .quiz-card__result h1 { font-size: clamp(1.85rem, 8vw, 2.8rem); }
+    .quiz-progress { margin: 1rem 0 1.5rem; }
+    .quiz-options { margin-top: 1.35rem; }
+    .quiz-feedback { min-height: 0; }
+    .quiz-card__result { min-height: 58svh; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { scroll-behavior: auto !important; animation-duration: .01ms !important; transition-duration: .01ms !important; }
+  }
 </style>
