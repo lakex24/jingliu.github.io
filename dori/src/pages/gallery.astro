@@ -33,37 +33,37 @@ import '@fontsource/ibm-plex-mono/400.css';
       <section class="gallery-wall" aria-label="Six picture frames">
         <button class="gallery-frame gallery-frame--portrait gallery-frame--gold" type="button" data-gallery-frame="0" aria-label="Add a photo to frame one">
           <span class="gallery-frame__inner">
-            <img alt="Photo in frame one" hidden />
+            <canvas role="img" aria-label="Photo in frame one" hidden></canvas>
             <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
           </span>
         </button>
         <button class="gallery-frame gallery-frame--landscape gallery-frame--silver" type="button" data-gallery-frame="1" aria-label="Add a photo to frame two">
           <span class="gallery-frame__inner">
-            <img alt="Photo in frame two" hidden />
+            <canvas role="img" aria-label="Photo in frame two" hidden></canvas>
             <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
           </span>
         </button>
         <button class="gallery-frame gallery-frame--portrait gallery-frame--gold" type="button" data-gallery-frame="2" aria-label="Add a photo to frame three">
           <span class="gallery-frame__inner">
-            <img alt="Photo in frame three" hidden />
+            <canvas role="img" aria-label="Photo in frame three" hidden></canvas>
             <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
           </span>
         </button>
         <button class="gallery-frame gallery-frame--landscape gallery-frame--silver" type="button" data-gallery-frame="3" aria-label="Add a photo to frame four">
           <span class="gallery-frame__inner">
-            <img alt="Photo in frame four" hidden />
+            <canvas role="img" aria-label="Photo in frame four" hidden></canvas>
             <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
           </span>
         </button>
         <button class="gallery-frame gallery-frame--portrait gallery-frame--gold" type="button" data-gallery-frame="4" aria-label="Add a photo to frame five">
           <span class="gallery-frame__inner">
-            <img alt="Photo in frame five" hidden />
+            <canvas role="img" aria-label="Photo in frame five" hidden></canvas>
             <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
           </span>
         </button>
         <button class="gallery-frame gallery-frame--landscape gallery-frame--silver" type="button" data-gallery-frame="5" aria-label="Add a photo to frame six">
           <span class="gallery-frame__inner">
-            <img alt="Photo in frame six" hidden />
+            <canvas role="img" aria-label="Photo in frame six" hidden></canvas>
             <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
           </span>
         </button>
@@ -79,15 +79,15 @@ import '@fontsource/ibm-plex-mono/400.css';
           <legend>Adjust selected photo</legend>
           <label>
             <span>Zoom <output id="gallery-zoom-value" for="gallery-zoom">100%</output></span>
-            <input id="gallery-zoom" type="range" min="100" max="220" value="100" />
+            <input id="gallery-zoom" type="range" min="100" max="250" value="100" />
           </label>
           <label>
             <span>Left · right <output id="gallery-x-value" for="gallery-x">Center</output></span>
-            <input id="gallery-x" type="range" min="0" max="100" value="50" />
+            <input id="gallery-x" type="range" min="-100" max="100" value="0" />
           </label>
           <label>
             <span>Up · down <output id="gallery-y-value" for="gallery-y">Center</output></span>
-            <input id="gallery-y" type="range" min="0" max="100" value="50" />
+            <input id="gallery-y" type="range" min="-100" max="100" value="0" />
           </label>
         </fieldset>
       </footer>
@@ -115,11 +115,12 @@ import '@fontsource/ibm-plex-mono/400.css';
         y: document.getElementById('gallery-y-value'),
       };
       const adjustments = {};
+      const frameSources = {};
       let activeFrame = null;
       let dragState = null;
 
       function defaultAdjustment() {
-        return { zoom: 100, x: 50, y: 50 };
+        return { mode: 'canvas-crop', zoom: 100, x: 0, y: 0 };
       }
 
       function loadAdjustment(frame) {
@@ -132,9 +133,10 @@ import '@fontsource/ibm-plex-mono/400.css';
           const savedX = Number(saved?.x);
           const savedY = Number(saved?.y);
           adjustments[frameNumber] = {
-            zoom: Number.isFinite(savedZoom) ? Math.min(220, Math.max(100, savedZoom)) : 100,
-            x: Number.isFinite(savedX) ? Math.min(100, Math.max(0, savedX)) : 50,
-            y: Number.isFinite(savedY) ? Math.min(100, Math.max(0, savedY)) : 50,
+            mode: 'canvas-crop',
+            zoom: Number.isFinite(savedZoom) ? Math.min(250, Math.max(100, savedZoom)) : 100,
+            x: Number.isFinite(savedX) ? Math.min(100, Math.max(-100, saved?.mode === 'canvas-crop' ? savedX : (savedX - 50) * 2)) : 0,
+            y: Number.isFinite(savedY) ? Math.min(100, Math.max(-100, saved?.mode === 'canvas-crop' ? savedY : (savedY - 50) * 2)) : 0,
           };
         } catch (error) {
           adjustments[frameNumber] = defaultAdjustment();
@@ -143,16 +145,40 @@ import '@fontsource/ibm-plex-mono/400.css';
       }
 
       function applyAdjustment(frame) {
-        const image = frame.querySelector('img');
+        const frameNumber = frame.dataset.galleryFrame;
+        const sourceImage = frameSources[frameNumber];
+        const canvas = frame.querySelector('canvas');
+        const inner = frame.querySelector('.gallery-frame__inner');
+        if (!sourceImage || !inner.clientWidth || !inner.clientHeight) return;
+
         const adjustment = loadAdjustment(frame);
-        image.style.setProperty('--gallery-zoom', String(adjustment.zoom / 100));
-        image.style.setProperty('--gallery-x', `${adjustment.x}%`);
-        image.style.setProperty('--gallery-y', `${adjustment.y}%`);
+        const frameRatio = inner.clientWidth / inner.clientHeight;
+        if (frameRatio >= 1) {
+          canvas.width = 900;
+          canvas.height = Math.round(900 / frameRatio);
+        } else {
+          canvas.height = 900;
+          canvas.width = Math.round(900 * frameRatio);
+        }
+
+        const context = canvas.getContext('2d');
+        const scale = Math.max(canvas.width / sourceImage.naturalWidth, canvas.height / sourceImage.naturalHeight) * (adjustment.zoom / 100);
+        const drawWidth = sourceImage.naturalWidth * scale;
+        const drawHeight = sourceImage.naturalHeight * scale;
+        const maxX = Math.max(0, (drawWidth - canvas.width) / 2);
+        const maxY = Math.max(0, (drawHeight - canvas.height) / 2);
+        const horizontalPosition = adjustment.x / 100;
+        const verticalPosition = adjustment.y / 100;
+        const drawX = (canvas.width - drawWidth) / 2 + horizontalPosition * maxX;
+        const drawY = (canvas.height - drawHeight) / 2 + verticalPosition * maxY;
+
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        context.drawImage(sourceImage, drawX, drawY, drawWidth, drawHeight);
       }
 
       function describePosition(value, first, second) {
-        if (value === 50) return 'Center';
-        return `${Math.abs(value - 50)}% ${value < 50 ? first : second}`;
+        if (value === 0) return 'Center';
+        return `${Math.abs(value)}% ${value < 0 ? first : second}`;
       }
 
       function syncAdjustmentControls(frame) {
@@ -188,22 +214,29 @@ import '@fontsource/ibm-plex-mono/400.css';
       }
 
       function displayPhoto(frame, source) {
-        const image = frame.querySelector('img');
+        const frameNumber = frame.dataset.galleryFrame;
+        const canvas = frame.querySelector('canvas');
         const empty = frame.querySelector('.gallery-frame__empty');
+        const image = new Image();
+        image.onload = () => {
+          frameSources[frameNumber] = image;
+          canvas.hidden = false;
+          applyAdjustment(frame);
+        };
         image.src = source;
-        image.draggable = false;
-        image.hidden = false;
         empty.hidden = true;
         frame.classList.add('has-photo');
         frame.setAttribute('aria-label', `Change the photo in frame ${Number(frame.dataset.galleryFrame) + 1}`);
-        applyAdjustment(frame);
       }
 
       function clearPhoto(frame) {
-        const image = frame.querySelector('img');
+        const frameNumber = frame.dataset.galleryFrame;
+        const canvas = frame.querySelector('canvas');
         const empty = frame.querySelector('.gallery-frame__empty');
-        image.removeAttribute('src');
-        image.hidden = true;
+        const context = canvas.getContext('2d');
+        context.clearRect(0, 0, canvas.width, canvas.height);
+        canvas.hidden = true;
+        delete frameSources[frameNumber];
         empty.hidden = false;
         frame.classList.remove('has-photo');
         frame.setAttribute('aria-label', `Add a photo to frame ${Number(frame.dataset.galleryFrame) + 1}`);
@@ -289,8 +322,8 @@ import '@fontsource/ibm-plex-mono/400.css';
           const deltaY = event.clientY - dragState.startY;
           if (Math.abs(deltaX) + Math.abs(deltaY) > 2) dragState.moved = true;
           const adjustment = loadAdjustment(frame);
-          adjustment.x = Math.round(Math.min(100, Math.max(0, dragState.adjustmentX - (deltaX / inner.clientWidth) * 100)));
-          adjustment.y = Math.round(Math.min(100, Math.max(0, dragState.adjustmentY - (deltaY / inner.clientHeight) * 100)));
+          adjustment.x = Math.round(Math.min(100, Math.max(-100, dragState.adjustmentX + (deltaX / inner.clientWidth) * 200)));
+          adjustment.y = Math.round(Math.min(100, Math.max(-100, dragState.adjustmentY + (deltaY / inner.clientHeight) * 200)));
           applyAdjustment(frame);
           syncAdjustmentControls(frame);
           event.preventDefault();
@@ -351,6 +384,10 @@ import '@fontsource/ibm-plex-mono/400.css';
         }
       });
 
+      addEventListener('resize', () => {
+        frames.filter((frame) => frame.classList.contains('has-photo')).forEach(applyAdjustment);
+      });
+
       removeButton.addEventListener('click', () => {
         if (!activeFrame || !activeFrame.classList.contains('has-photo')) return;
         localStorage.removeItem(`${storagePrefix}${activeFrame.dataset.galleryFrame}`);
@@ -398,15 +435,14 @@ import '@fontsource/ibm-plex-mono/400.css';
   .gallery-frame:hover, .gallery-frame.is-selected { z-index: 2; filter: brightness(1.1); transform: translateY(-4px) scale(1.025); box-shadow: 0 10px 22px rgba(0,0,0,.7), 0 24px 44px rgba(0,0,0,.4), inset 0 0 0 2px rgba(255,250,225,.74), inset 0 0 0 6px rgba(33,23,10,.62); }
   .gallery-frame.is-selected::after { opacity: 1; }
   .gallery-frame__inner { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; border: 2px solid rgba(11,12,14,.88); background: radial-gradient(circle at 50% 35%, rgba(151,187,214,.2), transparent 48%), linear-gradient(145deg, #101722, #05070b); box-shadow: inset 0 0 24px rgba(0,0,0,.72); }
-  .gallery-frame__inner img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: var(--gallery-x, 50%) var(--gallery-y, 50%); transform: scale(var(--gallery-zoom, 1)); transform-origin: var(--gallery-x, 50%) var(--gallery-y, 50%); transition: object-position .12s ease, transform .12s ease; }
-  .gallery-frame__inner img[hidden], .gallery-frame__empty[hidden] { display: none; }
+  .gallery-frame__inner canvas { width: 100%; height: 100%; display: block; }
+  .gallery-frame__inner canvas[hidden], .gallery-frame__empty[hidden] { display: none; }
   .gallery-frame__empty { display: grid; justify-items: center; gap: .2rem; color: rgba(217,234,247,.8); font-family: 'IBM Plex Mono', monospace; font-size: .48rem; letter-spacing: .12em; text-transform: uppercase; }
   .gallery-frame__empty b { color: #e5c879; font-family: Georgia, serif; font-size: 2rem; font-weight: 400; line-height: 1; text-shadow: 0 0 14px rgba(215,189,112,.55); }
   .gallery-frame.has-photo .gallery-frame__inner { background: #05070b; }
   .gallery-frame.has-photo { cursor: grab; touch-action: none; }
   .gallery-frame.has-photo.is-dragging { cursor: grabbing; }
-  .gallery-frame.has-photo.is-dragging .gallery-frame__inner img { transition: none; }
-  .gallery-frame__inner img { pointer-events: none; user-select: none; }
+  .gallery-frame__inner canvas { pointer-events: none; user-select: none; }
 
   .gallery-tools { position: absolute; z-index: 3; left: 50%; bottom: clamp(1.2rem, 3vh, 2.2rem); width: min(92vw, 52rem); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .65rem 1rem; padding: .75rem 1rem; border: 1px solid rgba(220,232,241,.24); background: rgba(4,7,11,.72); box-shadow: 0 10px 30px rgba(0,0,0,.34); backdrop-filter: blur(12px); transform: translateX(-50%); }
   .gallery-tools p { margin: 0; color: rgba(228,239,247,.82); font-family: 'IBM Plex Mono', monospace; font-size: .55rem; letter-spacing: .04em; line-height: 1.45; }
