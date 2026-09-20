@@ -145,12 +145,16 @@ import '@fontsource/ibm-plex-mono/400.css';
           void portal.offsetWidth;
           portal.classList.add('is-wrong');
           eyePortals.forEach((eye) => { eye.disabled = true; });
-          chamber?.classList.add('is-petrified');
-          if (status) status.textContent = 'The wrong carving turned the temple to stone. Returning home in ten seconds.';
+          chamber?.classList.add('is-cursing');
+          if (status) status.textContent = 'The story images vanished. Medusa is preparing her stone curse.';
           window.setTimeout(() => {
-            sessionStorage.removeItem('dori-inner-temple-unlocked');
-            window.location.assign('/');
-          }, 10000);
+            chamber?.classList.add('is-petrified');
+            if (status) status.textContent = 'The temple is stone. Returning home in ten seconds.';
+            window.setTimeout(() => {
+              sessionStorage.removeItem('dori-inner-temple-unlocked');
+              window.location.assign('/');
+            }, 10000);
+          }, 500);
         });
       });
     </script>
@@ -200,6 +204,7 @@ import '@fontsource/ibm-plex-mono/400.css';
   .medusa-chamber.is-awake .eye-portal { opacity: 1; pointer-events: auto; }
   .medusa-chamber.is-awake .eye-portal--left { transform: translate(-50%, -50%) rotate(1deg) scaleY(1); }
   .medusa-chamber.is-awake .eye-portal--right { transform: translate(-50%, -50%) rotate(-1deg) scaleY(1); }
+  .medusa-chamber.is-cursing .eye-portal { opacity: 0; pointer-events: none; transition: opacity .1s ease; }
   .eye-portal__scene { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; filter: saturate(1.28) contrast(1.08) brightness(.98); user-select: none; transition: filter .22s ease, transform .6s ease; }
   .eye-portal__letter { --letter-x: 50%; --letter-y: 50%; --letter-turn: 0deg; position: absolute; z-index: 2; left: var(--letter-x); top: var(--letter-y); color: rgba(218,213,185,.46); font-family: Georgia, 'Times New Roman', serif; font-size: clamp(.46rem, .82vw, .92rem); font-weight: 700; line-height: 1; text-shadow: -1px -1px 0 rgba(24,18,12,.46), 1px 1px 0 rgba(255,242,197,.16); transform: translate(-50%, -50%) rotate(var(--letter-turn)); mix-blend-mode: luminosity; }
   .eye-portal::after { content: ''; position: absolute; z-index: 3; inset: 0; pointer-events: none; border-radius: inherit; background: radial-gradient(ellipse at 34% 26%, rgba(255,255,255,.22), transparent 17%), linear-gradient(180deg, rgba(0,0,0,.44), transparent 35% 68%, rgba(0,0,0,.55)); box-shadow: inset 0 0 9px 2px rgba(0,0,0,.7); }
