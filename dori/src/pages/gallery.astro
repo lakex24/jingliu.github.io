@@ -27,7 +27,7 @@ import '@fontsource/ibm-plex-mono/400.css';
       <header class="gallery-heading">
         <p>My private collection</p>
         <h1 id="gallery-title">The Picture Gallery</h1>
-        <span>Tap an empty frame to add a photo.</span>
+        <span>Tap an empty frame to add a photo, or a filled frame to adjust it.</span>
       </header>
 
       <section class="gallery-wall" aria-label="Six picture frames">
@@ -71,7 +71,25 @@ import '@fontsource/ibm-plex-mono/400.css';
 
       <footer class="gallery-tools">
         <p id="gallery-status" aria-live="polite">Choose a frame to begin. Photos stay only in this browser.</p>
-        <button id="gallery-remove" type="button" disabled>Remove selected photo</button>
+        <div class="gallery-tool-actions">
+          <button id="gallery-change" type="button" disabled>Change photo</button>
+          <button id="gallery-remove" type="button" disabled>Remove photo</button>
+        </div>
+        <fieldset class="gallery-adjustments" id="gallery-adjustments" hidden>
+          <legend>Adjust selected photo</legend>
+          <label>
+            <span>Zoom <output id="gallery-zoom-value" for="gallery-zoom">100%</output></span>
+            <input id="gallery-zoom" type="range" min="100" max="220" value="100" />
+          </label>
+          <label>
+            <span>Left · right <output id="gallery-x-value" for="gallery-x">Center</output></span>
+            <input id="gallery-x" type="range" min="0" max="100" value="50" />
+          </label>
+          <label>
+            <span>Up · down <output id="gallery-y-value" for="gallery-y">Center</output></span>
+            <input id="gallery-y" type="range" min="0" max="100" value="50" />
+          </label>
+        </fieldset>
       </footer>
 
       <input id="gallery-photo-input" type="file" accept="image/*" hidden />
@@ -80,10 +98,82 @@ import '@fontsource/ibm-plex-mono/400.css';
     <script>
       const frames = [...document.querySelectorAll('[data-gallery-frame]')];
       const photoInput = document.getElementById('gallery-photo-input');
+      const changeButton = document.getElementById('gallery-change');
       const removeButton = document.getElementById('gallery-remove');
+      const adjustmentsPanel = document.getElementById('gallery-adjustments');
       const status = document.getElementById('gallery-status');
       const storagePrefix = 'dori-gallery-photo-';
+      const adjustmentPrefix = 'dori-gallery-adjust-';
+      const adjustmentInputs = {
+        zoom: document.getElementById('gallery-zoom'),
+        x: document.getElementById('gallery-x'),
+        y: document.getElementById('gallery-y'),
+      };
+      const adjustmentOutputs = {
+        zoom: document.getElementById('gallery-zoom-value'),
+        x: document.getElementById('gallery-x-value'),
+        y: document.getElementById('gallery-y-value'),
+      };
+      const adjustments = {};
       let activeFrame = null;
+
+      function defaultAdjustment() {
+        return { zoom: 100, x: 50, y: 50 };
+      }
+
+      function loadAdjustment(frame) {
+        const frameNumber = frame.dataset.galleryFrame;
+        if (adjustments[frameNumber]) return adjustments[frameNumber];
+
+        try {
+          const saved = JSON.parse(localStorage.getItem(`${adjustmentPrefix}${frameNumber}`));
+          const savedZoom = Number(saved?.zoom);
+          const savedX = Number(saved?.x);
+          const savedY = Number(saved?.y);
+          adjustments[frameNumber] = {
+            zoom: Number.isFinite(savedZoom) ? Math.min(220, Math.max(100, savedZoom)) : 100,
+            x: Number.isFinite(savedX) ? Math.min(100, Math.max(0, savedX)) : 50,
+            y: Number.isFinite(savedY) ? Math.min(100, Math.max(0, savedY)) : 50,
+          };
+        } catch (error) {
+          adjustments[frameNumber] = defaultAdjustment();
+        }
+        return adjustments[frameNumber];
+      }
+
+      function applyAdjustment(frame) {
+        const image = frame.querySelector('img');
+        const adjustment = loadAdjustment(frame);
+        image.style.setProperty('--gallery-zoom', String(adjustment.zoom / 100));
+        image.style.setProperty('--gallery-x', `${adjustment.x}%`);
+        image.style.setProperty('--gallery-y', `${adjustment.y}%`);
+      }
+
+      function describePosition(value, first, second) {
+        if (value === 50) return 'Center';
+        return `${Math.abs(value - 50)}% ${value < 50 ? first : second}`;
+      }
+
+      function syncAdjustmentControls(frame) {
+        const adjustment = loadAdjustment(frame);
+        adjustmentInputs.zoom.value = String(adjustment.zoom);
+        adjustmentInputs.x.value = String(adjustment.x);
+        adjustmentInputs.y.value = String(adjustment.y);
+        adjustmentOutputs.zoom.value = `${adjustment.zoom}%`;
+        adjustmentOutputs.x.value = describePosition(adjustment.x, 'left', 'right');
+        adjustmentOutputs.y.value = describePosition(adjustment.y, 'up', 'down');
+      }
+
+      function resetAdjustment(frame) {
+        const frameNumber = frame.dataset.galleryFrame;
+        adjustments[frameNumber] = defaultAdjustment();
+        try {
+          localStorage.removeItem(`${adjustmentPrefix}${frameNumber}`);
+        } catch (error) {
+          // The photo can still be adjusted for the current visit.
+        }
+        applyAdjustment(frame);
+      }
 
       function displayPhoto(frame, source) {
         const image = frame.querySelector('img');
@@ -93,6 +183,7 @@ import '@fontsource/ibm-plex-mono/400.css';
         empty.hidden = true;
         frame.classList.add('has-photo');
         frame.setAttribute('aria-label', `Change the photo in frame ${Number(frame.dataset.galleryFrame) + 1}`);
+        applyAdjustment(frame);
       }
 
       function clearPhoto(frame) {
@@ -108,7 +199,22 @@ import '@fontsource/ibm-plex-mono/400.css';
       function selectFrame(frame) {
         frames.forEach((item) => item.classList.toggle('is-selected', item === frame));
         activeFrame = frame;
-        removeButton.disabled = !frame.classList.contains('has-photo');
+        const hasPhoto = frame.classList.contains('has-photo');
+        changeButton.disabled = !hasPhoto;
+        removeButton.disabled = !hasPhoto;
+        adjustmentsPanel.hidden = !hasPhoto;
+        if (hasPhoto) {
+          syncAdjustmentControls(frame);
+          status.textContent = 'Use the sliders to adjust this photo, or choose another one.';
+        } else {
+          status.textContent = 'Choose a photo for this empty frame.';
+        }
+      }
+
+      function choosePhoto() {
+        if (!activeFrame) return;
+        photoInput.value = '';
+        photoInput.click();
       }
 
       function preparePhoto(file) {
@@ -142,8 +248,25 @@ import '@fontsource/ibm-plex-mono/400.css';
 
         frame.addEventListener('click', () => {
           selectFrame(frame);
-          photoInput.value = '';
-          photoInput.click();
+          if (!frame.classList.contains('has-photo')) choosePhoto();
+        });
+      });
+
+      changeButton.addEventListener('click', choosePhoto);
+
+      Object.entries(adjustmentInputs).forEach(([property, input]) => {
+        input.addEventListener('input', () => {
+          if (!activeFrame || !activeFrame.classList.contains('has-photo')) return;
+          const frameNumber = activeFrame.dataset.galleryFrame;
+          const adjustment = loadAdjustment(activeFrame);
+          adjustment[property] = Number(input.value);
+          applyAdjustment(activeFrame);
+          syncAdjustmentControls(activeFrame);
+          try {
+            localStorage.setItem(`${adjustmentPrefix}${frameNumber}`, JSON.stringify(adjustment));
+          } catch (error) {
+            status.textContent = 'The adjustment works now, but this browser could not save it.';
+          }
         });
       });
 
@@ -158,7 +281,11 @@ import '@fontsource/ibm-plex-mono/400.css';
         status.textContent = 'Placing your photo in the frame…';
         try {
           const preparedPhoto = await preparePhoto(file);
+          resetAdjustment(activeFrame);
           displayPhoto(activeFrame, preparedPhoto);
+          syncAdjustmentControls(activeFrame);
+          adjustmentsPanel.hidden = false;
+          changeButton.disabled = false;
           removeButton.disabled = false;
           try {
             localStorage.setItem(`${storagePrefix}${activeFrame.dataset.galleryFrame}`, preparedPhoto);
@@ -174,7 +301,11 @@ import '@fontsource/ibm-plex-mono/400.css';
       removeButton.addEventListener('click', () => {
         if (!activeFrame || !activeFrame.classList.contains('has-photo')) return;
         localStorage.removeItem(`${storagePrefix}${activeFrame.dataset.galleryFrame}`);
+        localStorage.removeItem(`${adjustmentPrefix}${activeFrame.dataset.galleryFrame}`);
+        delete adjustments[activeFrame.dataset.galleryFrame];
         clearPhoto(activeFrame);
+        adjustmentsPanel.hidden = true;
+        changeButton.disabled = true;
         removeButton.disabled = true;
         status.textContent = 'The frame is empty again.';
         activeFrame.focus();
@@ -214,20 +345,28 @@ import '@fontsource/ibm-plex-mono/400.css';
   .gallery-frame:hover, .gallery-frame.is-selected { z-index: 2; filter: brightness(1.1); transform: translateY(-4px) scale(1.025); box-shadow: 0 10px 22px rgba(0,0,0,.7), 0 24px 44px rgba(0,0,0,.4), inset 0 0 0 2px rgba(255,250,225,.74), inset 0 0 0 6px rgba(33,23,10,.62); }
   .gallery-frame.is-selected::after { opacity: 1; }
   .gallery-frame__inner { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; border: 2px solid rgba(11,12,14,.88); background: radial-gradient(circle at 50% 35%, rgba(151,187,214,.2), transparent 48%), linear-gradient(145deg, #101722, #05070b); box-shadow: inset 0 0 24px rgba(0,0,0,.72); }
-  .gallery-frame__inner img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .gallery-frame__inner img { width: 100%; height: 100%; display: block; object-fit: cover; object-position: var(--gallery-x, 50%) var(--gallery-y, 50%); transform: scale(var(--gallery-zoom, 1)); transform-origin: var(--gallery-x, 50%) var(--gallery-y, 50%); transition: object-position .12s ease, transform .12s ease; }
   .gallery-frame__inner img[hidden], .gallery-frame__empty[hidden] { display: none; }
   .gallery-frame__empty { display: grid; justify-items: center; gap: .2rem; color: rgba(217,234,247,.8); font-family: 'IBM Plex Mono', monospace; font-size: .48rem; letter-spacing: .12em; text-transform: uppercase; }
   .gallery-frame__empty b { color: #e5c879; font-family: Georgia, serif; font-size: 2rem; font-weight: 400; line-height: 1; text-shadow: 0 0 14px rgba(215,189,112,.55); }
   .gallery-frame.has-photo .gallery-frame__inner { background: #05070b; }
 
-  .gallery-tools { position: absolute; z-index: 3; left: 50%; bottom: clamp(1.2rem, 3vh, 2.2rem); width: min(92vw, 52rem); display: flex; align-items: center; justify-content: center; gap: 1rem; padding: .75rem 1rem; border: 1px solid rgba(220,232,241,.24); background: rgba(4,7,11,.62); box-shadow: 0 10px 30px rgba(0,0,0,.34); backdrop-filter: blur(12px); transform: translateX(-50%); }
+  .gallery-tools { position: absolute; z-index: 3; left: 50%; bottom: clamp(1.2rem, 3vh, 2.2rem); width: min(92vw, 52rem); display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; gap: .65rem 1rem; padding: .75rem 1rem; border: 1px solid rgba(220,232,241,.24); background: rgba(4,7,11,.72); box-shadow: 0 10px 30px rgba(0,0,0,.34); backdrop-filter: blur(12px); transform: translateX(-50%); }
   .gallery-tools p { margin: 0; color: rgba(228,239,247,.82); font-family: 'IBM Plex Mono', monospace; font-size: .55rem; letter-spacing: .04em; line-height: 1.45; }
   .gallery-tools button { flex: 0 0 auto; min-height: 38px; padding: .55rem .75rem; border: 1px solid rgba(227,238,246,.42); background: transparent; color: #e9f2f8; font-family: 'IBM Plex Mono', monospace; font-size: .5rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
   .gallery-tools button:hover:not(:disabled) { border-color: #fff; background: rgba(211,230,244,.1); }
   .gallery-tools button:disabled { opacity: .34; cursor: not-allowed; }
+  .gallery-tool-actions { display: flex; justify-content: flex-end; gap: .5rem; }
+  .gallery-adjustments { grid-column: 1 / -1; min-width: 0; margin: 0; padding: .65rem 0 0; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: .9rem; border: 0; border-top: 1px solid rgba(220,232,241,.18); }
+  .gallery-adjustments[hidden] { display: none; }
+  .gallery-adjustments legend { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+  .gallery-adjustments label { min-width: 0; display: grid; gap: .28rem; color: rgba(229,239,247,.84); font-family: 'IBM Plex Mono', monospace; font-size: .48rem; letter-spacing: .08em; text-transform: uppercase; }
+  .gallery-adjustments label > span { display: flex; justify-content: space-between; gap: .5rem; }
+  .gallery-adjustments output { color: #e4ca7e; text-transform: none; }
+  .gallery-adjustments input[type='range'] { width: 100%; accent-color: #d7b75d; cursor: ew-resize; }
 
   @media (max-width: 720px) {
-    .gallery { min-height: 1120px; overflow: visible; padding: 8.7rem 1rem 7rem; background-position: center top; background-attachment: fixed; }
+    .gallery { min-height: 1120px; overflow: visible; padding: 8.7rem 1rem 10.5rem; background-position: center top; background-attachment: fixed; }
     .gallery-heading { top: 4.4rem; width: calc(100% - 2rem); }
     .gallery-heading p { display: none; }
     .gallery-heading h1 { font-size: 2.25rem; }
@@ -235,7 +374,9 @@ import '@fontsource/ibm-plex-mono/400.css';
     .gallery-wall { width: min(94vw, 620px); grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, 225px); gap: 1.5rem 1rem; }
     .gallery-frame--portrait { width: min(88%, 160px); height: 100%; }
     .gallery-frame--landscape { width: 100%; height: 72%; }
-    .gallery-tools { position: fixed; bottom: .75rem; width: calc(100% - 1.5rem); flex-direction: column; gap: .5rem; text-align: center; }
+    .gallery-tools { position: fixed; bottom: .75rem; width: calc(100% - 1.5rem); grid-template-columns: 1fr; gap: .5rem; text-align: center; }
+    .gallery-tool-actions { justify-content: center; }
+    .gallery-adjustments { grid-template-columns: 1fr; gap: .55rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
