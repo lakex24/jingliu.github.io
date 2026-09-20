@@ -54,6 +54,10 @@ a:active { opacity: 0.72; transition: opacity 0.08s ease; }
 ::view-transition-new(root) { animation: page-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @keyframes page-out { to { opacity: 0; } }
 @keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* Named pieces morph between pages: the tapped tab label travels into the
+   section heading; the inner header bar holds still. Keep it unhurried. */
+::view-transition-group(*) { animation-duration: 0.45s; animation-timing-function: cubic-bezier(0.2, 0.7, 0.2, 1); }
+::view-transition-old(masthead), ::view-transition-new(masthead) { animation: none; mix-blend-mode: normal; }
 /* Astro's ClientRouter names the animation on the root the same way. */
 html[data-astro-transition] ::view-transition-old(root) { animation: page-out 0.22s ease both; }
 html[data-astro-transition] ::view-transition-new(root) { animation: page-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
@@ -187,6 +191,7 @@ p { margin: 0 0 1.1em; }
   font-family: var(--font-mono); font-size: 0.74rem; letter-spacing: 0.18em; text-transform: uppercase;
   color: var(--ink-soft); text-decoration: none; border-radius: 3px;
 }
+.nav__label { display: inline-block; }
 .nav a:hover, .nav a[aria-current="page"] { color: var(--violet-deep); }
 @media (max-width: 479px) { .nav a { padding: 0 0.55rem; letter-spacing: 0.12em; font-size: 0.7rem; } }
 .nav a[aria-current="page"] { text-decoration: underline; text-underline-offset: 0.35em; }
