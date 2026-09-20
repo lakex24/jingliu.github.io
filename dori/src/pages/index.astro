@@ -276,6 +276,34 @@ const greekLetters = [
             <label class="upload-button" for="photo-input"><span aria-hidden="true">◎</span> Take or choose a photo</label>
             <input id="photo-input" type="file" accept="image/*" capture="user" />
 
+            <fieldset class="photo-adjustments" id="photo-adjustments" hidden>
+              <legend>Crop &amp; adjust</legend>
+              <p class="photo-adjustments__hint">Drag the photo to place it inside the frame.</p>
+
+              <div class="photo-adjustment">
+                <label for="photo-zoom"><span>Zoom</span><output id="photo-zoom-value" for="photo-zoom">100%</output></label>
+                <input id="photo-zoom" type="range" min="100" max="250" value="100" step="1" data-photo-adjust="zoom" />
+              </div>
+              <div class="photo-adjustment">
+                <label for="photo-x"><span>Left · right</span><output id="photo-x-value" for="photo-x">Center</output></label>
+                <input id="photo-x" type="range" min="-100" max="100" value="0" step="1" data-photo-adjust="x" />
+              </div>
+              <div class="photo-adjustment">
+                <label for="photo-y"><span>Up · down</span><output id="photo-y-value" for="photo-y">Center</output></label>
+                <input id="photo-y" type="range" min="-100" max="100" value="0" step="1" data-photo-adjust="y" />
+              </div>
+              <div class="photo-adjustment">
+                <label for="photo-brightness"><span>Brightness</span><output id="photo-brightness-value" for="photo-brightness">100%</output></label>
+                <input id="photo-brightness" type="range" min="65" max="140" value="100" step="1" data-photo-adjust="brightness" />
+              </div>
+              <div class="photo-adjustment">
+                <label for="photo-contrast"><span>Contrast</span><output id="photo-contrast-value" for="photo-contrast">100%</output></label>
+                <input id="photo-contrast" type="range" min="65" max="150" value="100" step="1" data-photo-adjust="contrast" />
+              </div>
+
+              <button type="button" id="reset-photo-adjustments">Reset crop</button>
+            </fieldset>
+
             <fieldset class="mood-picker">
               <legend>Choose a mood</legend>
               <button type="button" class="is-active" data-mood="blue" aria-pressed="true"><span class="swatch swatch--blue"></span> Blue Hour</button>
@@ -638,8 +666,13 @@ const greekLetters = [
       const empty = document.getElementById('photo-empty');
       const savePhoto = document.getElementById('save-photo');
       const timestamp = document.getElementById('photo-timestamp');
+      const photoStage = document.getElementById('photo-stage');
+      const photoAdjustments = document.getElementById('photo-adjustments');
+      const photoControls = [...document.querySelectorAll('[data-photo-adjust]')];
       let sourceImage = null;
       let mood = 'blue';
+      let photoSettings = { zoom: 1, x: 0, y: 0, brightness: 1, contrast: 1 };
+      let photoDrag = null;
 
       const moods = {
         blue: { filter: 'contrast(1.13) saturate(.72) hue-rotate(8deg) brightness(.92)', caption: 'BLUE HOUR · 00:17', color: 'rgba(54, 107, 160, .18)' },
@@ -649,14 +682,29 @@ const greekLetters = [
 
       function renderPhoto() {
         if (!sourceImage) return;
+        const stageWidth = photoStage.clientWidth;
+        const stageHeight = photoStage.clientHeight;
+        if (!stageWidth || !stageHeight) return;
+        const stageRatio = stageWidth / stageHeight;
+        if (stageRatio >= 1) {
+          canvas.width = 1200;
+          canvas.height = Math.round(1200 / stageRatio);
+        } else {
+          canvas.height = 1200;
+          canvas.width = Math.round(1200 * stageRatio);
+        }
         const width = canvas.width;
         const height = canvas.height;
-        const scale = Math.max(width / sourceImage.naturalWidth, height / sourceImage.naturalHeight);
+        const scale = Math.max(width / sourceImage.naturalWidth, height / sourceImage.naturalHeight) * photoSettings.zoom;
         const drawWidth = sourceImage.naturalWidth * scale;
         const drawHeight = sourceImage.naturalHeight * scale;
+        const maxX = Math.max(0, (drawWidth - width) / 2);
+        const maxY = Math.max(0, (drawHeight - height) / 2);
+        const drawX = (width - drawWidth) / 2 + (photoSettings.x / 100) * maxX;
+        const drawY = (height - drawHeight) / 2 + (photoSettings.y / 100) * maxY;
         context.clearRect(0, 0, width, height);
-        context.filter = moods[mood].filter;
-        context.drawImage(sourceImage, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+        context.filter = `${moods[mood].filter} brightness(${photoSettings.brightness}) contrast(${photoSettings.contrast})`;
+        context.drawImage(sourceImage, drawX, drawY, drawWidth, drawHeight);
         context.filter = 'none';
         const wash = context.createLinearGradient(0, 0, width, height);
         wash.addColorStop(0, moods[mood].color);
@@ -667,6 +715,28 @@ const greekLetters = [
         timestamp.textContent = moods[mood].caption;
       }
 
+      function syncPhotoControls() {
+        const values = {
+          zoom: Math.round(photoSettings.zoom * 100),
+          x: Math.round(photoSettings.x),
+          y: Math.round(photoSettings.y),
+          brightness: Math.round(photoSettings.brightness * 100),
+          contrast: Math.round(photoSettings.contrast * 100)
+        };
+        photoControls.forEach((control) => control.value = values[control.dataset.photoAdjust]);
+        document.getElementById('photo-zoom-value').value = `${values.zoom}%`;
+        document.getElementById('photo-x-value').value = values.x === 0 ? 'Center' : `${Math.abs(values.x)}% ${values.x < 0 ? 'left' : 'right'}`;
+        document.getElementById('photo-y-value').value = values.y === 0 ? 'Center' : `${Math.abs(values.y)}% ${values.y < 0 ? 'up' : 'down'}`;
+        document.getElementById('photo-brightness-value').value = `${values.brightness}%`;
+        document.getElementById('photo-contrast-value').value = `${values.contrast}%`;
+      }
+
+      function resetPhotoSettings() {
+        photoSettings = { zoom: 1, x: 0, y: 0, brightness: 1, contrast: 1 };
+        syncPhotoControls();
+        renderPhoto();
+      }
+
       input.addEventListener('change', () => {
         const file = input.files?.[0];
         if (!file) return;
@@ -674,14 +744,53 @@ const greekLetters = [
         const image = new Image();
         image.onload = () => {
           sourceImage = image;
-          renderPhoto();
+          resetPhotoSettings();
           canvas.hidden = false;
           empty.hidden = true;
+          photoAdjustments.hidden = false;
+          photoStage.classList.add('is-editing');
           savePhoto.disabled = false;
           URL.revokeObjectURL(url);
         };
         image.src = url;
       });
+
+      photoControls.forEach((control) => control.addEventListener('input', () => {
+        const value = Number(control.value);
+        const setting = control.dataset.photoAdjust;
+        photoSettings[setting] = ['zoom', 'brightness', 'contrast'].includes(setting) ? value / 100 : value;
+        syncPhotoControls();
+        renderPhoto();
+      }));
+
+      document.getElementById('reset-photo-adjustments').addEventListener('click', resetPhotoSettings);
+
+      photoStage.addEventListener('pointerdown', (event) => {
+        if (!sourceImage) return;
+        photoDrag = { pointerId: event.pointerId, startX: event.clientX, startY: event.clientY, photoX: photoSettings.x, photoY: photoSettings.y };
+        photoStage.setPointerCapture(event.pointerId);
+        photoStage.classList.add('is-dragging');
+      });
+
+      photoStage.addEventListener('pointermove', (event) => {
+        if (!photoDrag || event.pointerId !== photoDrag.pointerId) return;
+        const rect = photoStage.getBoundingClientRect();
+        photoSettings.x = Math.max(-100, Math.min(100, photoDrag.photoX + ((event.clientX - photoDrag.startX) / rect.width) * 200));
+        photoSettings.y = Math.max(-100, Math.min(100, photoDrag.photoY + ((event.clientY - photoDrag.startY) / rect.height) * 200));
+        syncPhotoControls();
+        renderPhoto();
+      });
+
+      function finishPhotoDrag(event) {
+        if (!photoDrag || event.pointerId !== photoDrag.pointerId) return;
+        if (photoStage.hasPointerCapture(event.pointerId)) photoStage.releasePointerCapture(event.pointerId);
+        photoStage.classList.remove('is-dragging');
+        photoDrag = null;
+      }
+
+      photoStage.addEventListener('pointerup', finishPhotoDrag);
+      photoStage.addEventListener('pointercancel', finishPhotoDrag);
+      addEventListener('resize', renderPhoto);
 
       document.querySelectorAll('[data-mood]').forEach((button) => button.addEventListener('click', () => {
         mood = button.dataset.mood;
