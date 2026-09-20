@@ -1181,6 +1181,14 @@ const greekLetters = [
       const mythCanvas = document.getElementById('myth-canvas');
       const mythContext = mythCanvas.getContext('2d');
       const mythAnswers = {};
+      const mythPortraitSources = {
+        creature: '/mythmaker/creature-realistic-v1.png',
+        god: '/mythmaker/god-realistic-v1.png',
+        goddess: '/mythmaker/goddess-realistic-v1.png',
+        girl: '/mythmaker/mortal-girl-realistic-v1.png',
+        boy: '/mythmaker/mortal-boy-realistic-v1.png'
+      };
+      const mythPortraitImages = {};
 
       const mythNames = {
         creature: {
@@ -1324,6 +1332,7 @@ const greekLetters = [
         question.querySelectorAll('[data-myth-answer]').forEach((button) => button.addEventListener('click', () => {
           if (question.dataset.mythQuestion === 'form' && mythAnswers.form !== button.dataset.mythAnswer) {
             adaptMythQuestions(button.dataset.mythAnswer);
+            loadMythPortrait(button.dataset.mythAnswer).catch(() => {});
           }
           mythAnswers[question.dataset.mythQuestion] = button.dataset.mythAnswer;
           question.querySelectorAll('[data-myth-answer]').forEach((choice) => {
@@ -1347,19 +1356,30 @@ const greekLetters = [
         }
       }
 
-      function drawMythPortrait(seed) {
+      function loadMythPortrait(form) {
+        let image = mythPortraitImages[form];
+        if (!image) {
+          image = new Image();
+          image.decoding = 'async';
+          image.src = mythPortraitSources[form];
+          mythPortraitImages[form] = image;
+        }
+        if (image.complete) {
+          return image.naturalWidth ? Promise.resolve(image) : Promise.reject(new Error(`Could not load ${form} portrait.`));
+        }
+        return new Promise((resolve, reject) => {
+          image.addEventListener('load', () => resolve(image), { once: true });
+          image.addEventListener('error', () => reject(new Error(`Could not load ${form} portrait.`)), { once: true });
+        });
+      }
+
+      async function drawMythPortrait(seed) {
         const width = mythCanvas.width;
         const height = mythCanvas.height;
         const moonlit = mythAnswers.light === 'moon';
         const lightColor = moonlit ? '#b9d9ff' : '#ffd477';
         const deepColor = moonlit ? '#17213f' : '#512b19';
-        const isCreature = mythAnswers.form === 'creature';
-        const hasLongHair = ['goddess', 'girl'].includes(mythAnswers.form);
-        const skinTones = ['#f0d2b6', '#d8aa87', '#aa7459', '#76503e'];
-        const hairColors = ['#17131d', '#402820', '#8c552f', '#d0ad65'];
-        const skin = isCreature ? (moonlit ? '#7184b7' : '#b47a48') : skinTones[seed % skinTones.length];
-        const hair = isCreature ? (moonlit ? '#252a55' : '#5f3025') : hairColors[(seed + 1) % hairColors.length];
-        const eye = mythAnswers.virtue === 'wisdom' ? '#9ee5ff' : '#f7cf67';
+        const portraitImage = await loadMythPortrait(mythAnswers.form);
 
         mythContext.clearRect(0, 0, width, height);
         const background = mythContext.createLinearGradient(0, 0, width, height);
@@ -1376,9 +1396,9 @@ const greekLetters = [
         mythContext.fillRect(0, 0, width, height);
 
         if (mythAnswers.realm === 'stars') {
-          for (let index = 0; index < 46; index += 1) {
+          for (let index = 0; index < 70; index += 1) {
             const x = (index * 197 + seed * 31) % width;
-            const y = (index * 113 + seed * 17) % 790;
+            const y = (index * 113 + seed * 17) % 950;
             const radius = 1.4 + ((index + seed) % 4) * .65;
             drawMythEllipse(x, y, radius, radius, index % 5 === 0 ? '#fff3c4' : '#dcecff');
           }
@@ -1420,80 +1440,36 @@ const greekLetters = [
           mythContext.fill(); mythContext.stroke();
         }
 
-        if (hasLongHair || isCreature) drawMythEllipse(450, 465, isCreature ? 205 : 190, 300, hair);
-        else drawMythEllipse(450, 350, 170, 180, hair);
+        const maximumPortraitWidth = width * .98;
+        const maximumPortraitHeight = height * .98;
+        const portraitScale = Math.min(maximumPortraitWidth / portraitImage.naturalWidth, maximumPortraitHeight / portraitImage.naturalHeight);
+        const portraitWidth = portraitImage.naturalWidth * portraitScale;
+        const portraitHeight = portraitImage.naturalHeight * portraitScale;
+        mythContext.save();
+        mythContext.shadowColor = `${lightColor}b8`;
+        mythContext.shadowBlur = 32;
+        mythContext.drawImage(portraitImage, (width - portraitWidth) / 2, height - portraitHeight, portraitWidth, portraitHeight);
+        mythContext.restore();
 
-        const garment = mythContext.createLinearGradient(245, 680, 680, 1050);
-        garment.addColorStop(0, `${lightColor}b8`);
-        garment.addColorStop(.34, moonlit ? '#353554' : '#704329');
-        garment.addColorStop(1, '#11121d');
-        mythContext.beginPath();
-        mythContext.moveTo(345, 640);
-        mythContext.bezierCurveTo(210, 690, 145, 850, 105, 1100);
-        mythContext.lineTo(795, 1100);
-        mythContext.bezierCurveTo(755, 850, 690, 690, 555, 640);
-        mythContext.closePath();
-        mythContext.fillStyle = garment;
-        mythContext.fill();
+        const portraitTint = mythContext.createLinearGradient(0, 0, width, height);
+        portraitTint.addColorStop(0, `${lightColor}15`);
+        portraitTint.addColorStop(.62, 'rgba(0,0,0,0)');
+        portraitTint.addColorStop(1, 'rgba(0,0,0,.22)');
+        mythContext.fillStyle = portraitTint;
+        mythContext.fillRect(0, 0, width, height);
 
         if (mythAnswers.gift === 'cloak') {
-          mythContext.fillStyle = 'rgba(20,18,43,.72)';
+          mythContext.strokeStyle = '#f1d17a';
+          mythContext.lineWidth = 5;
+          mythContext.shadowColor = '#f1d17a';
+          mythContext.shadowBlur = 18;
           mythContext.beginPath();
-          mythContext.moveTo(310, 625);
-          mythContext.quadraticCurveTo(450, 560, 590, 625);
-          mythContext.lineTo(735, 1100);
-          mythContext.lineTo(165, 1100);
-          mythContext.closePath();
-          mythContext.fill();
+          mythContext.moveTo(168, 760);
+          mythContext.quadraticCurveTo(450, 660, 732, 760);
+          mythContext.quadraticCurveTo(690, 930, 650, 1080);
+          mythContext.stroke();
+          mythContext.shadowBlur = 0;
         }
-
-        drawMythEllipse(450, 615, 60, 92, skin);
-
-        if (isCreature) {
-          mythContext.fillStyle = skin;
-          mythContext.beginPath(); mythContext.moveTo(330, 300); mythContext.lineTo(250, 145); mythContext.lineTo(390, 250); mythContext.closePath(); mythContext.fill();
-          mythContext.beginPath(); mythContext.moveTo(570, 300); mythContext.lineTo(650, 145); mythContext.lineTo(510, 250); mythContext.closePath(); mythContext.fill();
-        }
-
-        drawMythEllipse(450, 415, 145, 190, skin, `${lightColor}55`, 3);
-
-        mythContext.fillStyle = hair;
-        mythContext.beginPath();
-        mythContext.arc(450, 365, 151, Math.PI, Math.PI * 2);
-        mythContext.bezierCurveTo(545, 270, 520, 250, 450, 248);
-        mythContext.bezierCurveTo(380, 250, 350, 278, 299, 365);
-        mythContext.fill();
-
-        const eyeY = 410;
-        [-53, 53].forEach((offset) => {
-          drawMythEllipse(450 + offset, eyeY, 25, 13, '#f7f1e8');
-          drawMythEllipse(450 + offset, eyeY, isCreature ? 7 : 9, isCreature ? 11 : 9, eye);
-          drawMythEllipse(450 + offset, eyeY, 3.5, 5, '#11131b');
-        });
-        mythContext.strokeStyle = hair;
-        mythContext.lineWidth = 8;
-        mythContext.lineCap = 'round';
-        mythContext.beginPath(); mythContext.moveTo(365, 372); mythContext.quadraticCurveTo(395, 357, 425, 372); mythContext.stroke();
-        mythContext.beginPath(); mythContext.moveTo(475, 372); mythContext.quadraticCurveTo(505, 357, 535, 372); mythContext.stroke();
-        mythContext.strokeStyle = 'rgba(83,50,45,.55)';
-        mythContext.lineWidth = 4;
-        mythContext.beginPath(); mythContext.moveTo(450, 425); mythContext.quadraticCurveTo(438, 478, 456, 484); mythContext.stroke();
-        mythContext.strokeStyle = mythAnswers.virtue === 'courage' ? '#9b5360' : '#7e5a68';
-        mythContext.lineWidth = 6;
-        mythContext.beginPath(); mythContext.moveTo(414, 523); mythContext.quadraticCurveTo(450, 543, 486, 523); mythContext.stroke();
-
-        if (isCreature) {
-          [410, 450, 490].forEach((x, index) => drawMythEllipse(x, 326 - Math.abs(index - 1) * 13, 4, 4, lightColor));
-        }
-
-        mythContext.textAlign = 'center';
-        mythContext.textBaseline = 'middle';
-        mythContext.shadowColor = lightColor;
-        mythContext.shadowBlur = 18;
-        mythContext.fillStyle = lightColor;
-        mythContext.font = '600 58px Georgia, "Apple Color Emoji", "Segoe UI Emoji", serif';
-        mythContext.fillText(mythAnswers.virtue === 'wisdom' ? '◇' : '✦', 450, 685);
-        mythContext.shadowBlur = 0;
 
         if (mythAnswers.gift === 'horns') {
           mythContext.strokeStyle = '#d9f3ff'; mythContext.lineWidth = 15; mythContext.lineCap = 'round';
@@ -1520,6 +1496,14 @@ const greekLetters = [
           mythContext.font = '600 92px Georgia, serif'; mythContext.fillStyle = '#f2ce72'; mythContext.fillText('Ω', 685, 820);
         }
 
+        mythContext.textAlign = 'center';
+        mythContext.textBaseline = 'middle';
+        mythContext.shadowColor = lightColor;
+        mythContext.shadowBlur = 18;
+        mythContext.fillStyle = lightColor;
+        mythContext.font = '600 58px Georgia, "Apple Color Emoji", "Segoe UI Emoji", serif';
+        mythContext.fillText(mythAnswers.virtue === 'wisdom' ? '◇' : '✦', 105, 100);
+
         mythContext.font = '600 70px Georgia, "Apple Color Emoji", "Segoe UI Emoji", serif';
         mythContext.fillStyle = lightColor;
         mythContext.textAlign = 'center';
@@ -1527,9 +1511,15 @@ const greekLetters = [
         mythContext.shadowBlur = 16;
         mythContext.fillText(mythWords.realm[mythAnswers.realm].companion, 785, 980);
         mythContext.shadowBlur = 0;
+
+        const vignette = mythContext.createRadialGradient(450, 500, 350, 450, 500, 700);
+        vignette.addColorStop(.55, 'rgba(0,0,0,0)');
+        vignette.addColorStop(1, 'rgba(0,0,0,.42)');
+        mythContext.fillStyle = vignette;
+        mythContext.fillRect(0, 0, width, height);
       }
 
-      mythQuiz.addEventListener('submit', (event) => {
+      mythQuiz.addEventListener('submit', async (event) => {
         event.preventDefault();
         if (mythQuestions.some((question) => !mythAnswers[question.dataset.mythQuestion])) return;
 
@@ -1552,7 +1542,15 @@ const greekLetters = [
           return item;
         }));
         mythCanvas.setAttribute('aria-label', `Portrait of ${name}, ${form.label}`);
-        drawMythPortrait(seed);
+        mythReveal.disabled = true;
+        mythProgress.textContent = 'Painting your portrait…';
+        try {
+          await drawMythPortrait(seed);
+        } catch (error) {
+          mythProgress.textContent = 'The portrait could not be painted. Please try again.';
+          mythReveal.disabled = false;
+          return;
+        }
 
         mythQuiz.hidden = true;
         mythResult.hidden = false;
