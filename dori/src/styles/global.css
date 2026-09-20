@@ -197,14 +197,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 
 /* Library */
 .realm--library::before { background: linear-gradient(180deg, rgba(3,5,9,.3), rgba(3,5,9,.58)), linear-gradient(90deg, rgba(3,5,9,.42), transparent 27% 73%, rgba(3,5,9,.42)), url('/library-background-no-highlight-v5.webp') center / cover no-repeat; }
-.medusa-door { position: fixed; z-index: 5; left: calc(50vw + 51.1vh); top: 34.3vh; width: 44px; height: 64px; border: 0; background: transparent; cursor: pointer; transform: translate(-50%, -50%); }
-.medusa-door span { position: absolute; left: 50%; top: 50%; width: 1.05vh; height: 4.6vh; border: 1px solid rgba(244,211,136,.48); border-radius: 1px; background: linear-gradient(90deg, #4b290c 0%, #b77b27 24%, #d9a84c 48%, #8c5519 76%, #3b210b 100%); box-shadow: inset 1px 0 rgba(255,235,181,.24), inset -1px 0 rgba(27,13,3,.55), 0 0 5px rgba(219,170,75,.24); transform: translate(-50%, -50%); transition: background .2s ease, box-shadow .2s ease, filter .2s ease; }
-.medusa-door:hover span, .medusa-door:focus-visible span { background: linear-gradient(90deg, #59310d 0%, #ca8c31 24%, #e8bb61 48%, #9e641f 76%, #45260c 100%); box-shadow: inset 1px 0 rgba(255,242,200,.34), inset -1px 0 rgba(27,13,3,.5), 0 0 7px rgba(234,195,109,.38); filter: brightness(1.08); }
-.medusa-door:focus-visible { outline: 1px solid rgba(255,225,154,.7); outline-offset: 2px; }
-@media (min-aspect-ratio: 16 / 9) {
-  .medusa-door { left: 78.8vw; top: calc(50vh - 8.8vw); }
-  .medusa-door span { width: .62vw; height: 2.6vw; }
-}
 .library-intro { margin-inline: auto; text-align: center; }
 .library-intro > p:last-child { margin-inline: auto; }
 .library-room { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(260px, .48fr); gap: clamp(1.5rem, 3vw, 3.5rem); align-items: end; max-width: 1500px; margin: clamp(3rem, 6vw, 6rem) auto 0; }
@@ -239,6 +231,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .book--gold { --book-edge: #28180b; --book-base: #6a431e; --book-light: #946b36; --book-foil: #efd494; }
 .book--black { --book-edge: #060507; --book-base: #17131a; --book-light: #342a37; --book-foil: #c7a359; }
 .book--mist { --book-edge: #273237; --book-base: #718487; --book-light: #a5b2ab; --book-foil: #8a641d; --book-ink: #17150f; }
+.book.medusa-book { --book-edge: #241507; --book-base: #765020; --book-light: #b68942; --book-foil: #f0d18b; --texture-x: 80%; flex-grow: .72; min-width: 48px; height: 290px; cursor: pointer; text-decoration: none; filter: brightness(1.1) saturate(1.05); box-shadow: inset 4px 0 0 rgba(240,209,139,.18), inset 7px 0 9px rgba(255,255,255,.04), inset -4px 0 rgba(255,232,181,.15), inset -13px 0 18px rgba(0,0,0,.35), inset 0 3px 2px rgba(255,255,255,.1), 3px 0 0 rgba(214,189,138,.1), 9px 13px 20px rgba(0,0,0,.58), 0 0 18px rgba(211,164,76,.14); }
+.book.medusa-book:hover, .book.medusa-book:focus-visible { filter: brightness(1.2) saturate(1.08); box-shadow: inset 4px 0 0 rgba(240,209,139,.25), inset -4px 0 rgba(255,232,181,.2), inset -13px 0 18px rgba(0,0,0,.34), 11px 24px 28px rgba(0,0,0,.62), 0 0 0 1px var(--gold-bright), 0 0 25px rgba(211,164,76,.24); }
+.medusa-book__bands { position: absolute; z-index: 2; inset: 15% 13%; border-top: 2px solid rgba(240,209,139,.64); border-bottom: 2px solid rgba(240,209,139,.5); box-shadow: 0 2px rgba(45,24,5,.65), 0 -2px rgba(45,24,5,.52); pointer-events: none; }
 .book__title { position: relative; z-index: 1; color: var(--book-foil); font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive; font-size: clamp(1.05rem, 1.9vw, 1.5rem); font-weight: 500; letter-spacing: .015em; line-height: 1.05; text-shadow: 0 1px 2px rgba(0,0,0,.72); }
 .book-note { min-height: 260px; padding: 2rem; border: 1px solid var(--line); background: rgba(198,161,91,.055); }
 .book-note__kicker { margin: 0 0 1rem; color: var(--gold); font-family: var(--mono); font-size: .56rem; letter-spacing: .14em; text-transform: uppercase; }
@@ -296,8 +291,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .composer-row { grid-template-columns: minmax(0, 1fr); }
   .photo-studio { margin-top: 2.5rem; }
   .photo-stage { aspect-ratio: 3 / 4; }
-  .realm--library::before { background-position: center, center, 78.8% center; }
-  .medusa-door { left: 78.8vw; top: 34.3vh; width: 44px; height: 64px; transform: translate(-50%, -50%); }
   .bookshelf { min-height: 360px; gap: .12rem; padding: 1rem 2% 1.75rem; }
   .book { min-width: 34px; height: 244px; padding: 2.4rem .28rem 2.1rem; }
   .book--tall { height: 290px; }
@@ -308,6 +301,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .book:nth-of-type(4) { height: 236px; }
   .book:nth-of-type(5) { height: 218px; }
   .book:nth-of-type(6) { height: 200px; }
+  .book.medusa-book { min-width: 28px; height: 184px; }
   .book__title { font-size: .88rem; }
 }
 
