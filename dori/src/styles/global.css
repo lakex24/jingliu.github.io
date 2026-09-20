@@ -186,7 +186,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .save-photo:disabled { opacity: .35; cursor: not-allowed; }
 
 /* Library */
-.realm--library::before { background: linear-gradient(180deg, rgba(3,5,9,.3), rgba(3,5,9,.58)), linear-gradient(90deg, rgba(3,5,9,.42), transparent 27% 73%, rgba(3,5,9,.42)), url('/library-background-alcove-v3.webp') center / cover no-repeat; }
+.realm--library::before { background: linear-gradient(180deg, rgba(3,5,9,.3), rgba(3,5,9,.58)), linear-gradient(90deg, rgba(3,5,9,.42), transparent 27% 73%, rgba(3,5,9,.42)), url('/library-background-bright-book-v4.webp') center / cover no-repeat; }
 .library-intro { margin-inline: auto; text-align: center; }
 .library-intro > p:last-child { margin-inline: auto; }
 .library-room { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(260px, .48fr); gap: clamp(1.5rem, 3vw, 3.5rem); align-items: end; max-width: 1500px; margin: clamp(3rem, 6vw, 6rem) auto 0; }
