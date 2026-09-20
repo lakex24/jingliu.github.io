@@ -8,19 +8,178 @@ import '@fontsource/ibm-plex-mono/400.css';
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
-    <title>Picture Frame — Dori</title>
-    <meta name="description" content="Dori’s picture frame page." />
+    <title>My Picture Gallery — Dori</title>
+    <meta name="description" content="A personal gallery where Dori can place favorite photos into elegant frames." />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#05080d" />
+    <link rel="preload" href="/gallery-room-greek-v1.png" as="image" type="image/png" />
     <link rel="icon" href="data:," />
   </head>
   <body>
-    <main class="blank-gallery" aria-label="Picture frame page">
+    <main class="gallery" aria-labelledby="gallery-title">
+      <div class="gallery__shade" aria-hidden="true"></div>
+
       <a class="gallery-back" href="/" aria-label="Return to the home page">
         <span aria-hidden="true">←</span>
         <span>Back home</span>
       </a>
+
+      <header class="gallery-heading">
+        <p>My private collection</p>
+        <h1 id="gallery-title">The Picture Gallery</h1>
+        <span>Tap an empty frame to add a photo.</span>
+      </header>
+
+      <section class="gallery-wall" aria-label="Six picture frames">
+        <button class="gallery-frame gallery-frame--portrait gallery-frame--gold" type="button" data-gallery-frame="0" aria-label="Add a photo to frame one">
+          <span class="gallery-frame__inner">
+            <img alt="Photo in frame one" hidden />
+            <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
+          </span>
+        </button>
+        <button class="gallery-frame gallery-frame--landscape gallery-frame--silver" type="button" data-gallery-frame="1" aria-label="Add a photo to frame two">
+          <span class="gallery-frame__inner">
+            <img alt="Photo in frame two" hidden />
+            <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
+          </span>
+        </button>
+        <button class="gallery-frame gallery-frame--portrait gallery-frame--gold" type="button" data-gallery-frame="2" aria-label="Add a photo to frame three">
+          <span class="gallery-frame__inner">
+            <img alt="Photo in frame three" hidden />
+            <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
+          </span>
+        </button>
+        <button class="gallery-frame gallery-frame--landscape gallery-frame--silver" type="button" data-gallery-frame="3" aria-label="Add a photo to frame four">
+          <span class="gallery-frame__inner">
+            <img alt="Photo in frame four" hidden />
+            <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
+          </span>
+        </button>
+        <button class="gallery-frame gallery-frame--portrait gallery-frame--gold" type="button" data-gallery-frame="4" aria-label="Add a photo to frame five">
+          <span class="gallery-frame__inner">
+            <img alt="Photo in frame five" hidden />
+            <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
+          </span>
+        </button>
+        <button class="gallery-frame gallery-frame--landscape gallery-frame--silver" type="button" data-gallery-frame="5" aria-label="Add a photo to frame six">
+          <span class="gallery-frame__inner">
+            <img alt="Photo in frame six" hidden />
+            <span class="gallery-frame__empty"><b aria-hidden="true">＋</b><span>Add photo</span></span>
+          </span>
+        </button>
+      </section>
+
+      <footer class="gallery-tools">
+        <p id="gallery-status" aria-live="polite">Choose a frame to begin. Photos stay only in this browser.</p>
+        <button id="gallery-remove" type="button" disabled>Remove selected photo</button>
+      </footer>
+
+      <input id="gallery-photo-input" type="file" accept="image/*" hidden />
     </main>
+
+    <script>
+      const frames = [...document.querySelectorAll('[data-gallery-frame]')];
+      const photoInput = document.getElementById('gallery-photo-input');
+      const removeButton = document.getElementById('gallery-remove');
+      const status = document.getElementById('gallery-status');
+      const storagePrefix = 'dori-gallery-photo-';
+      let activeFrame = null;
+
+      function displayPhoto(frame, source) {
+        const image = frame.querySelector('img');
+        const empty = frame.querySelector('.gallery-frame__empty');
+        image.src = source;
+        image.hidden = false;
+        empty.hidden = true;
+        frame.classList.add('has-photo');
+        frame.setAttribute('aria-label', `Change the photo in frame ${Number(frame.dataset.galleryFrame) + 1}`);
+      }
+
+      function clearPhoto(frame) {
+        const image = frame.querySelector('img');
+        const empty = frame.querySelector('.gallery-frame__empty');
+        image.removeAttribute('src');
+        image.hidden = true;
+        empty.hidden = false;
+        frame.classList.remove('has-photo');
+        frame.setAttribute('aria-label', `Add a photo to frame ${Number(frame.dataset.galleryFrame) + 1}`);
+      }
+
+      function selectFrame(frame) {
+        frames.forEach((item) => item.classList.toggle('is-selected', item === frame));
+        activeFrame = frame;
+        removeButton.disabled = !frame.classList.contains('has-photo');
+      }
+
+      function preparePhoto(file) {
+        return new Promise((resolve, reject) => {
+          const objectUrl = URL.createObjectURL(file);
+          const image = new Image();
+          image.onload = () => {
+            const maximumEdge = 900;
+            const scale = Math.min(1, maximumEdge / Math.max(image.naturalWidth, image.naturalHeight));
+            const canvas = document.createElement('canvas');
+            canvas.width = Math.max(1, Math.round(image.naturalWidth * scale));
+            canvas.height = Math.max(1, Math.round(image.naturalHeight * scale));
+            const context = canvas.getContext('2d');
+            context.fillStyle = '#0a0d13';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.drawImage(image, 0, 0, canvas.width, canvas.height);
+            URL.revokeObjectURL(objectUrl);
+            resolve(canvas.toDataURL('image/jpeg', .8));
+          };
+          image.onerror = () => {
+            URL.revokeObjectURL(objectUrl);
+            reject(new Error('That photo could not be opened.'));
+          };
+          image.src = objectUrl;
+        });
+      }
+
+      frames.forEach((frame) => {
+        const savedPhoto = localStorage.getItem(`${storagePrefix}${frame.dataset.galleryFrame}`);
+        if (savedPhoto) displayPhoto(frame, savedPhoto);
+
+        frame.addEventListener('click', () => {
+          selectFrame(frame);
+          photoInput.value = '';
+          photoInput.click();
+        });
+      });
+
+      photoInput.addEventListener('change', async () => {
+        const file = photoInput.files?.[0];
+        if (!file || !activeFrame) return;
+        if (!file.type.startsWith('image/')) {
+          status.textContent = 'Please choose an image file.';
+          return;
+        }
+
+        status.textContent = 'Placing your photo in the frame…';
+        try {
+          const preparedPhoto = await preparePhoto(file);
+          displayPhoto(activeFrame, preparedPhoto);
+          removeButton.disabled = false;
+          try {
+            localStorage.setItem(`${storagePrefix}${activeFrame.dataset.galleryFrame}`, preparedPhoto);
+            status.textContent = 'Your photo is framed and saved on this device.';
+          } catch (error) {
+            status.textContent = 'Your photo is framed, but this browser has no more room to save it.';
+          }
+        } catch (error) {
+          status.textContent = 'That photo could not be opened. Please try another one.';
+        }
+      });
+
+      removeButton.addEventListener('click', () => {
+        if (!activeFrame || !activeFrame.classList.contains('has-photo')) return;
+        localStorage.removeItem(`${storagePrefix}${activeFrame.dataset.galleryFrame}`);
+        clearPhoto(activeFrame);
+        removeButton.disabled = true;
+        status.textContent = 'The frame is empty again.';
+        activeFrame.focus();
+      });
+    </script>
   </body>
 </html>
 
@@ -28,11 +187,58 @@ import '@fontsource/ibm-plex-mono/400.css';
   :root { color-scheme: dark; }
   * { box-sizing: border-box; }
   html, body { min-width: 320px; min-height: 100%; margin: 0; }
-  body { background: #05080d; color: #dce7f0; font-family: 'Cormorant Variable', Georgia, serif; }
-  .blank-gallery { position: relative; min-height: 100svh; overflow: hidden; background: radial-gradient(circle at 78% 12%, rgba(79,112,144,.12), transparent 30%), linear-gradient(150deg, #080c13, #030508 72%); }
-  .blank-gallery::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .12; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E"); }
-  .gallery-back { position: absolute; z-index: 1; top: clamp(1.2rem, 3vw, 2.4rem); left: clamp(1.2rem, 4vw, 3.5rem); min-height: 46px; display: inline-flex; align-items: center; gap: .65rem; padding: .65rem .9rem; border: 1px solid rgba(207,220,232,.38); color: #dce7f0; background: rgba(5,8,13,.38); font-family: 'IBM Plex Mono', monospace; font-size: .64rem; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 18px rgba(167,202,230,.08); backdrop-filter: blur(8px); transition: border-color .2s ease, color .2s ease, background .2s ease, transform .2s ease; }
+  body { background: #05080d; color: #eef4f8; font-family: 'Cormorant Variable', Georgia, serif; }
+  button, input { font: inherit; }
+  button { color: inherit; }
+
+  .gallery { position: relative; isolation: isolate; min-height: max(100svh, 760px); overflow: hidden; padding: clamp(7rem, 14vh, 9rem) clamp(1rem, 5vw, 5rem) 6.5rem; background: #080b11 url('/gallery-room-greek-v1.png') center / cover no-repeat; }
+  .gallery__shade { position: absolute; z-index: -1; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(3,6,10,.62), transparent 22% 73%, rgba(3,6,10,.68)), linear-gradient(90deg, rgba(3,6,10,.24), transparent 17% 83%, rgba(3,6,10,.24)); }
+  .gallery-back { position: absolute; z-index: 4; top: clamp(1rem, 2.5vw, 2rem); left: clamp(1rem, 3vw, 3rem); min-height: 46px; display: inline-flex; align-items: center; gap: .65rem; padding: .65rem .9rem; border: 1px solid rgba(230,239,246,.52); color: #edf5fb; background: rgba(5,8,13,.52); font-family: 'IBM Plex Mono', monospace; font-size: .62rem; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; box-shadow: 0 0 18px rgba(167,202,230,.12); backdrop-filter: blur(8px); transition: border-color .2s ease, background .2s ease, transform .2s ease; }
   .gallery-back > span:first-child { font-family: Georgia, serif; font-size: 1.45rem; line-height: .7; }
-  .gallery-back:hover { border-color: rgba(231,240,247,.72); color: #fff; background: rgba(170,197,218,.08); transform: translateX(-2px); }
-  .gallery-back:focus-visible { outline: 2px solid #dce7f0; outline-offset: 4px; }
+  .gallery-back:hover { border-color: #fff; background: rgba(170,197,218,.12); transform: translateX(-2px); }
+  .gallery-back:focus-visible, .gallery-frame:focus-visible, .gallery-tools button:focus-visible { outline: 2px solid #dcecff; outline-offset: 4px; }
+
+  .gallery-heading { position: absolute; z-index: 2; top: clamp(1rem, 2.5vw, 2rem); left: 50%; width: min(52rem, calc(100% - 15rem)); text-align: center; transform: translateX(-50%); text-shadow: 0 2px 14px rgba(0,0,0,.86); }
+  .gallery-heading p { margin: 0; color: #e2c77d; font-family: 'IBM Plex Mono', monospace; font-size: .56rem; letter-spacing: .2em; text-transform: uppercase; }
+  .gallery-heading h1 { margin: .1rem 0 0; color: #fffaf0; font-size: clamp(2rem, 4vw, 4.2rem); font-weight: 400; line-height: .92; }
+  .gallery-heading > span { display: block; margin-top: .35rem; color: rgba(231,240,248,.82); font-size: clamp(.9rem, 1.4vw, 1.08rem); }
+
+  .gallery-wall { position: relative; z-index: 1; width: min(82vw, 1280px); margin: 0 auto; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); grid-template-rows: repeat(2, clamp(155px, 21vh, 215px)); gap: clamp(1.2rem, 4vh, 2.8rem) clamp(1.5rem, 5vw, 4.8rem); align-items: center; justify-items: center; }
+  .gallery-frame { position: relative; display: block; height: 100%; max-height: 210px; padding: 13px; border: 0; background: linear-gradient(135deg, #4d3213, #f0d68f 18%, #74501e 42%, #f7e4a9 62%, #5c3a13 83%, #d6b765); box-shadow: 0 7px 16px rgba(0,0,0,.62), 0 20px 36px rgba(0,0,0,.34), inset 0 0 0 2px rgba(255,246,211,.52), inset 0 0 0 6px rgba(51,29,7,.7); cursor: pointer; transform: translateZ(0); transition: transform .2s ease, filter .2s ease, box-shadow .2s ease; }
+  .gallery-frame::before { content: ''; position: absolute; inset: 5px; border: 2px ridge rgba(255,239,191,.74); pointer-events: none; }
+  .gallery-frame::after { content: ''; position: absolute; inset: -9px; z-index: -1; opacity: 0; border: 1px solid rgba(198,225,245,.66); box-shadow: 0 0 22px rgba(141,202,244,.48); transition: opacity .2s ease; }
+  .gallery-frame--portrait { width: min(68%, 170px); }
+  .gallery-frame--landscape { width: min(100%, 285px); height: 76%; }
+  .gallery-frame--silver { background: linear-gradient(135deg, #3f4650, #eef5fa 18%, #687582 38%, #f9fcff 58%, #4b5662 81%, #cfdbe4); box-shadow: 0 7px 16px rgba(0,0,0,.62), 0 20px 36px rgba(0,0,0,.34), inset 0 0 0 2px rgba(255,255,255,.62), inset 0 0 0 6px rgba(24,30,37,.72); }
+  .gallery-frame--silver::before { border-color: rgba(235,247,255,.84); }
+  .gallery-frame:hover, .gallery-frame.is-selected { z-index: 2; filter: brightness(1.1); transform: translateY(-4px) scale(1.025); box-shadow: 0 10px 22px rgba(0,0,0,.7), 0 24px 44px rgba(0,0,0,.4), inset 0 0 0 2px rgba(255,250,225,.74), inset 0 0 0 6px rgba(33,23,10,.62); }
+  .gallery-frame.is-selected::after { opacity: 1; }
+  .gallery-frame__inner { position: relative; width: 100%; height: 100%; display: grid; place-items: center; overflow: hidden; border: 2px solid rgba(11,12,14,.88); background: radial-gradient(circle at 50% 35%, rgba(151,187,214,.2), transparent 48%), linear-gradient(145deg, #101722, #05070b); box-shadow: inset 0 0 24px rgba(0,0,0,.72); }
+  .gallery-frame__inner img { width: 100%; height: 100%; display: block; object-fit: cover; }
+  .gallery-frame__inner img[hidden], .gallery-frame__empty[hidden] { display: none; }
+  .gallery-frame__empty { display: grid; justify-items: center; gap: .2rem; color: rgba(217,234,247,.8); font-family: 'IBM Plex Mono', monospace; font-size: .48rem; letter-spacing: .12em; text-transform: uppercase; }
+  .gallery-frame__empty b { color: #e5c879; font-family: Georgia, serif; font-size: 2rem; font-weight: 400; line-height: 1; text-shadow: 0 0 14px rgba(215,189,112,.55); }
+  .gallery-frame.has-photo .gallery-frame__inner { background: #05070b; }
+
+  .gallery-tools { position: absolute; z-index: 3; left: 50%; bottom: clamp(1.2rem, 3vh, 2.2rem); width: min(92vw, 52rem); display: flex; align-items: center; justify-content: center; gap: 1rem; padding: .75rem 1rem; border: 1px solid rgba(220,232,241,.24); background: rgba(4,7,11,.62); box-shadow: 0 10px 30px rgba(0,0,0,.34); backdrop-filter: blur(12px); transform: translateX(-50%); }
+  .gallery-tools p { margin: 0; color: rgba(228,239,247,.82); font-family: 'IBM Plex Mono', monospace; font-size: .55rem; letter-spacing: .04em; line-height: 1.45; }
+  .gallery-tools button { flex: 0 0 auto; min-height: 38px; padding: .55rem .75rem; border: 1px solid rgba(227,238,246,.42); background: transparent; color: #e9f2f8; font-family: 'IBM Plex Mono', monospace; font-size: .5rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
+  .gallery-tools button:hover:not(:disabled) { border-color: #fff; background: rgba(211,230,244,.1); }
+  .gallery-tools button:disabled { opacity: .34; cursor: not-allowed; }
+
+  @media (max-width: 720px) {
+    .gallery { min-height: 1120px; overflow: visible; padding: 8.7rem 1rem 7rem; background-position: center top; background-attachment: fixed; }
+    .gallery-heading { top: 4.4rem; width: calc(100% - 2rem); }
+    .gallery-heading p { display: none; }
+    .gallery-heading h1 { font-size: 2.25rem; }
+    .gallery-heading > span { font-size: .88rem; }
+    .gallery-wall { width: min(94vw, 620px); grid-template-columns: repeat(2, minmax(0, 1fr)); grid-template-rows: repeat(3, 225px); gap: 1.5rem 1rem; }
+    .gallery-frame--portrait { width: min(88%, 160px); height: 100%; }
+    .gallery-frame--landscape { width: 100%; height: 72%; }
+    .gallery-tools { position: fixed; bottom: .75rem; width: calc(100% - 1.5rem); flex-direction: column; gap: .5rem; text-align: center; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .gallery-frame, .gallery-back { transition: none; }
+  }
 </style>
