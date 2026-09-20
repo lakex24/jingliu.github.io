@@ -246,7 +246,7 @@ const pinterestQuotes = [
         </header>
 
         <div class="realm-intro library-intro">
-          <p class="kicker">18 treasures · 4 reminders</p>
+          <p class="kicker">6 volumes · your shelf</p>
           <h1 id="library-title">The bookshelf</h1>
           <p>Pick a spine to open the note tucked inside.</p>
         </div>
@@ -262,8 +262,8 @@ const pinterestQuotes = [
             <button class="book book--black book--tall" type="button" data-book="moon" aria-label="Untitled book · Favorite" aria-pressed="false">
               <span class="book__label">Favorite</span><span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--mist book--short" type="button" data-book="garden" aria-label="Untitled book · Return Tuesday" aria-pressed="false">
-              <span class="book__label">Return Tue</span><span class="book__title" aria-hidden="true"></span>
+            <button class="book book--mist book--short" type="button" data-book="garden" aria-label="Untitled book" aria-pressed="false">
+              <span class="book__title" aria-hidden="true"></span>
             </button>
             <button class="book book--navy book--thin" type="button" data-book="reach" aria-label="Untitled book · Wish list" aria-pressed="false">
               <span class="book__label">Wish list</span><span class="book__title" aria-hidden="true"></span>
@@ -279,6 +279,10 @@ const pinterestQuotes = [
             <h2 id="book-title">Untitled volume</h2>
             <label class="book-title-editor" for="book-title-input">Write on the spine</label>
             <input id="book-title-input" type="text" maxlength="42" autocomplete="off" placeholder="Type a book title…" />
+            <div class="book-arrange" role="group" aria-label="Arrange selected book">
+              <button type="button" id="move-book-left">← Move left</button>
+              <button type="button" id="move-book-right">Move right →</button>
+            </div>
             <p id="book-copy">Continue at chapter 23. A new adventure is waiting.</p>
             <button type="button" id="book-reminder">Mark for tonight</button>
           </aside>
@@ -511,7 +515,7 @@ const pinterestQuotes = [
         wild: 'Continue at chapter 23. A new adventure is waiting.',
         wrinkle: 'Ask Mom about the strange idea after chapter 5.',
         moon: 'Favorite line saved on the Moonlight board.',
-        garden: 'Return this one to the library on Tuesday.',
+        garden: 'Keep this one close for a slow, quiet afternoon.',
         reach: 'Look for this one on the next library visit.',
         anne: 'This one is next on the reading list.'
       };
@@ -519,16 +523,41 @@ const pinterestQuotes = [
       const reminderButton = document.getElementById('book-reminder');
       const bookTitleInput = document.getElementById('book-title-input');
       const bookTitles = JSON.parse(localStorage.getItem('dori-book-titles') || '{}');
+      const bookshelf = document.querySelector('.bookshelf');
+      const shelfEdge = bookshelf.querySelector('.shelf-edge');
+      const defaultBookOrder = Object.keys(books);
+      let bookOrder = JSON.parse(localStorage.getItem('dori-book-order') || 'null');
+      if (!Array.isArray(bookOrder) || bookOrder.length !== defaultBookOrder.length || defaultBookOrder.some((key) => !bookOrder.includes(key))) {
+        bookOrder = [...defaultBookOrder];
+      }
+      const moveBookLeft = document.getElementById('move-book-left');
+      const moveBookRight = document.getElementById('move-book-right');
+
+      function renderBookOrder() {
+        bookOrder.forEach((key) => bookshelf.insertBefore(document.querySelector(`[data-book="${key}"]`), shelfEdge));
+      }
+
+      function saveBookOrder() {
+        localStorage.setItem('dori-book-order', JSON.stringify(bookOrder));
+        renderBookOrder();
+      }
+
+      function updateMoveButtons() {
+        const index = bookOrder.indexOf(selectedBook);
+        moveBookLeft.disabled = index <= 0;
+        moveBookRight.disabled = index >= bookOrder.length - 1;
+      }
 
       function applyBookTitle(key) {
         const book = document.querySelector(`[data-book="${key}"]`);
         const title = (bookTitles[key] || '').trim();
-        const label = book.querySelector('.book__label').textContent;
+        const label = book.querySelector('.book__label')?.textContent?.trim();
         book.querySelector('.book__title').textContent = title;
-        book.setAttribute('aria-label', `${title || 'Untitled book'} · ${label}`);
+        book.setAttribute('aria-label', `${title || 'Untitled book'}${label ? ` · ${label}` : ''}`);
         if (selectedBook === key) document.getElementById('book-title').textContent = title || 'Untitled volume';
       }
 
+      renderBookOrder();
       Object.keys(books).forEach(applyBookTitle);
 
       function showBook(key) {
@@ -544,8 +573,50 @@ const pinterestQuotes = [
         const reminders = JSON.parse(localStorage.getItem('dori-book-reminders') || '{}');
         reminderButton.textContent = reminders[key] ? 'Marked for tonight ✓' : 'Mark for tonight';
         reminderButton.classList.toggle('is-marked', Boolean(reminders[key]));
+        updateMoveButtons();
       }
-      document.querySelectorAll('[data-book]').forEach((book) => book.addEventListener('click', () => showBook(book.dataset.book)));
+      document.querySelectorAll('[data-book]').forEach((book) => {
+        book.draggable = true;
+        book.addEventListener('click', () => showBook(book.dataset.book));
+        book.addEventListener('dragstart', (event) => {
+          event.dataTransfer.effectAllowed = 'move';
+          event.dataTransfer.setData('text/plain', book.dataset.book);
+          book.classList.add('is-dragging');
+        });
+        book.addEventListener('dragend', () => book.classList.remove('is-dragging'));
+        book.addEventListener('dragover', (event) => {
+          event.preventDefault();
+          event.dataTransfer.dropEffect = 'move';
+        });
+        book.addEventListener('drop', (event) => {
+          event.preventDefault();
+          const draggedKey = event.dataTransfer.getData('text/plain');
+          const targetKey = book.dataset.book;
+          if (!draggedKey || draggedKey === targetKey) return;
+          const nextOrder = bookOrder.filter((key) => key !== draggedKey);
+          const targetIndex = nextOrder.indexOf(targetKey);
+          const targetBox = book.getBoundingClientRect();
+          const placeAfter = event.clientX > targetBox.left + targetBox.width / 2;
+          nextOrder.splice(targetIndex + (placeAfter ? 1 : 0), 0, draggedKey);
+          bookOrder = nextOrder;
+          saveBookOrder();
+          updateMoveButtons();
+        });
+      });
+      moveBookLeft.addEventListener('click', () => {
+        const index = bookOrder.indexOf(selectedBook);
+        if (index <= 0) return;
+        [bookOrder[index - 1], bookOrder[index]] = [bookOrder[index], bookOrder[index - 1]];
+        saveBookOrder();
+        updateMoveButtons();
+      });
+      moveBookRight.addEventListener('click', () => {
+        const index = bookOrder.indexOf(selectedBook);
+        if (index >= bookOrder.length - 1) return;
+        [bookOrder[index], bookOrder[index + 1]] = [bookOrder[index + 1], bookOrder[index]];
+        saveBookOrder();
+        updateMoveButtons();
+      });
       bookTitleInput.addEventListener('input', () => {
         const title = bookTitleInput.value;
         if (title.trim()) bookTitles[selectedBook] = title;
