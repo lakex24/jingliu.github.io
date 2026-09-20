@@ -71,6 +71,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .realm-header__actions { display: flex; align-items: center; gap: .7rem; }
 .home-button { min-height: 46px; padding: .5rem .25rem; border: 0; background: transparent; color: var(--gold-bright); font-family: var(--mono); font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; }
 .home-button span { margin-right: .5rem; color: var(--ghost); }
+.home-button--icon { width: 46px; display: grid; place-items: center; padding: 0; }
+.home-button--icon span { margin: 0; color: var(--gold-bright); font-family: Georgia, serif; font-size: 2rem; line-height: 1; text-shadow: 0 0 13px rgba(234,211,153,.38); transition: color .2s ease, text-shadow .2s ease, transform .2s ease; }
+.home-button--icon:hover span { color: #ffe6a8; text-shadow: 0 0 20px rgba(234,211,153,.62); transform: translateY(-1px); }
 .realm-intro { margin-top: clamp(2.5rem, 6vw, 6rem); }
 .kicker { margin: 0 0 1.1rem; color: var(--gold); font-family: var(--mono); font-size: .63rem; letter-spacing: .18em; text-transform: uppercase; }
 .realm-intro h1 { margin: 0; color: var(--ivory); font-size: clamp(3.5rem, 8vw, 7.5rem); font-weight: 400; letter-spacing: -.03em; line-height: .82; text-wrap: balance; }
