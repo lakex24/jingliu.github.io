@@ -5,6 +5,8 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [main]
+    paths-ignore:
+      - 'dori/**'   # Dori's site is built and served from the Mac mini, not Pages
   workflow_dispatch:
 
 permissions:

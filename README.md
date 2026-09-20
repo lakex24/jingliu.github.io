@@ -35,3 +35,10 @@ forwarded by a small script on the home page.
 `.github/workflows/deploy.yml` builds and publishes on every push to `main`.
 One-time setup: **Settings → Pages → Build and deployment → Source: GitHub
 Actions**. The custom domain comes from `public/CNAME`.
+
+## `dori/` — Dori's site
+
+A second, self-contained Astro site at `dori-homepage.mind-pixels.com`. It is
+**not** deployed by the Pages workflow (a Pages site carries one hostname);
+it is built on the Mac mini with `dori/deploy.sh` and served through the
+Cloudflare tunnel. Run `cd dori && npm ci && npm run dev` to work on it.

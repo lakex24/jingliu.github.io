@@ -1,0 +1,26 @@
+/* Dori — tokens from the brief: black, golden, ghostly blue. Placeholder until the mockup lands. */
+:root {
+  --night: #07070a;
+  --night-soft: #111117;
+  --gold: #c9a64a;
+  --gold-soft: #e6cf8a;
+  --ghost: #9fd3e8;
+  --ghost-deep: #5aa7c6;
+  --ink: #ece9e1;
+  --ink-mute: rgba(236, 233, 225, 0.55);
+  --font-display: 'Cormorant Variable', 'Cormorant', Georgia, serif;
+  --font-mono: 'IBM Plex Mono', ui-monospace, Menlo, monospace;
+  color-scheme: dark;
+}
+*, *::before, *::after { box-sizing: border-box; }
+html { background: var(--night); }
+body {
+  margin: 0; min-height: 100svh; display: grid; place-items: center;
+  background: radial-gradient(60% 50% at 50% 30%, rgba(159,211,232,0.10), transparent 70%), var(--night);
+  color: var(--ink); font-family: var(--font-display); text-align: center; padding: 0 16px;
+}
+.holding { max-width: 34rem; }
+.holding__kicker { font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.3em; text-transform: uppercase; color: var(--ghost-deep); margin: 0 0 1.5rem; }
+.holding h1 { font-weight: 400; font-size: clamp(2.4rem, 8vw, 4.5rem); line-height: 1.05; margin: 0 0 1rem; color: var(--gold-soft); letter-spacing: 0.02em; }
+.holding p { font-size: 1.2rem; line-height: 1.6; color: var(--ink-mute); margin: 0; font-style: italic; }
+.holding__rule { width: 3rem; height: 1px; background: var(--gold); margin: 2rem auto; opacity: 0.7; }
