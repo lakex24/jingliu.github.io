@@ -1373,6 +1373,315 @@ const greekLetters = [
         });
       }
 
+      function drawMythTemple(horizon, lightColor) {
+        mythContext.save();
+        mythContext.globalAlpha = .42;
+        const stone = mythContext.createLinearGradient(0, horizon - 180, 0, horizon + 80);
+        stone.addColorStop(0, `${lightColor}76`);
+        stone.addColorStop(.5, '#273049');
+        stone.addColorStop(1, '#080b13');
+        mythContext.fillStyle = stone;
+        mythContext.fillRect(55, horizon, 790, 24);
+        mythContext.fillRect(82, horizon - 25, 736, 25);
+        mythContext.beginPath();
+        mythContext.moveTo(120, horizon - 130);
+        mythContext.lineTo(450, horizon - 250);
+        mythContext.lineTo(780, horizon - 130);
+        mythContext.closePath();
+        mythContext.fill();
+        mythContext.fillRect(120, horizon - 130, 660, 28);
+        for (let column = 0; column < 9; column += 1) {
+          const x = 145 + column * 76;
+          mythContext.fillRect(x - 20, horizon - 105, 40, 105);
+          mythContext.fillRect(x - 27, horizon - 113, 54, 12);
+          mythContext.fillRect(x - 28, horizon - 8, 56, 12);
+          mythContext.strokeStyle = `${lightColor}3d`;
+          mythContext.lineWidth = 2;
+          for (let flute = -12; flute <= 12; flute += 8) {
+            mythContext.beginPath();
+            mythContext.moveTo(x + flute, horizon - 98);
+            mythContext.lineTo(x + flute, horizon - 12);
+            mythContext.stroke();
+          }
+        }
+        mythContext.strokeStyle = `${lightColor}8a`;
+        mythContext.lineWidth = 3;
+        mythContext.beginPath();
+        mythContext.moveTo(155, horizon - 137);
+        mythContext.lineTo(450, horizon - 228);
+        mythContext.lineTo(745, horizon - 137);
+        mythContext.stroke();
+        mythContext.restore();
+      }
+
+      function drawMythStarRealm(seed, lightColor, moonlit) {
+        mythContext.save();
+        mythContext.globalCompositeOperation = 'screen';
+        const nebulae = [
+          [145, 260, 280, moonlit ? '#513b94' : '#9e493d'],
+          [705, 345, 330, moonlit ? '#175f9a' : '#b77b30'],
+          [440, 690, 360, moonlit ? '#8c376f' : '#76354d']
+        ];
+        nebulae.forEach(([x, y, radius, color]) => {
+          const glow = mythContext.createRadialGradient(x, y, 0, x, y, radius);
+          glow.addColorStop(0, `${color}72`);
+          glow.addColorStop(.38, `${color}35`);
+          glow.addColorStop(1, `${color}00`);
+          mythContext.fillStyle = glow;
+          mythContext.fillRect(x - radius, y - radius, radius * 2, radius * 2);
+        });
+        mythContext.restore();
+
+        for (let index = 0; index < 125; index += 1) {
+          const x = (index * 197 + seed * 31) % mythCanvas.width;
+          const y = (index * 113 + seed * 17) % 940;
+          const radius = .7 + ((index + seed) % 5) * .48;
+          mythContext.shadowColor = index % 7 === 0 ? '#f8d77c' : '#bce8ff';
+          mythContext.shadowBlur = radius * 4;
+          drawMythEllipse(x, y, radius, radius, index % 7 === 0 ? '#fff0b7' : '#e8f5ff');
+        }
+        mythContext.shadowBlur = 0;
+
+        const constellations = [
+          [[80, 185], [155, 130], [230, 205], [192, 286], [280, 330]],
+          [[650, 140], [722, 205], [812, 172], [780, 265], [838, 318]],
+          [[82, 512], [145, 468], [205, 535], [270, 475]]
+        ];
+        mythContext.strokeStyle = `${lightColor}61`;
+        mythContext.lineWidth = 2;
+        constellations.forEach((points) => {
+          mythContext.beginPath();
+          points.forEach(([x, y], index) => index ? mythContext.lineTo(x, y) : mythContext.moveTo(x, y));
+          mythContext.stroke();
+          points.forEach(([x, y]) => drawMythEllipse(x, y, 5, 5, '#f7e4a8', '#ffffff', 1.5));
+        });
+
+        const celestial = mythContext.createRadialGradient(748, 125, 8, 748, 125, 78);
+        celestial.addColorStop(0, '#fff8dc');
+        celestial.addColorStop(.45, lightColor);
+        celestial.addColorStop(.48, `${lightColor}48`);
+        celestial.addColorStop(1, `${lightColor}00`);
+        mythContext.fillStyle = celestial;
+        mythContext.fillRect(660, 37, 176, 176);
+        drawMythTemple(875, lightColor);
+      }
+
+      function drawMythSeaRealm(seed, lightColor, moonlit) {
+        const disc = mythContext.createRadialGradient(740, 145, 10, 740, 145, 100);
+        disc.addColorStop(0, '#fff7d2');
+        disc.addColorStop(.34, lightColor);
+        disc.addColorStop(.38, `${lightColor}50`);
+        disc.addColorStop(1, `${lightColor}00`);
+        mythContext.fillStyle = disc;
+        mythContext.fillRect(625, 30, 230, 230);
+
+        mythContext.fillStyle = moonlit ? '#11182c' : '#38221e';
+        mythContext.beginPath();
+        mythContext.moveTo(0, 645);
+        mythContext.lineTo(120, 520);
+        mythContext.lineTo(205, 603);
+        mythContext.lineTo(300, 500);
+        mythContext.lineTo(390, 645);
+        mythContext.lineTo(535, 535);
+        mythContext.lineTo(655, 625);
+        mythContext.lineTo(760, 520);
+        mythContext.lineTo(900, 640);
+        mythContext.closePath();
+        mythContext.fill();
+        drawMythTemple(670, lightColor);
+
+        const water = mythContext.createLinearGradient(0, 625, 0, 1100);
+        water.addColorStop(0, moonlit ? '#244b72' : '#72513a');
+        water.addColorStop(.35, moonlit ? '#102c51' : '#263a4a');
+        water.addColorStop(1, '#060b18');
+        mythContext.fillStyle = water;
+        mythContext.fillRect(0, 625, 900, 475);
+
+        for (let wave = 0; wave < 15; wave += 1) {
+          const y = 648 + wave * 31;
+          const shift = (wave * 67 + seed * 9) % 150;
+          mythContext.beginPath();
+          mythContext.moveTo(-100 + shift, y);
+          for (let x = -100 + shift; x < 1000; x += 125) {
+            mythContext.quadraticCurveTo(x + 32, y - 13 - wave * .25, x + 65, y);
+            mythContext.quadraticCurveTo(x + 94, y + 11, x + 125, y);
+          }
+          mythContext.strokeStyle = wave % 3 === 0 ? `${lightColor}82` : 'rgba(130,214,238,.24)';
+          mythContext.lineWidth = wave % 3 === 0 ? 3 : 1.5;
+          mythContext.stroke();
+        }
+
+        const reflection = mythContext.createLinearGradient(690, 610, 790, 1030);
+        reflection.addColorStop(0, `${lightColor}70`);
+        reflection.addColorStop(1, `${lightColor}00`);
+        mythContext.fillStyle = reflection;
+        mythContext.beginPath();
+        mythContext.moveTo(710, 625);
+        mythContext.lineTo(775, 625);
+        mythContext.lineTo(845, 1040);
+        mythContext.lineTo(610, 1040);
+        mythContext.closePath();
+        mythContext.fill();
+      }
+
+      function drawMythWing(side, lightColor) {
+        mythContext.save();
+        mythContext.translate(450, 0);
+        mythContext.scale(side, 1);
+        const wing = mythContext.createLinearGradient(-100, 420, -350, 850);
+        wing.addColorStop(0, '#fff9dc');
+        wing.addColorStop(.28, lightColor);
+        wing.addColorStop(1, `${lightColor}0d`);
+        mythContext.fillStyle = wing;
+        mythContext.strokeStyle = `${lightColor}dc`;
+        mythContext.lineWidth = 4;
+        mythContext.shadowColor = lightColor;
+        mythContext.shadowBlur = 22;
+        mythContext.beginPath();
+        mythContext.moveTo(-95, 520);
+        mythContext.bezierCurveTo(-190, 330, -390, 300, -405, 495);
+        mythContext.bezierCurveTo(-415, 650, -340, 820, -215, 930);
+        mythContext.bezierCurveTo(-240, 720, -135, 665, -95, 520);
+        mythContext.closePath();
+        mythContext.fill();
+        mythContext.stroke();
+        mythContext.shadowBlur = 0;
+        for (let feather = 0; feather < 12; feather += 1) {
+          const rootY = 500 + feather * 27;
+          const tipX = -385 + (feather % 3) * 26;
+          const tipY = 380 + feather * 46;
+          mythContext.beginPath();
+          mythContext.moveTo(-110 - feather * 6, rootY);
+          mythContext.quadraticCurveTo(-250, rootY - 45, tipX, tipY);
+          mythContext.quadraticCurveTo(-250, tipY + 28, -135 - feather * 4, rootY + 30);
+          mythContext.strokeStyle = feather % 2 ? `${lightColor}d1` : 'rgba(255,255,255,.62)';
+          mythContext.lineWidth = 3;
+          mythContext.stroke();
+        }
+        mythContext.restore();
+      }
+
+      function drawMythAccessory(gift, lightColor) {
+        mythContext.save();
+        mythContext.lineJoin = 'round';
+        mythContext.lineCap = 'round';
+        if (gift === 'cloak') {
+          const cloak = mythContext.createLinearGradient(130, 680, 760, 1080);
+          cloak.addColorStop(0, 'rgba(28,24,70,.20)');
+          cloak.addColorStop(.55, 'rgba(19,18,49,.68)');
+          cloak.addColorStop(1, 'rgba(4,7,18,.88)');
+          mythContext.fillStyle = cloak;
+          mythContext.strokeStyle = '#e9c96c';
+          mythContext.lineWidth = 6;
+          mythContext.shadowColor = '#d8b955';
+          mythContext.shadowBlur = 18;
+          mythContext.beginPath();
+          mythContext.moveTo(154, 715);
+          mythContext.quadraticCurveTo(450, 625, 746, 715);
+          mythContext.lineTo(690, 1100);
+          mythContext.lineTo(210, 1100);
+          mythContext.closePath();
+          mythContext.fill();
+          mythContext.stroke();
+          mythContext.shadowBlur = 0;
+          for (let fold = 0; fold < 7; fold += 1) {
+            const x = 250 + fold * 67;
+            mythContext.strokeStyle = `rgba(183,207,255,${.12 + fold % 2 * .08})`;
+            mythContext.lineWidth = 3;
+            mythContext.beginPath();
+            mythContext.moveTo(x, 755);
+            mythContext.quadraticCurveTo(x - 25, 900, x + 4, 1080);
+            mythContext.stroke();
+          }
+          drawMythEllipse(450, 698, 27, 27, '#bd8d32', '#ffe79a', 5);
+          drawMythEllipse(450, 698, 9, 9, '#9bdcff');
+        } else if (gift === 'horns') {
+          [-1, 1].forEach((side) => {
+            mythContext.save();
+            mythContext.translate(450, 0);
+            mythContext.scale(side, 1);
+            mythContext.shadowColor = '#b7efff';
+            mythContext.shadowBlur = 24;
+            mythContext.strokeStyle = 'rgba(174,226,255,.34)';
+            mythContext.lineWidth = 30;
+            mythContext.beginPath(); mythContext.moveTo(-100, 300); mythContext.bezierCurveTo(-160, 230, -168, 125, -112, 58); mythContext.stroke();
+            const crystal = mythContext.createLinearGradient(-170, 245, -95, 80);
+            crystal.addColorStop(0, '#557ead'); crystal.addColorStop(.45, '#dff8ff'); crystal.addColorStop(1, '#8e75dc');
+            mythContext.strokeStyle = crystal;
+            mythContext.lineWidth = 18;
+            mythContext.beginPath(); mythContext.moveTo(-100, 300); mythContext.bezierCurveTo(-160, 230, -168, 125, -112, 58); mythContext.stroke();
+            mythContext.shadowBlur = 0;
+            for (let band = 0; band < 5; band += 1) {
+              mythContext.strokeStyle = 'rgba(255,255,255,.72)'; mythContext.lineWidth = 2;
+              mythContext.beginPath(); mythContext.moveTo(-139 - band * 3, 245 - band * 34); mythContext.lineTo(-116 - band * 5, 236 - band * 34); mythContext.stroke();
+            }
+            mythContext.restore();
+          });
+        } else if (gift === 'crown') {
+          const gold = mythContext.createLinearGradient(330, 130, 570, 285);
+          gold.addColorStop(0, '#8f5d17'); gold.addColorStop(.35, '#fff0a3'); gold.addColorStop(.65, '#c58a25'); gold.addColorStop(1, '#6d4210');
+          mythContext.fillStyle = gold;
+          mythContext.strokeStyle = '#ffe69a';
+          mythContext.lineWidth = 5;
+          mythContext.shadowColor = '#f3c65d'; mythContext.shadowBlur = 18;
+          mythContext.beginPath(); mythContext.moveTo(330, 280); mythContext.lineTo(348, 160); mythContext.lineTo(407, 232); mythContext.lineTo(450, 112); mythContext.lineTo(493, 232); mythContext.lineTo(552, 160); mythContext.lineTo(570, 280); mythContext.closePath(); mythContext.fill(); mythContext.stroke();
+          mythContext.shadowBlur = 0;
+          [['#8fd8ff', 390], ['#7a184d', 450], ['#8fd8ff', 510]].forEach(([color, x], index) => drawMythEllipse(x, 248 - index % 2 * 7, 12, 17, color, '#fff0b5', 3));
+          mythContext.strokeStyle = 'rgba(105,60,8,.72)'; mythContext.lineWidth = 3;
+          for (let x = 352; x <= 548; x += 28) { mythContext.beginPath(); mythContext.arc(x, 270, 10, Math.PI, Math.PI * 2); mythContext.stroke(); }
+        } else if (gift === 'thunderbolt') {
+          const bolt = mythContext.createLinearGradient(110, 500, 310, 875);
+          bolt.addColorStop(0, '#fffbd4'); bolt.addColorStop(.48, '#ffd24f'); bolt.addColorStop(1, '#dc7a11');
+          mythContext.fillStyle = bolt; mythContext.strokeStyle = '#fff3a8'; mythContext.lineWidth = 4;
+          mythContext.shadowColor = '#ffe36d'; mythContext.shadowBlur = 30;
+          mythContext.beginPath(); mythContext.moveTo(170, 485); mythContext.lineTo(285, 485); mythContext.lineTo(225, 625); mythContext.lineTo(305, 625); mythContext.lineTo(145, 890); mythContext.lineTo(190, 680); mythContext.lineTo(105, 680); mythContext.closePath(); mythContext.fill(); mythContext.stroke();
+          mythContext.strokeStyle = '#c8efff'; mythContext.lineWidth = 3;
+          [[170,570,85,535],[240,700,330,735],[182,770,95,815]].forEach(([x1,y1,x2,y2]) => { mythContext.beginPath(); mythContext.moveTo(x1,y1); mythContext.lineTo((x1+x2)/2,y1-22); mythContext.lineTo(x2,y2); mythContext.stroke(); });
+        } else if (gift === 'helm') {
+          const bronze = mythContext.createLinearGradient(285, 130, 615, 510);
+          bronze.addColorStop(0, '#f7e6bd'); bronze.addColorStop(.28, '#9faab8'); bronze.addColorStop(.58, '#465362'); bronze.addColorStop(1, '#d4b06b');
+          mythContext.strokeStyle = bronze; mythContext.lineWidth = 28;
+          mythContext.shadowColor = lightColor; mythContext.shadowBlur = 16;
+          mythContext.beginPath(); mythContext.arc(450, 345, 165, Math.PI * 1.06, Math.PI * 1.94); mythContext.stroke();
+          mythContext.lineWidth = 13; mythContext.beginPath(); mythContext.moveTo(316, 394); mythContext.lineTo(335, 545); mythContext.moveTo(584, 394); mythContext.lineTo(565, 545); mythContext.stroke();
+          mythContext.fillStyle = '#6f3047'; mythContext.beginPath(); mythContext.moveTo(430, 178); mythContext.quadraticCurveTo(450, 62, 610, 102); mythContext.quadraticCurveTo(514, 122, 470, 220); mythContext.closePath(); mythContext.fill();
+          mythContext.strokeStyle = '#efd48b'; mythContext.lineWidth = 6; mythContext.beginPath(); mythContext.moveTo(450, 156); mythContext.lineTo(450, 258); mythContext.stroke();
+        } else if (gift === 'bow') {
+          const bow = mythContext.createLinearGradient(660, 520, 790, 940);
+          bow.addColorStop(0, '#fff0a2'); bow.addColorStop(.5, '#bd7720'); bow.addColorStop(1, '#6f390e');
+          mythContext.strokeStyle = bow; mythContext.lineWidth = 15; mythContext.shadowColor = '#f6cf65'; mythContext.shadowBlur = 18;
+          mythContext.beginPath(); mythContext.moveTo(690, 515); mythContext.quadraticCurveTo(850, 710, 690, 930); mythContext.stroke(); mythContext.shadowBlur = 0;
+          mythContext.strokeStyle = '#f9e9c2'; mythContext.lineWidth = 2.5; mythContext.beginPath(); mythContext.moveTo(690, 515); mythContext.lineTo(690, 930); mythContext.stroke();
+          mythContext.strokeStyle = '#e9c35c'; mythContext.lineWidth = 6; mythContext.beginPath(); mythContext.moveTo(625, 720); mythContext.lineTo(770, 720); mythContext.stroke();
+          mythContext.fillStyle = '#e9c35c'; mythContext.beginPath(); mythContext.moveTo(780,720); mythContext.lineTo(750,705); mythContext.lineTo(750,735); mythContext.closePath(); mythContext.fill();
+          for (let mark = 0; mark < 8; mark += 1) drawMythEllipse(715 + Math.sin(mark) * 16, 560 + mark * 43, 4, 4, mark % 2 ? '#7bd7ed' : '#f7e39b');
+        } else if (gift === 'sandals') {
+          [-1, 1].forEach((side) => {
+            mythContext.save(); mythContext.translate(side < 0 ? 235 : 665, 850); mythContext.scale(side, 1);
+            mythContext.fillStyle = 'rgba(228,242,255,.82)'; mythContext.strokeStyle = '#fff1ba'; mythContext.lineWidth = 3;
+            for (let feather = 0; feather < 7; feather += 1) {
+              mythContext.beginPath(); mythContext.moveTo(0, 0); mythContext.quadraticCurveTo(-45, -35 - feather * 7, -95 - feather * 7, -20 - feather * 3); mythContext.quadraticCurveTo(-48, 5, 0, 0); mythContext.fill(); mythContext.stroke();
+            }
+            mythContext.strokeStyle = '#ba7d2f'; mythContext.lineWidth = 10; mythContext.beginPath(); mythContext.arc(12, 18, 58, Math.PI * 1.05, Math.PI * 1.85); mythContext.stroke();
+            mythContext.restore();
+          });
+        } else if (gift === 'shield') {
+          mythContext.shadowColor = '#e6ba57'; mythContext.shadowBlur = 22;
+          const shield = mythContext.createRadialGradient(650, 775, 10, 685, 820, 132);
+          shield.addColorStop(0, '#ffe6a0'); shield.addColorStop(.24, '#9e6824'); shield.addColorStop(.63, '#3c2a20'); shield.addColorStop(.82, '#c59339'); shield.addColorStop(1, '#6f451c');
+          drawMythEllipse(685, 820, 132, 132, shield, '#ffe39a', 9);
+          mythContext.shadowBlur = 0;
+          mythContext.strokeStyle = '#eccb73'; mythContext.lineWidth = 4;
+          mythContext.beginPath(); mythContext.arc(685, 820, 101, 0, Math.PI * 2); mythContext.stroke();
+          for (let mark = 0; mark < 16; mark += 1) {
+            const angle = mark / 16 * Math.PI * 2;
+            drawMythEllipse(685 + Math.cos(angle) * 111, 820 + Math.sin(angle) * 111, 5, 5, '#f3d47c');
+          }
+          mythContext.font = '600 96px Georgia, serif'; mythContext.fillStyle = '#f5d77f'; mythContext.textAlign = 'center'; mythContext.textBaseline = 'middle'; mythContext.fillText('Ω', 685, 820);
+        }
+        mythContext.restore();
+      }
+
       async function drawMythPortrait(seed) {
         const width = mythCanvas.width;
         const height = mythCanvas.height;
@@ -1395,25 +1704,8 @@ const greekLetters = [
         mythContext.fillStyle = aura;
         mythContext.fillRect(0, 0, width, height);
 
-        if (mythAnswers.realm === 'stars') {
-          for (let index = 0; index < 70; index += 1) {
-            const x = (index * 197 + seed * 31) % width;
-            const y = (index * 113 + seed * 17) % 950;
-            const radius = 1.4 + ((index + seed) % 4) * .65;
-            drawMythEllipse(x, y, radius, radius, index % 5 === 0 ? '#fff3c4' : '#dcecff');
-          }
-        } else {
-          mythContext.lineWidth = 5;
-          for (let wave = 0; wave < 5; wave += 1) {
-            const y = 760 + wave * 64;
-            mythContext.beginPath();
-            mythContext.moveTo(-30, y);
-            mythContext.bezierCurveTo(180, y - 58, 290, y + 52, 450, y);
-            mythContext.bezierCurveTo(610, y - 52, 720, y + 58, 930, y);
-            mythContext.strokeStyle = wave % 2 ? 'rgba(113,198,229,.28)' : 'rgba(207,239,247,.22)';
-            mythContext.stroke();
-          }
-        }
+        if (mythAnswers.realm === 'stars') drawMythStarRealm(seed, lightColor, moonlit);
+        else drawMythSeaRealm(seed, lightColor, moonlit);
 
         mythContext.lineWidth = 4;
         mythContext.strokeStyle = `${lightColor}82`;
@@ -1422,22 +1714,8 @@ const greekLetters = [
         mythContext.stroke();
 
         if (mythAnswers.gift === 'wings') {
-          const wingGradient = mythContext.createLinearGradient(100, 420, 450, 850);
-          wingGradient.addColorStop(0, `${lightColor}72`);
-          wingGradient.addColorStop(1, `${lightColor}0a`);
-          mythContext.fillStyle = wingGradient;
-          mythContext.strokeStyle = `${lightColor}a8`;
-          mythContext.lineWidth = 3;
-          mythContext.beginPath();
-          mythContext.moveTo(355, 505);
-          mythContext.bezierCurveTo(145, 335, 52, 500, 232, 835);
-          mythContext.bezierCurveTo(250, 690, 328, 630, 355, 505);
-          mythContext.fill(); mythContext.stroke();
-          mythContext.beginPath();
-          mythContext.moveTo(545, 505);
-          mythContext.bezierCurveTo(755, 335, 848, 500, 668, 835);
-          mythContext.bezierCurveTo(650, 690, 572, 630, 545, 505);
-          mythContext.fill(); mythContext.stroke();
+          drawMythWing(1, lightColor);
+          drawMythWing(-1, lightColor);
         }
 
         const maximumPortraitWidth = width * .98;
@@ -1458,43 +1736,7 @@ const greekLetters = [
         mythContext.fillStyle = portraitTint;
         mythContext.fillRect(0, 0, width, height);
 
-        if (mythAnswers.gift === 'cloak') {
-          mythContext.strokeStyle = '#f1d17a';
-          mythContext.lineWidth = 5;
-          mythContext.shadowColor = '#f1d17a';
-          mythContext.shadowBlur = 18;
-          mythContext.beginPath();
-          mythContext.moveTo(168, 760);
-          mythContext.quadraticCurveTo(450, 660, 732, 760);
-          mythContext.quadraticCurveTo(690, 930, 650, 1080);
-          mythContext.stroke();
-          mythContext.shadowBlur = 0;
-        }
-
-        if (mythAnswers.gift === 'horns') {
-          mythContext.strokeStyle = '#d9f3ff'; mythContext.lineWidth = 15; mythContext.lineCap = 'round';
-          mythContext.beginPath(); mythContext.moveTo(350, 290); mythContext.bezierCurveTo(295, 200, 305, 135, 350, 95); mythContext.stroke();
-          mythContext.beginPath(); mythContext.moveTo(550, 290); mythContext.bezierCurveTo(605, 200, 595, 135, 550, 95); mythContext.stroke();
-        } else if (mythAnswers.gift === 'crown') {
-          mythContext.fillStyle = '#f2ce72';
-          mythContext.beginPath(); mythContext.moveTo(335, 270); mythContext.lineTo(350, 160); mythContext.lineTo(410, 230); mythContext.lineTo(450, 125); mythContext.lineTo(490, 230); mythContext.lineTo(550, 160); mythContext.lineTo(565, 270); mythContext.closePath(); mythContext.fill();
-        } else if (mythAnswers.gift === 'thunderbolt') {
-          mythContext.fillStyle = '#ffe07b';
-          mythContext.beginPath(); mythContext.moveTo(175, 510); mythContext.lineTo(275, 510); mythContext.lineTo(225, 635); mythContext.lineTo(300, 635); mythContext.lineTo(155, 865); mythContext.lineTo(195, 680); mythContext.lineTo(120, 680); mythContext.closePath(); mythContext.fill();
-        } else if (mythAnswers.gift === 'helm') {
-          mythContext.strokeStyle = '#d9e2ec'; mythContext.lineWidth = 24;
-          mythContext.beginPath(); mythContext.arc(450, 335, 158, Math.PI * 1.05, Math.PI * 1.95); mythContext.stroke();
-          mythContext.fillStyle = '#d9e2ec'; mythContext.fillRect(440, 145, 20, 95);
-        } else if (mythAnswers.gift === 'bow') {
-          mythContext.strokeStyle = '#f2ce72'; mythContext.lineWidth = 9;
-          mythContext.beginPath(); mythContext.moveTo(700, 545); mythContext.quadraticCurveTo(820, 715, 700, 915); mythContext.stroke();
-          mythContext.lineWidth = 3; mythContext.beginPath(); mythContext.moveTo(700, 545); mythContext.lineTo(700, 915); mythContext.stroke();
-        } else if (mythAnswers.gift === 'sandals') {
-          mythContext.font = '600 88px Georgia, serif'; mythContext.fillStyle = '#f4e3b0'; mythContext.fillText('❧', 250, 845); mythContext.fillText('❧', 650, 845);
-        } else if (mythAnswers.gift === 'shield') {
-          drawMythEllipse(685, 820, 118, 118, '#8f672f', '#f2ce72', 12);
-          mythContext.font = '600 92px Georgia, serif'; mythContext.fillStyle = '#f2ce72'; mythContext.fillText('Ω', 685, 820);
-        }
+        drawMythAccessory(mythAnswers.gift, lightColor);
 
         mythContext.textAlign = 'center';
         mythContext.textBaseline = 'middle';
