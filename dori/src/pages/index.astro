@@ -368,40 +368,42 @@ const greekLetters = [
 
           <form class="myth-quiz" id="myth-quiz">
             <fieldset class="myth-question myth-question--identity" data-myth-question="form">
-              <legend><span>01</span> Would you rather become…</legend>
+              <legend><span>01</span><span class="myth-question__prompt">Would you rather become…</span></legend>
               <div class="myth-choices">
                 <button type="button" data-myth-answer="creature" aria-pressed="false">A magical creature</button>
+                <button type="button" data-myth-answer="god" aria-pressed="false">A Greek god</button>
                 <button type="button" data-myth-answer="goddess" aria-pressed="false">A Greek goddess</button>
-                <button type="button" data-myth-answer="human" aria-pressed="false">A fearless human</button>
+                <button type="button" data-myth-answer="girl" aria-pressed="false">A mortal girl</button>
+                <button type="button" data-myth-answer="boy" aria-pressed="false">A mortal boy</button>
               </div>
             </fieldset>
 
-            <fieldset class="myth-question" data-myth-question="light">
-              <legend><span>02</span> Would you rather live by…</legend>
+            <fieldset class="myth-question" data-myth-question="light" disabled>
+              <legend><span>02</span><span class="myth-question__prompt">Choose who you become first.</span></legend>
               <div class="myth-choices">
-                <button type="button" data-myth-answer="moon" aria-pressed="false">Silver moonlight</button>
-                <button type="button" data-myth-answer="sun" aria-pressed="false">Golden sunlight</button>
+                <button type="button" data-myth-answer="moon" aria-pressed="false">Moonlight</button>
+                <button type="button" data-myth-answer="sun" aria-pressed="false">Sunlight</button>
               </div>
             </fieldset>
 
-            <fieldset class="myth-question" data-myth-question="realm">
-              <legend><span>03</span> Would you rather explore…</legend>
+            <fieldset class="myth-question" data-myth-question="realm" disabled>
+              <legend><span>03</span><span class="myth-question__prompt">Your adventure will appear here.</span></legend>
               <div class="myth-choices">
                 <button type="button" data-myth-answer="sea" aria-pressed="false">A hidden sea</button>
                 <button type="button" data-myth-answer="stars" aria-pressed="false">The endless stars</button>
               </div>
             </fieldset>
 
-            <fieldset class="myth-question" data-myth-question="adornment">
-              <legend><span>04</span> Would you rather carry…</legend>
+            <fieldset class="myth-question" data-myth-question="gift" disabled>
+              <legend><span>04</span><span class="myth-question__prompt">Your magical gift will appear here.</span></legend>
               <div class="myth-choices">
                 <button type="button" data-myth-answer="wings" aria-pressed="false">Celestial wings</button>
-                <button type="button" data-myth-answer="crown" aria-pressed="false">A golden crown</button>
+                <button type="button" data-myth-answer="crown" aria-pressed="false">Golden crown</button>
               </div>
             </fieldset>
 
-            <fieldset class="myth-question" data-myth-question="virtue">
-              <legend><span>05</span> Would you rather be known for…</legend>
+            <fieldset class="myth-question" data-myth-question="virtue" disabled>
+              <legend><span>05</span><span class="myth-question__prompt">Your greatest strength will appear here.</span></legend>
               <div class="myth-choices">
                 <button type="button" data-myth-answer="courage" aria-pressed="false">A courageous heart</button>
                 <button type="button" data-myth-answer="wisdom" aria-pressed="false">Ancient wisdom</button>
@@ -415,21 +417,18 @@ const greekLetters = [
           </form>
 
           <article class="myth-result" id="myth-result" aria-live="polite" hidden>
-            <div class="myth-portrait" id="myth-portrait" data-form="goddess" data-light="moon" data-realm="stars" data-adornment="wings">
-              <span class="myth-portrait__orbit" aria-hidden="true"></span>
-              <span class="myth-portrait__adornment" aria-hidden="true"></span>
-              <span class="myth-portrait__figure" aria-hidden="true">
-                <span class="myth-portrait__head"></span>
-                <span class="myth-portrait__body"></span>
-              </span>
-              <span class="myth-portrait__companion" id="myth-companion" aria-hidden="true">✦</span>
+            <div class="myth-portrait" id="myth-portrait" data-light="moon">
+              <canvas id="myth-canvas" width="900" height="1100" aria-label="Your generated myth character portrait"></canvas>
             </div>
             <div class="myth-result__copy">
               <p class="myth-result__eyebrow" id="myth-title">The Moonlit Star-Walker</p>
               <h3 id="myth-name">Elara</h3>
               <p id="myth-description"></p>
               <ul class="myth-powers" id="myth-powers" aria-label="Character powers"></ul>
-              <button class="myth-again" id="myth-again" type="button">Answer again</button>
+              <div class="myth-result__actions">
+                <button class="myth-save" id="myth-save" type="button">Save character image</button>
+                <button class="myth-again" id="myth-again" type="button">Answer again</button>
+              </div>
             </div>
           </article>
         </section>
@@ -1179,6 +1178,8 @@ const greekLetters = [
       const mythProgress = document.getElementById('myth-progress');
       const mythResult = document.getElementById('myth-result');
       const mythPortrait = document.getElementById('myth-portrait');
+      const mythCanvas = document.getElementById('myth-canvas');
+      const mythContext = mythCanvas.getContext('2d');
       const mythAnswers = {};
 
       const mythNames = {
@@ -1186,21 +1187,64 @@ const greekLetters = [
           moon: ['Nymera', 'Veluna', 'Astryss', 'Lunelle'],
           sun: ['Solara', 'Aureli', 'Pyrella', 'Calixa']
         },
+        god: {
+          moon: ['Orion', 'Leandros', 'Evander', 'Atlas'],
+          sun: ['Asterion', 'Theron', 'Helion', 'Nikos']
+        },
         goddess: {
           moon: ['Elara', 'Calyra', 'Nyssia', 'Selenea'],
           sun: ['Aurelia', 'Thalia', 'Solenne', 'Elaris']
         },
-        human: {
+        girl: {
           moon: ['Doria', 'Lyra', 'Cassia', 'Mira'],
           sun: ['Thea', 'Iris', 'Phoebe', 'Cleo']
+        },
+        boy: {
+          moon: ['Theo', 'Nico', 'Lucian', 'Milo'],
+          sun: ['Leo', 'Felix', 'Damon', 'Alexios']
+        }
+      };
+
+      const mythQuestionSets = {
+        creature: {
+          light: { prompt: 'Would you rather awaken beneath…', options: [['moon', 'A violet moon'], ['sun', 'A blazing sunrise']] },
+          realm: { prompt: 'Would you rather protect…', options: [['sea', 'An enchanted ocean'], ['stars', 'A hidden constellation']] },
+          gift: { prompt: 'Would you rather grow…', options: [['wings', 'Celestial wings'], ['horns', 'Crystal horns']] },
+          virtue: { prompt: 'Would you rather be loved for…', options: [['courage', 'Untamed courage'], ['wisdom', 'Clever wisdom']] }
+        },
+        god: {
+          light: { prompt: 'Would you rather command…', options: [['moon', 'The moon and night'], ['sun', 'The sun and fire']] },
+          realm: { prompt: 'Would you rather rule…', options: [['sea', 'The wild oceans'], ['stars', 'The upper skies']] },
+          gift: { prompt: 'Would you rather wield…', options: [['thunderbolt', 'A thunderbolt'], ['helm', 'An enchanted helm']] },
+          virtue: { prompt: 'Would you rather lead with…', options: [['courage', 'Fearless courage'], ['wisdom', 'Ancient wisdom']] }
+        },
+        goddess: {
+          light: { prompt: 'Would you rather glow with…', options: [['moon', 'Silver moonlight'], ['sun', 'Golden sunlight']] },
+          realm: { prompt: 'Would you rather watch over…', options: [['sea', 'A secret sea kingdom'], ['stars', 'The constellations']] },
+          gift: { prompt: 'Would you rather wear…', options: [['wings', 'Celestial wings'], ['crown', 'A living-gold crown']] },
+          virtue: { prompt: 'Would you rather be remembered for…', options: [['courage', 'A brave heart'], ['wisdom', 'Prophetic wisdom']] }
+        },
+        girl: {
+          light: { prompt: 'Would you rather begin your quest at…', options: [['moon', 'Moonrise'], ['sun', 'Sunrise']] },
+          realm: { prompt: 'Would you rather discover…', options: [['sea', 'A city under the sea'], ['stars', 'A staircase to the stars']] },
+          gift: { prompt: 'Would you rather carry…', options: [['cloak', 'An enchanted cloak'], ['bow', 'A golden bow']] },
+          virtue: { prompt: 'Would you rather win with…', options: [['courage', 'Daring courage'], ['wisdom', 'Brilliant ideas']] }
+        },
+        boy: {
+          light: { prompt: 'Would you rather set out at…', options: [['moon', 'Midnight'], ['sun', 'First light']] },
+          realm: { prompt: 'Would you rather find…', options: [['sea', 'A lost island'], ['stars', 'A doorway in the stars']] },
+          gift: { prompt: 'Would you rather receive…', options: [['sandals', 'Winged sandals'], ['shield', 'A bronze shield']] },
+          virtue: { prompt: 'Would you rather be famous for…', options: [['courage', 'Unshakable courage'], ['wisdom', 'Ingenious plans']] }
         }
       };
 
       const mythWords = {
         form: {
           creature: { label: 'Mystical creature', description: 'a rare creature born from old magic' },
+          god: { label: 'Greek god', description: 'a young god whose power echoes across Olympus' },
           goddess: { label: 'Greek goddess', description: 'a young goddess remembered in secret legends' },
-          human: { label: 'Human hero', description: 'a fearless human whose choices become legends' }
+          girl: { label: 'Mortal heroine', description: 'a mortal girl whose choices become legends' },
+          boy: { label: 'Mortal hero', description: 'a mortal boy whose choices become legends' }
         },
         light: {
           moon: { title: 'Moonlit', power: 'Moonlight magic', description: 'silver moonlight' },
@@ -1210,9 +1254,16 @@ const greekLetters = [
           sea: { title: 'Tidekeeper', power: 'Tide calling', description: 'the secret paths beneath the sea', companion: '🐚' },
           stars: { title: 'Star-Walker', power: 'Constellation finding', description: 'roads drawn between the stars', companion: '✦' }
         },
-        adornment: {
+        gift: {
           wings: { power: 'Celestial flight', description: 'celestial wings' },
-          crown: { power: 'Golden command', description: 'a crown of living gold' }
+          horns: { power: 'Crystal hearing', description: 'horns carved from moon crystal' },
+          thunderbolt: { power: 'Storm calling', description: 'a thunderbolt that answers only one hand' },
+          helm: { power: 'Invisible passage', description: 'an enchanted silver helm' },
+          crown: { power: 'Golden command', description: 'a crown of living gold' },
+          cloak: { power: 'Shadow walking', description: 'an enchanted cloak woven from twilight' },
+          bow: { power: 'True aim', description: 'a golden bow that never misses' },
+          sandals: { power: 'Wind walking', description: 'winged sandals swift as the west wind' },
+          shield: { power: 'Unbroken defense', description: 'a bronze shield bright as dawn' }
         },
         virtue: {
           courage: { title: 'Brave', power: 'Courageous heart', description: 'runs toward danger when others need help' },
@@ -1220,7 +1271,50 @@ const greekLetters = [
         }
       };
 
+      function setMythQuestion(questionKey, definition) {
+        const question = mythQuestions.find((item) => item.dataset.mythQuestion === questionKey);
+        question.disabled = false;
+        question.querySelector('.myth-question__prompt').textContent = definition.prompt;
+        question.querySelectorAll('[data-myth-answer]').forEach((button, index) => {
+          button.dataset.mythAnswer = definition.options[index][0];
+          button.textContent = definition.options[index][1];
+          button.classList.remove('is-selected');
+          button.setAttribute('aria-pressed', 'false');
+        });
+      }
+
+      function adaptMythQuestions(form) {
+        ['light', 'realm', 'gift', 'virtue'].forEach((key) => {
+          delete mythAnswers[key];
+          setMythQuestion(key, mythQuestionSets[form][key]);
+        });
+      }
+
+      function lockMythQuestions() {
+        const defaults = {
+          light: ['Choose who you become first.', ['Moonlight', 'Sunlight']],
+          realm: ['Your adventure will appear here.', ['A hidden sea', 'The endless stars']],
+          gift: ['Your magical gift will appear here.', ['Magical gift', 'Ancient treasure']],
+          virtue: ['Your greatest strength will appear here.', ['Courage', 'Wisdom']]
+        };
+        Object.entries(defaults).forEach(([key, [prompt, labels]]) => {
+          const question = mythQuestions.find((item) => item.dataset.mythQuestion === key);
+          question.disabled = true;
+          question.querySelector('.myth-question__prompt').textContent = prompt;
+          question.querySelectorAll('[data-myth-answer]').forEach((button, index) => {
+            button.textContent = labels[index];
+            button.classList.remove('is-selected');
+            button.setAttribute('aria-pressed', 'false');
+          });
+        });
+      }
+
       function updateMythProgress() {
+        if (!mythAnswers.form) {
+          mythReveal.disabled = true;
+          mythProgress.textContent = 'Choose who you become first.';
+          return;
+        }
         const remaining = mythQuestions.filter((question) => !mythAnswers[question.dataset.mythQuestion]).length;
         mythReveal.disabled = remaining !== 0;
         mythProgress.textContent = remaining === 0 ? 'Your myth is ready to be revealed.' : `${remaining} ${remaining === 1 ? 'choice' : 'choices'} left.`;
@@ -1228,6 +1322,9 @@ const greekLetters = [
 
       mythQuestions.forEach((question) => {
         question.querySelectorAll('[data-myth-answer]').forEach((button) => button.addEventListener('click', () => {
+          if (question.dataset.mythQuestion === 'form' && mythAnswers.form !== button.dataset.mythAnswer) {
+            adaptMythQuestions(button.dataset.mythAnswer);
+          }
           mythAnswers[question.dataset.mythQuestion] = button.dataset.mythAnswer;
           question.querySelectorAll('[data-myth-answer]').forEach((choice) => {
             const active = choice === button;
@@ -1238,31 +1335,238 @@ const greekLetters = [
         }));
       });
 
+      function drawMythEllipse(x, y, radiusX, radiusY, fill, stroke = null, lineWidth = 1) {
+        mythContext.beginPath();
+        mythContext.ellipse(x, y, radiusX, radiusY, 0, 0, Math.PI * 2);
+        mythContext.fillStyle = fill;
+        mythContext.fill();
+        if (stroke) {
+          mythContext.lineWidth = lineWidth;
+          mythContext.strokeStyle = stroke;
+          mythContext.stroke();
+        }
+      }
+
+      function drawMythPortrait(seed) {
+        const width = mythCanvas.width;
+        const height = mythCanvas.height;
+        const moonlit = mythAnswers.light === 'moon';
+        const lightColor = moonlit ? '#b9d9ff' : '#ffd477';
+        const deepColor = moonlit ? '#17213f' : '#512b19';
+        const isCreature = mythAnswers.form === 'creature';
+        const hasLongHair = ['goddess', 'girl'].includes(mythAnswers.form);
+        const skinTones = ['#f0d2b6', '#d8aa87', '#aa7459', '#76503e'];
+        const hairColors = ['#17131d', '#402820', '#8c552f', '#d0ad65'];
+        const skin = isCreature ? (moonlit ? '#7184b7' : '#b47a48') : skinTones[seed % skinTones.length];
+        const hair = isCreature ? (moonlit ? '#252a55' : '#5f3025') : hairColors[(seed + 1) % hairColors.length];
+        const eye = mythAnswers.virtue === 'wisdom' ? '#9ee5ff' : '#f7cf67';
+
+        mythContext.clearRect(0, 0, width, height);
+        const background = mythContext.createLinearGradient(0, 0, width, height);
+        background.addColorStop(0, deepColor);
+        background.addColorStop(.58, moonlit ? '#261f46' : '#2e1620');
+        background.addColorStop(1, '#05070d');
+        mythContext.fillStyle = background;
+        mythContext.fillRect(0, 0, width, height);
+
+        const aura = mythContext.createRadialGradient(450, 325, 10, 450, 325, 330);
+        aura.addColorStop(0, `${lightColor}72`);
+        aura.addColorStop(1, `${lightColor}00`);
+        mythContext.fillStyle = aura;
+        mythContext.fillRect(0, 0, width, height);
+
+        if (mythAnswers.realm === 'stars') {
+          for (let index = 0; index < 46; index += 1) {
+            const x = (index * 197 + seed * 31) % width;
+            const y = (index * 113 + seed * 17) % 790;
+            const radius = 1.4 + ((index + seed) % 4) * .65;
+            drawMythEllipse(x, y, radius, radius, index % 5 === 0 ? '#fff3c4' : '#dcecff');
+          }
+        } else {
+          mythContext.lineWidth = 5;
+          for (let wave = 0; wave < 5; wave += 1) {
+            const y = 760 + wave * 64;
+            mythContext.beginPath();
+            mythContext.moveTo(-30, y);
+            mythContext.bezierCurveTo(180, y - 58, 290, y + 52, 450, y);
+            mythContext.bezierCurveTo(610, y - 52, 720, y + 58, 930, y);
+            mythContext.strokeStyle = wave % 2 ? 'rgba(113,198,229,.28)' : 'rgba(207,239,247,.22)';
+            mythContext.stroke();
+          }
+        }
+
+        mythContext.lineWidth = 4;
+        mythContext.strokeStyle = `${lightColor}82`;
+        mythContext.beginPath();
+        mythContext.arc(450, 340, 268, 0, Math.PI * 2);
+        mythContext.stroke();
+
+        if (mythAnswers.gift === 'wings') {
+          const wingGradient = mythContext.createLinearGradient(100, 420, 450, 850);
+          wingGradient.addColorStop(0, `${lightColor}72`);
+          wingGradient.addColorStop(1, `${lightColor}0a`);
+          mythContext.fillStyle = wingGradient;
+          mythContext.strokeStyle = `${lightColor}a8`;
+          mythContext.lineWidth = 3;
+          mythContext.beginPath();
+          mythContext.moveTo(355, 505);
+          mythContext.bezierCurveTo(145, 335, 52, 500, 232, 835);
+          mythContext.bezierCurveTo(250, 690, 328, 630, 355, 505);
+          mythContext.fill(); mythContext.stroke();
+          mythContext.beginPath();
+          mythContext.moveTo(545, 505);
+          mythContext.bezierCurveTo(755, 335, 848, 500, 668, 835);
+          mythContext.bezierCurveTo(650, 690, 572, 630, 545, 505);
+          mythContext.fill(); mythContext.stroke();
+        }
+
+        if (hasLongHair || isCreature) drawMythEllipse(450, 465, isCreature ? 205 : 190, 300, hair);
+        else drawMythEllipse(450, 350, 170, 180, hair);
+
+        const garment = mythContext.createLinearGradient(245, 680, 680, 1050);
+        garment.addColorStop(0, `${lightColor}b8`);
+        garment.addColorStop(.34, moonlit ? '#353554' : '#704329');
+        garment.addColorStop(1, '#11121d');
+        mythContext.beginPath();
+        mythContext.moveTo(345, 640);
+        mythContext.bezierCurveTo(210, 690, 145, 850, 105, 1100);
+        mythContext.lineTo(795, 1100);
+        mythContext.bezierCurveTo(755, 850, 690, 690, 555, 640);
+        mythContext.closePath();
+        mythContext.fillStyle = garment;
+        mythContext.fill();
+
+        if (mythAnswers.gift === 'cloak') {
+          mythContext.fillStyle = 'rgba(20,18,43,.72)';
+          mythContext.beginPath();
+          mythContext.moveTo(310, 625);
+          mythContext.quadraticCurveTo(450, 560, 590, 625);
+          mythContext.lineTo(735, 1100);
+          mythContext.lineTo(165, 1100);
+          mythContext.closePath();
+          mythContext.fill();
+        }
+
+        drawMythEllipse(450, 615, 60, 92, skin);
+
+        if (isCreature) {
+          mythContext.fillStyle = skin;
+          mythContext.beginPath(); mythContext.moveTo(330, 300); mythContext.lineTo(250, 145); mythContext.lineTo(390, 250); mythContext.closePath(); mythContext.fill();
+          mythContext.beginPath(); mythContext.moveTo(570, 300); mythContext.lineTo(650, 145); mythContext.lineTo(510, 250); mythContext.closePath(); mythContext.fill();
+        }
+
+        drawMythEllipse(450, 415, 145, 190, skin, `${lightColor}55`, 3);
+
+        mythContext.fillStyle = hair;
+        mythContext.beginPath();
+        mythContext.arc(450, 365, 151, Math.PI, Math.PI * 2);
+        mythContext.bezierCurveTo(545, 270, 520, 250, 450, 248);
+        mythContext.bezierCurveTo(380, 250, 350, 278, 299, 365);
+        mythContext.fill();
+
+        const eyeY = 410;
+        [-53, 53].forEach((offset) => {
+          drawMythEllipse(450 + offset, eyeY, 25, 13, '#f7f1e8');
+          drawMythEllipse(450 + offset, eyeY, isCreature ? 7 : 9, isCreature ? 11 : 9, eye);
+          drawMythEllipse(450 + offset, eyeY, 3.5, 5, '#11131b');
+        });
+        mythContext.strokeStyle = hair;
+        mythContext.lineWidth = 8;
+        mythContext.lineCap = 'round';
+        mythContext.beginPath(); mythContext.moveTo(365, 372); mythContext.quadraticCurveTo(395, 357, 425, 372); mythContext.stroke();
+        mythContext.beginPath(); mythContext.moveTo(475, 372); mythContext.quadraticCurveTo(505, 357, 535, 372); mythContext.stroke();
+        mythContext.strokeStyle = 'rgba(83,50,45,.55)';
+        mythContext.lineWidth = 4;
+        mythContext.beginPath(); mythContext.moveTo(450, 425); mythContext.quadraticCurveTo(438, 478, 456, 484); mythContext.stroke();
+        mythContext.strokeStyle = mythAnswers.virtue === 'courage' ? '#9b5360' : '#7e5a68';
+        mythContext.lineWidth = 6;
+        mythContext.beginPath(); mythContext.moveTo(414, 523); mythContext.quadraticCurveTo(450, 543, 486, 523); mythContext.stroke();
+
+        if (isCreature) {
+          [410, 450, 490].forEach((x, index) => drawMythEllipse(x, 326 - Math.abs(index - 1) * 13, 4, 4, lightColor));
+        }
+
+        mythContext.textAlign = 'center';
+        mythContext.textBaseline = 'middle';
+        mythContext.shadowColor = lightColor;
+        mythContext.shadowBlur = 18;
+        mythContext.fillStyle = lightColor;
+        mythContext.font = '600 58px Georgia, "Apple Color Emoji", "Segoe UI Emoji", serif';
+        mythContext.fillText(mythAnswers.virtue === 'wisdom' ? '◇' : '✦', 450, 685);
+        mythContext.shadowBlur = 0;
+
+        if (mythAnswers.gift === 'horns') {
+          mythContext.strokeStyle = '#d9f3ff'; mythContext.lineWidth = 15; mythContext.lineCap = 'round';
+          mythContext.beginPath(); mythContext.moveTo(350, 290); mythContext.bezierCurveTo(295, 200, 305, 135, 350, 95); mythContext.stroke();
+          mythContext.beginPath(); mythContext.moveTo(550, 290); mythContext.bezierCurveTo(605, 200, 595, 135, 550, 95); mythContext.stroke();
+        } else if (mythAnswers.gift === 'crown') {
+          mythContext.fillStyle = '#f2ce72';
+          mythContext.beginPath(); mythContext.moveTo(335, 270); mythContext.lineTo(350, 160); mythContext.lineTo(410, 230); mythContext.lineTo(450, 125); mythContext.lineTo(490, 230); mythContext.lineTo(550, 160); mythContext.lineTo(565, 270); mythContext.closePath(); mythContext.fill();
+        } else if (mythAnswers.gift === 'thunderbolt') {
+          mythContext.fillStyle = '#ffe07b';
+          mythContext.beginPath(); mythContext.moveTo(175, 510); mythContext.lineTo(275, 510); mythContext.lineTo(225, 635); mythContext.lineTo(300, 635); mythContext.lineTo(155, 865); mythContext.lineTo(195, 680); mythContext.lineTo(120, 680); mythContext.closePath(); mythContext.fill();
+        } else if (mythAnswers.gift === 'helm') {
+          mythContext.strokeStyle = '#d9e2ec'; mythContext.lineWidth = 24;
+          mythContext.beginPath(); mythContext.arc(450, 335, 158, Math.PI * 1.05, Math.PI * 1.95); mythContext.stroke();
+          mythContext.fillStyle = '#d9e2ec'; mythContext.fillRect(440, 145, 20, 95);
+        } else if (mythAnswers.gift === 'bow') {
+          mythContext.strokeStyle = '#f2ce72'; mythContext.lineWidth = 9;
+          mythContext.beginPath(); mythContext.moveTo(700, 545); mythContext.quadraticCurveTo(820, 715, 700, 915); mythContext.stroke();
+          mythContext.lineWidth = 3; mythContext.beginPath(); mythContext.moveTo(700, 545); mythContext.lineTo(700, 915); mythContext.stroke();
+        } else if (mythAnswers.gift === 'sandals') {
+          mythContext.font = '600 88px Georgia, serif'; mythContext.fillStyle = '#f4e3b0'; mythContext.fillText('❧', 250, 845); mythContext.fillText('❧', 650, 845);
+        } else if (mythAnswers.gift === 'shield') {
+          drawMythEllipse(685, 820, 118, 118, '#8f672f', '#f2ce72', 12);
+          mythContext.font = '600 92px Georgia, serif'; mythContext.fillStyle = '#f2ce72'; mythContext.fillText('Ω', 685, 820);
+        }
+
+        mythContext.font = '600 70px Georgia, "Apple Color Emoji", "Segoe UI Emoji", serif';
+        mythContext.fillStyle = lightColor;
+        mythContext.textAlign = 'center';
+        mythContext.shadowColor = lightColor;
+        mythContext.shadowBlur = 16;
+        mythContext.fillText(mythWords.realm[mythAnswers.realm].companion, 785, 980);
+        mythContext.shadowBlur = 0;
+      }
+
       mythQuiz.addEventListener('submit', (event) => {
         event.preventDefault();
         if (mythQuestions.some((question) => !mythAnswers[question.dataset.mythQuestion])) return;
 
-        const seed = ['form', 'light', 'realm', 'adornment', 'virtue'].map((key) => mythAnswers[key]).join('').split('').reduce((total, letter) => total + letter.charCodeAt(0), 0);
+        const seed = ['form', 'light', 'realm', 'gift', 'virtue'].map((key) => mythAnswers[key]).join('').split('').reduce((total, letter) => total + letter.charCodeAt(0), 0);
         const possibleNames = mythNames[mythAnswers.form][mythAnswers.light];
         const name = possibleNames[seed % possibleNames.length];
         const form = mythWords.form[mythAnswers.form];
         const light = mythWords.light[mythAnswers.light];
         const realm = mythWords.realm[mythAnswers.realm];
-        const adornment = mythWords.adornment[mythAnswers.adornment];
+        const gift = mythWords.gift[mythAnswers.gift];
         const virtue = mythWords.virtue[mythAnswers.virtue];
 
-        mythPortrait.dataset.form = mythAnswers.form;
         mythPortrait.dataset.light = mythAnswers.light;
-        mythPortrait.dataset.realm = mythAnswers.realm;
-        mythPortrait.dataset.adornment = mythAnswers.adornment;
-        document.getElementById('myth-companion').textContent = realm.companion;
         document.getElementById('myth-title').textContent = `The ${virtue.title} ${light.title} ${realm.title}`;
         document.getElementById('myth-name').textContent = name;
-        document.getElementById('myth-description').textContent = `${name} is ${form.description}, guided by ${light.description}. With ${adornment.description}, ${name} explores ${realm.description} and ${virtue.description}.`;
-        document.getElementById('myth-powers').innerHTML = [form.label, light.power, realm.power, adornment.power, virtue.power].map((power) => `<li>${power}</li>`).join('');
+        document.getElementById('myth-description').textContent = `${name} is ${form.description}, guided by ${light.description}. With ${gift.description}, ${name} explores ${realm.description} and ${virtue.description}.`;
+        document.getElementById('myth-powers').replaceChildren(...[form.label, light.power, realm.power, gift.power, virtue.power].map((power) => {
+          const item = document.createElement('li');
+          item.textContent = power;
+          return item;
+        }));
+        mythCanvas.setAttribute('aria-label', `Portrait of ${name}, ${form.label}`);
+        drawMythPortrait(seed);
 
         mythQuiz.hidden = true;
         mythResult.hidden = false;
+      });
+
+      document.getElementById('myth-save').addEventListener('click', () => {
+        mythCanvas.toBlob((blob) => {
+          if (!blob) return;
+          const link = document.createElement('a');
+          link.download = `${document.getElementById('myth-name').textContent.toLowerCase()}-myth.png`;
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        }, 'image/png');
       });
 
       document.getElementById('myth-again').addEventListener('click', () => {
@@ -1271,6 +1575,7 @@ const greekLetters = [
           choice.classList.remove('is-selected');
           choice.setAttribute('aria-pressed', 'false');
         }));
+        lockMythQuestions();
         mythResult.hidden = true;
         mythQuiz.hidden = false;
         updateMythProgress();
