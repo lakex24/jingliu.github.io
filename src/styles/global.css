@@ -54,8 +54,11 @@ a:active { opacity: 0.72; transition: opacity 0.08s ease; }
 ::view-transition-new(root) { animation: page-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @keyframes page-out { to { opacity: 0; } }
 @keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+/* Astro's ClientRouter names the animation on the root the same way. */
+html[data-astro-transition] ::view-transition-old(root) { animation: page-out 0.22s ease both; }
+html[data-astro-transition] ::view-transition-new(root) { animation: page-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
 @media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none !important; }
 }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
@@ -147,13 +150,13 @@ p { margin: 0 0 1.1em; }
 @media (max-width: 599px) {
   /* Phones: the Home link becomes a small back arrow so the four tabs stay on one row beside it. */
   .masthead--inner { flex-wrap: nowrap; gap: 0.75rem; }
-  .home-link { flex: 0 0 auto; width: var(--tap); justify-content: center; margin-left: -0.6rem; }
-  .home-link__icon { display: block; }
+  .home-link { flex: 0 0 auto; width: var(--tap); justify-content: center; margin-left: -0.75rem; }
+  .home-link__icon { display: block; transform: rotate(-90deg); }
   .home-link__text { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
   /* Tabs sit to the right as a group, clear of the home icon. */
   .masthead--inner .nav { flex: 0 1 auto; min-width: 0; margin-left: auto; }
-  .masthead--inner .nav ul { justify-content: flex-end; flex-wrap: nowrap; gap: 0.15rem; }
-  .masthead--inner .nav a { padding: 0 0.3rem; font-size: 0.66rem; letter-spacing: 0.1em; }
+  .masthead--inner .nav ul { justify-content: flex-end; flex-wrap: nowrap; gap: 0.45rem; }
+  .masthead--inner .nav a { padding: 0 0.35rem; font-size: 0.66rem; letter-spacing: 0.1em; }
   .masthead--inner .nav li:last-child a { padding-right: 0; }
 }
 .page-title { margin: clamp(1.75rem, 4vw, 2.75rem) 0 0; max-width: 40rem; }

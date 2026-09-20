@@ -13,6 +13,7 @@ import '../styles/global.css';
 import { site } from '../data/site';
 import Ministry from '../components/Ministry.astro';
 import { Image } from 'astro:assets';
+import { ClientRouter } from 'astro:transitions';
 import { tilePhotos } from '../data/art';
 
 interface Props {
@@ -41,6 +42,8 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <!-- Paint the paper before any stylesheet arrives: no white frame between pages. -->
+    <style set:html={`html{background:${theme === 'dark' ? '#17112a' : '#f4f0fa'}}`} />
     <title>{fullTitle}</title>
     <meta name="description" content={description} />
     <link rel="canonical" href={canonical} />
@@ -55,6 +58,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:url" content={canonical} />
     <meta property="og:site_name" content={site.name} />
     {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
+    <ClientRouter fallback="swap" />
     <slot name="head" />
   </head>
   <body>
@@ -77,12 +81,11 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
       ) : (
         <header class="masthead masthead--inner">
           <a class="home-link mono" href="/" aria-label="Home">
-            <svg class="home-link__icon" viewBox="0 0 22 16" width="22" height="16" aria-hidden="true" shape-rendering="crispEdges">
-              <!-- a small house, with a back-chevron tucked to its left -->
+            <svg class="home-link__icon" viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" shape-rendering="crispEdges">
+              <!-- a small house, turned to point back the way you came -->
               <g fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="square" stroke-linejoin="miter">
-                <path d="M8 8.5 L14 3 L20 8.5 M9.5 7.5 V14 H18.5 V7.5" />
-                <path d="M12.5 14 V10.5 H15.5 V14" />
-                <path d="M4.5 5 L1.5 8 L4.5 11" />
+                <path d="M2 8 L8 2.5 L14 8 M3.5 7 V14 H12.5 V7" />
+                <path d="M6.5 14 V10.5 H9.5 V14" />
               </g>
             </svg>
             <span class="home-link__text">Home</span>

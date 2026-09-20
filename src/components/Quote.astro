@@ -41,7 +41,7 @@ const payload = all.map((q) => ({ id: q.id, ...q.data }));
 )}
 
 <script>
-  (() => {
+  document.addEventListener('astro:page-load', () => {
     const fig = document.getElementById('quote');
     const dataEl = document.getElementById('quote-data');
     if (!fig || !dataEl) return;
@@ -87,5 +87,5 @@ const payload = all.map((q) => ({ id: q.id, ...q.data }));
       fig.classList.toggle('quote--wide', long);
     }
     fig.dataset.current = chosen!;
-  })();
+  });
 </script>

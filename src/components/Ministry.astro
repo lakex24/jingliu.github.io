@@ -42,7 +42,7 @@ const keys = [
 </dialog>
 
 <script>
-  (() => {
+  document.addEventListener('astro:page-load', () => {
     const open = document.getElementById('ministry-open');
     const dlg = document.getElementById('ministry') as HTMLDialogElement | null;
     if (!open || !dlg || typeof dlg.showModal !== 'function') return;
@@ -81,7 +81,7 @@ const keys = [
       else if (e.key === 'Backspace') { e.preventDefault(); entered = entered.slice(0, -1); render(); }
     });
     dlg.addEventListener('click', (e) => { if (e.target === dlg) dlg.close(); });
-  })();
+  });
 </script>
 
 <style>

@@ -18,6 +18,7 @@ const tiles = site.nav.map((n) => ({ ...n, ...tilePhotos[n.href] }));
         var map = { '#roles': '/career/#roles', '#features': '/career/#features', '#publication': '/career/#publication', '#blogs': '/blogs/', '#contact': '/career/#contact' };
         var to = map[location.hash];
         if (to) location.replace(to);
+        document.addEventListener('astro:page-load', function () { var t = map[location.hash]; if (t) location.replace(t); });
       })();
     </script>
   </Fragment>
