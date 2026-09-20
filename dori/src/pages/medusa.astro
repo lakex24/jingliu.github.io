@@ -1,0 +1,87 @@
+---
+import '@fontsource-variable/cormorant/wght.css';
+import '@fontsource-variable/cormorant/wght-italic.css';
+import '@fontsource/ibm-plex-mono/400.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Medusa’s Temple — Dori</title>
+    <meta name="description" content="A secret moonlit temple where Medusa sleeps with her eyes closed." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#05080d" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Medusa’s Temple — Dori" />
+    <meta property="og:description" content="A secret moonlit temple where Medusa sleeps with her eyes closed." />
+    <meta property="og:url" content="https://dori-homepage.mind-pixels.com/medusa/" />
+    <meta property="og:image" content="https://dori-homepage.mind-pixels.com/medusa-temple-ruins-v1.webp" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Medusa’s Temple — Dori" />
+    <meta name="twitter:description" content="A secret moonlit temple where Medusa sleeps with her eyes closed." />
+    <meta name="twitter:image" content="https://dori-homepage.mind-pixels.com/medusa-temple-ruins-v1.webp" />
+    <link rel="preload" href="/medusa-temple-ruins-v1.webp" as="image" type="image/webp" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <main class="medusa-chamber" aria-labelledby="medusa-title">
+      <img class="medusa-chamber__image" src="/medusa-temple-ruins-v1.webp" alt="A serene marble Medusa with closed eyes among the moonlit ruins of a great Greek temple" width="1672" height="941" />
+      <div class="medusa-chamber__shade" aria-hidden="true"></div>
+      <div class="medusa-chamber__grain" aria-hidden="true"></div>
+
+      <a class="medusa-return" href="/#library" aria-label="Return to the Library">
+        <span aria-hidden="true">←</span>
+        <span>Library</span>
+      </a>
+
+      <header class="medusa-title">
+        <p>The secret volume</p>
+        <h1 id="medusa-title">Medusa</h1>
+      </header>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --medusa-night: #05080d;
+    --medusa-gold: #e6cb88;
+    --medusa-ghost: #c8dff2;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { min-width: 320px; min-height: 100%; margin: 0; background: var(--medusa-night); }
+  body { color: #f1eadc; font-family: 'Cormorant Variable', 'Cormorant Garamond', Georgia, serif; }
+
+  .medusa-chamber { position: relative; isolation: isolate; min-height: 100svh; overflow: hidden; background: var(--medusa-night); }
+  .medusa-chamber__image { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center; animation: medusa-arrive 1.6s ease-out both; }
+  .medusa-chamber__shade { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: linear-gradient(180deg, rgba(2,5,10,.38), transparent 28% 68%, rgba(2,5,10,.72)), linear-gradient(90deg, rgba(2,5,10,.54), transparent 26% 72%, rgba(2,5,10,.2)); }
+  .medusa-chamber__grain { position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .13; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); }
+
+  .medusa-return { position: absolute; z-index: 2; top: clamp(1.2rem, 3vw, 2.5rem); left: clamp(1rem, 3.5vw, 3.5rem); display: flex; align-items: center; gap: .75rem; min-height: 46px; padding: .55rem .85rem; border: 1px solid rgba(230,203,136,.45); border-radius: 999px; background: rgba(3,7,12,.46); color: var(--medusa-gold); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .62rem; letter-spacing: .16em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .medusa-return > span:first-child { font-size: 1.15rem; line-height: 1; }
+  .medusa-return:hover { color: #fff0bf; border-color: var(--medusa-gold); box-shadow: 0 0 22px rgba(230,203,136,.2); transform: translateX(-2px); }
+  .medusa-return:focus-visible { outline: 2px solid var(--medusa-ghost); outline-offset: 4px; }
+
+  .medusa-title { position: absolute; z-index: 1; right: clamp(1.2rem, 4vw, 4rem); bottom: clamp(1.2rem, 4vw, 3rem); text-align: right; text-shadow: 0 3px 22px rgba(0,0,0,.8); }
+  .medusa-title p { margin: 0 0 .35rem; color: rgba(200,223,242,.72); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: clamp(.48rem, .7vw, .62rem); letter-spacing: .2em; text-transform: uppercase; }
+  .medusa-title h1 { margin: 0; color: #f0dfb3; font-size: clamp(3.2rem, 8vw, 7.5rem); font-weight: 400; letter-spacing: .04em; line-height: .78; }
+
+  @keyframes medusa-arrive {
+    from { opacity: 0; transform: scale(1.035); filter: brightness(.65); }
+    to { opacity: 1; transform: scale(1); filter: brightness(1); }
+  }
+
+  @media (max-width: 680px) {
+    .medusa-chamber__image { object-position: 50% center; }
+    .medusa-return { top: 1rem; left: 1rem; }
+    .medusa-title { right: 1rem; bottom: 1.4rem; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .medusa-chamber__image { animation: none; }
+    .medusa-return { transition: none; }
+  }
+</style>

@@ -187,6 +187,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 
 /* Library */
 .realm--library::before { background: linear-gradient(180deg, rgba(3,5,9,.3), rgba(3,5,9,.58)), linear-gradient(90deg, rgba(3,5,9,.42), transparent 27% 73%, rgba(3,5,9,.42)), url('/library-background-bright-book-v4.webp') center / cover no-repeat; }
+.medusa-door { position: fixed; z-index: 5; left: calc(50vw + 51.1vh); top: 34.7vh; width: 44px; height: 64px; border: 0; background: transparent; cursor: pointer; transform: translate(-50%, -50%); }
+.medusa-door span { position: absolute; left: 50%; top: 50%; width: 18px; height: 52px; border: 1px solid transparent; border-radius: 2px; transform: translate(-50%, -50%); transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, filter .2s ease; }
+.medusa-door:hover span, .medusa-door:focus-visible span { border-color: rgba(255,225,154,.72); background: linear-gradient(90deg, rgba(95,54,11,.18), rgba(255,216,121,.2), rgba(78,43,8,.18)); box-shadow: 0 0 10px rgba(234,211,153,.5), 0 0 24px rgba(198,161,91,.3); filter: brightness(1.2); }
+@media (min-aspect-ratio: 16 / 9) {
+  .medusa-door { left: 78.8vw; top: calc(50vh - 8.7vw); }
+}
 .library-intro { margin-inline: auto; text-align: center; }
 .library-intro > p:last-child { margin-inline: auto; }
 .library-room { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(260px, .48fr); gap: clamp(1.5rem, 3vw, 3.5rem); align-items: end; max-width: 1500px; margin: clamp(3rem, 6vw, 6rem) auto 0; }
@@ -277,6 +283,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .composer-row { grid-template-columns: minmax(0, 1fr); }
   .photo-studio { margin-top: 2.5rem; }
   .photo-stage { aspect-ratio: 3 / 4; }
+  .medusa-door { left: auto; right: .45rem; top: 34vh; width: 44px; height: 64px; transform: none; }
+  .medusa-door span { width: 18px; height: 54px; border-color: rgba(255,225,154,.6); background: linear-gradient(90deg, #70420f, #d5a94f 45%, #7c4d16); box-shadow: inset 2px 0 rgba(255,239,194,.28), inset -3px 0 rgba(32,17,4,.4), 0 0 15px rgba(198,161,91,.28); }
   .bookshelf { min-height: 360px; gap: .12rem; padding: 1rem 2% 1.75rem; }
   .book { min-width: 34px; height: 244px; padding: 2.4rem .28rem 2.1rem; }
   .book--tall { height: 290px; }
