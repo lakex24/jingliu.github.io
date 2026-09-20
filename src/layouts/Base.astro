@@ -35,9 +35,6 @@ interface Props {
 }
 const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage, noindex = false, theme = 'light' } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : site.name;
-// View-transition names: the tapped tab (or home tile title) morphs into the section heading.
-const slugOf = (href: string) => href.replaceAll('/', '') || 'home';
-const vt = (href: string) => `view-transition-name: tab-${slugOf(href)}`;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
 <!doctype html>
@@ -96,20 +93,18 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           <nav class="nav" aria-label="Primary">
             <ul>
               {site.nav.map((item) => (
-                <li><a href={item.href} aria-current={section === item.href ? 'page' : undefined}>
-                  <span class="nav__label" style={section === item.href ? undefined : vt(item.href)}>{item.label}</span>
-                </a></li>
+                <li><a href={item.href} aria-current={section === item.href ? 'page' : undefined}>{item.label}</a></li>
               ))}
             </ul>
           </nav>
         </header>
       )}
-      <main id="main" tabindex="-1">
+      <main id="main" tabindex="-1" style="view-transition-name: main">
         {!home && (
           <div class="page-title">
             {headingHref
               ? <p class="crumb mono"><a href={headingHref}>{heading}</a></p>
-              : <h1 style={section ? vt(section) : undefined}>{heading}</h1>}
+              : <h1>{heading}</h1>}
             <slot name="intro" />
           </div>
         )}

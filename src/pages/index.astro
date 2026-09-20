@@ -41,7 +41,7 @@ const tiles = site.nav.map((n) => ({ ...n, ...tilePhotos[n.href] }));
               <Picture src={t.img} formats={['avif', 'webp']} widths={[320, 480, 640, 900]} sizes="(min-width: 900px) 25vw, 50vw" alt={t.alt} loading="eager" />
             </div>
             <span class="tile__text">
-              <span class="tile__title"><span style={`view-transition-name: tab-${t.href.replaceAll('/', '')}`}>{t.label}</span> <Arrow class="tile__arrow" /></span>
+              <span class="tile__title">{t.label} <Arrow class="tile__arrow" /></span>
               <span class="tile__tag mono">{t.tagline}</span>
             </span>
           </a>
