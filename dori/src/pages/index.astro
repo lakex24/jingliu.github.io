@@ -38,35 +38,35 @@ const pinterestQuotes = [
     pin: '453808099976913740'
   },
   {
-    board: 'gold',
+    board: 'dream',
     text: 'The day a blind man sees, the first thing he throws away is the stick that has helped him all his life.',
     credit: 'Unknown, as pinned',
     pin: '453808099976868586'
   },
   {
-    board: 'gold',
+    board: 'dream',
     text: 'Be careful who you trust. Salt and sugar look the same.',
     pin: '453808099976868605'
   },
   {
-    board: 'gold',
+    board: 'dream',
     text: "Don't set yourself on fire to keep others warm.",
     pin: '453808099976868607'
   },
   {
-    board: 'gold',
+    board: 'dream',
     text: "Sometimes the grass is greener because it's fake.",
     credit: 'Lindsey Lee and Co., as pinned',
     pin: '453808099976868610'
   },
   {
-    board: 'gold',
+    board: 'dream',
     text: 'The villain will always be the villain if the hero tells the story.',
     credit: 'Unknown, as pinned',
     pin: '453808099976868629'
   },
   {
-    board: 'gold',
+    board: 'dream',
     text: "Who betrays you once will betray you a thousand times. There's no need to drink the whole sea to realize it's salty.",
     credit: 'Popular saying, as pinned',
     pin: '453808099976882248'
@@ -145,7 +145,6 @@ const pinterestQuotes = [
 
         <div class="board-filter" aria-label="Filter diary boards">
           <button type="button" class="is-active" data-board="dream" aria-pressed="true">Dreamscapes</button>
-          <button type="button" data-board="gold" aria-pressed="false">Golden notes</button>
         </div>
 
         <div class="quote-grid" id="quote-grid">
@@ -159,7 +158,7 @@ const pinterestQuotes = [
               data-board-card={quote.board}
             >
               <p class="quote-card__board">
-                {quote.board === 'dream' ? 'Dreamscapes' : 'Golden notes'} · {String(
+                Dreamscapes · {String(
                   pinterestQuotes.slice(0, index + 1).filter((item) => item.board === quote.board).length
                 ).padStart(2, '0')}
               </p>
@@ -181,7 +180,6 @@ const pinterestQuotes = [
               <label for="new-board">Board</label>
               <select id="new-board">
                 <option value="dream">Dreamscapes</option>
-                <option value="gold">Golden notes</option>
               </select>
               <button type="submit">Keep it</button>
             </div>
@@ -336,9 +334,9 @@ const pinterestQuotes = [
       const quoteGrid = document.getElementById('quote-grid');
       const savedThoughts = JSON.parse(localStorage.getItem('dori-diary') || '[]').map((thought) => ({
         ...thought,
-        board: thought.board === 'dream' ? 'dream' : 'gold'
+        board: 'dream'
       }));
-      const boardNames = { dream: 'Dreamscapes', gold: 'Golden notes' };
+      const boardNames = { dream: 'Dreamscapes' };
 
       function addThoughtCard(thought) {
         const card = document.createElement('article');
