@@ -146,12 +146,10 @@ import '@fontsource/ibm-plex-mono/400.css';
           portal.classList.add('is-wrong');
           eyePortals.forEach((eye) => { eye.disabled = true; });
           chamber?.classList.add('is-petrified');
-          if (status) status.textContent = 'The wrong carving turned the temple to stone for ten seconds.';
+          if (status) status.textContent = 'The wrong carving turned the temple to stone. Returning home in ten seconds.';
           window.setTimeout(() => {
-            chamber?.classList.remove('is-petrified');
-            portal.classList.remove('is-wrong');
-            eyePortals.forEach((eye) => { eye.disabled = false; });
-            if (status) status.textContent = 'The stone curse has lifted. Search for delta and try again.';
+            sessionStorage.removeItem('dori-inner-temple-unlocked');
+            window.location.assign('/');
           }, 10000);
         });
       });
