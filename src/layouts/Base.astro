@@ -59,6 +59,16 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
     <meta property="og:site_name" content={site.name} />
     {ogImage && <meta property="og:image" content={new URL(ogImage, Astro.site)} />}
     <ClientRouter fallback="swap" />
+    <script>
+      document.addEventListener('astro:after-swap', () => {
+        const main = document.getElementById('main');
+        if (!main || matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+        main.classList.remove('ink');
+        void main.offsetWidth; // restart the animation
+        main.classList.add('ink');
+        main.addEventListener('animationend', () => main.classList.remove('ink'), { once: true });
+      });
+    </script>
     <slot name="head" />
   </head>
   <body>
@@ -79,7 +89,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           </nav>
         </header>
       ) : (
-        <header class="masthead masthead--inner" style="view-transition-name: masthead">
+        <header class="masthead masthead--inner">
           <a class="home-link mono" href="/" aria-label="Home">
             <svg class="home-link__icon" viewBox="0 0 16 16" width="18" height="18" aria-hidden="true" shape-rendering="crispEdges">
               <!-- a small house, turned to point back the way you came -->
@@ -99,7 +109,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
           </nav>
         </header>
       )}
-      <main id="main" tabindex="-1" style="view-transition-name: main">
+      <main id="main" tabindex="-1">
         {!home && (
           <div class="page-title">
             {headingHref

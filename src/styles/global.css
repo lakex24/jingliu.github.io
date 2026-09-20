@@ -47,34 +47,24 @@ html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; overflow-x: clip
 * { -webkit-tap-highlight-color: transparent; }
 a:active { opacity: 0.72; transition: opacity 0.08s ease; }
 
-/* Page-to-page: header and footer hold still; the new content bleeds in like
-   watercolour on paper — an irregular, feathered blot spreading from near the
-   top of the page over a couple of seconds, sharpening as it settles. */
-@view-transition { navigation: auto; }
-/* Keep the page tappable while the ink is still spreading. */
-::view-transition { pointer-events: none; }
-::view-transition-old(root), ::view-transition-new(root) { animation: root-fade 0.2s ease both; }
-::view-transition-old(masthead), ::view-transition-new(masthead) { animation: none; mix-blend-mode: normal; }
-::view-transition-old(main) { animation: page-out 0.3s ease both; }
-::view-transition-new(main) {
-  animation: ink-in 1.2s cubic-bezier(0.4, 0.05, 0.3, 1) both;
+/* Page-to-page: the swap itself is instant (no view-transition overlay, so the
+   page stays tappable); the new content then bleeds in like watercolour — an
+   irregular, feathered blot spreading down from the top of the content. */
+::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+main.ink {
+  animation: ink-in 1.2s cubic-bezier(0.4, 0.05, 0.3, 1);
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%20120'%3E%3Cfilter%20id='w'%20x='-40%'%20y='-60%'%20width='180%'%20height='220%'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.018'%20numOctaves='3'%20seed='11'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20scale='44'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3CfeGaussianBlur%20stdDeviation='7'/%3E%3C/filter%3E%3Ccircle%20cx='100'%20cy='0'%20r='78'%20fill='black'%20filter='url(%23w)'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%20120'%3E%3Cfilter%20id='w'%20x='-40%'%20y='-60%'%20width='180%'%20height='220%'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.018'%20numOctaves='3'%20seed='11'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20scale='44'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3CfeGaussianBlur%20stdDeviation='7'/%3E%3C/filter%3E%3Ccircle%20cx='100'%20cy='0'%20r='78'%20fill='black'%20filter='url(%23w)'/%3E%3C/svg%3E");
   -webkit-mask-repeat: no-repeat; mask-repeat: no-repeat;
   -webkit-mask-position: 50% 0; mask-position: 50% 0;
+  -webkit-mask-size: 320vmax 320vmax; mask-size: 320vmax 320vmax;
 }
-@keyframes root-fade { from { opacity: 0.999; } to { opacity: 1; } }
-@keyframes page-out { to { opacity: 0; } }
 @keyframes ink-in {
   from { -webkit-mask-size: 0 0; mask-size: 0 0; opacity: 0.85; filter: blur(3px); }
   35%  { opacity: 1; }
   70%  { filter: blur(0); }
-  /* Sized to the viewport, so the spread is visible where the reader is looking;
-     the live page replaces the snapshot unmasked when the animation ends. */
   to   { -webkit-mask-size: 320vmax 320vmax; mask-size: 320vmax 320vmax; opacity: 1; filter: blur(0); }
 }
-@media (prefers-reduced-motion: reduce) {
-  ::view-transition-old(*), ::view-transition-new(*) { animation: none !important; -webkit-mask-image: none !important; mask-image: none !important; }
-}
+@media (prefers-reduced-motion: reduce) { main.ink { animation: none; -webkit-mask-image: none; mask-image: none; } }
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
