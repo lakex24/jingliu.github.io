@@ -165,6 +165,10 @@ const greekLetters = [
         <section class="greek-keyboard" id="greek-keyboard" aria-label="Greek letter keyboard" hidden>
           <div class="greek-keyboard__display">
             <output id="greek-output" class="is-empty" aria-label="Greek message" aria-live="polite"></output>
+            <label class="greek-password-toggle" for="show-greek-password">
+              <input id="show-greek-password" type="checkbox" />
+              <span>Show password</span>
+            </label>
           </div>
           <div class="greek-cubes" role="group" aria-label="Greek letters">
             {greekLetters.map(([letter, name]) => (
@@ -378,12 +382,13 @@ const greekLetters = [
       const greekKeyButton = document.getElementById('greek-key-button');
       const greekKeyboard = document.getElementById('greek-keyboard');
       const greekOutput = document.getElementById('greek-output');
+      const showGreekPassword = document.getElementById('show-greek-password');
       const greekLineKey = 'dori-greek-line';
       const greekDoorCodes = new Set(['ΔΟΡΙΑΝΑ', 'ΝΤΟΡΙΑΝΑ']);
       let greekLine = localStorage.getItem(greekLineKey) || '';
 
       function renderGreekLine() {
-        greekOutput.textContent = greekLine;
+        greekOutput.textContent = showGreekPassword.checked ? greekLine : greekLine.replace(/\S/g, '•');
         greekOutput.classList.toggle('is-empty', !greekLine);
       }
 
@@ -405,10 +410,15 @@ const greekLetters = [
         greekKeyButton.setAttribute('aria-label', open ? 'Close the Greek writing room' : 'Open the Greek writing room');
         greekKeyButton.title = open ? 'Close the Greek writing room' : 'Open the Greek writing room';
         document.querySelector('.realm--diary').classList.toggle('is-greek-room', open);
-        if (open) window.scrollTo({ top: 0, behavior: 'smooth' });
+        if (open) {
+          showGreekPassword.checked = false;
+          renderGreekLine();
+          window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
       }
 
       greekKeyButton.addEventListener('click', () => setGreekKeyboard(greekKeyboard.hidden));
+      showGreekPassword.addEventListener('change', renderGreekLine);
       document.querySelectorAll('[data-greek-letter]').forEach((button) => {
         button.addEventListener('click', () => saveGreekLine(greekLine + button.dataset.greekLetter));
       });
