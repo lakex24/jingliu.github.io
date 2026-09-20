@@ -33,16 +33,6 @@ const pinterestQuotes = [
   },
   {
     board: 'dream',
-    text: "There's a ‘hell’ in hello, ‘good’ in goodbye, ‘lie’ in believe, ‘over’ in lover, ‘end’ in friend, and an ‘if’ in life.",
-    pin: '453808099976824480'
-  },
-  {
-    board: 'dream',
-    text: 'Evil is just “live” spelled backwards.',
-    pin: '453808099976874243'
-  },
-  {
-    board: 'dream',
     text: 'You say you love rain but you open your umbrella. You say you love the sun but you find a shadow spot. You say you love wind but you close your windows. This is why I am afraid when you say you love me.',
     credit: 'William Shakespeare, as pinned',
     pin: '453808099976913740'
@@ -185,7 +175,7 @@ const pinterestQuotes = [
               class:list={[
                 'quote-card',
                 quote.board === 'dream' && 'quote-card--blue',
-                (index === 0 || index === 8) && 'quote-card--feature'
+                pinterestQuotes.findIndex((item) => item.board === quote.board) === index && 'quote-card--feature'
               ]}
               data-board-card={quote.board}
             >
