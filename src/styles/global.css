@@ -42,7 +42,21 @@
 
 /* ---- Base ---- */
 *, *::before, *::after { box-sizing: border-box; }
-html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; overflow-x: clip; }
+html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; overflow-x: clip; background: var(--paper); }
+/* No grey tap flash on touch; links get a soft press state instead. */
+* { -webkit-tap-highlight-color: transparent; }
+a:active { opacity: 0.72; transition: opacity 0.08s ease; }
+
+/* Page-to-page: a quiet cross-fade with a slight rise (cross-document view
+   transitions; browsers without support simply load the next page). */
+@view-transition { navigation: auto; }
+::view-transition-old(root) { animation: page-out 0.22s ease both; }
+::view-transition-new(root) { animation: page-in 0.45s cubic-bezier(0.2, 0.7, 0.2, 1) both; }
+@keyframes page-out { to { opacity: 0; } }
+@keyframes page-in { from { opacity: 0; transform: translateY(8px); } to { opacity: 1; transform: none; } }
+@media (prefers-reduced-motion: reduce) {
+  ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+}
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation: none !important; transition: none !important; }
@@ -189,6 +203,8 @@ p { margin: 0 0 1.1em; }
     text-shadow: 0 1px 8px rgba(36,26,56,0.6);
   }
   .nav--home a:hover, .nav--home a[aria-current="page"] { color: var(--paper); }
+  .nav--home a:active { opacity: 1; }
+  .nav--home li:active .nav__bg { filter: brightness(0.85) saturate(0.7); transition: filter 0.15s ease; }
 }
 
 /* ---- Footer ---- */
