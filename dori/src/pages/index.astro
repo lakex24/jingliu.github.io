@@ -3,25 +3,408 @@ import '@fontsource-variable/cormorant/wght.css';
 import '@fontsource-variable/cormorant/wght-italic.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '../styles/global.css';
-// Holding page. The real site (Diary · Photo · Library) is implemented from the mockup.
 ---
 <!doctype html>
 <html lang="en">
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>Dori</title>
-    <meta name="description" content="A magical little website." />
-    <meta name="robots" content="noindex" />
-    <meta name="theme-color" content="#07070a" />
+    <title>Dori — Diary · Photo · Library</title>
+    <meta name="description" content="Dori's magical world of favorite words, cinematic photos, and beloved books." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#06080d" />
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="Dori — A little world of my own" />
+    <meta property="og:description" content="Favorite words, cinematic photos, and beloved books." />
+    <meta property="og:url" content="https://dori-homepage.mind-pixels.com/" />
+    <meta property="og:image" content="https://dori-homepage.mind-pixels.com/og.png" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="Dori — A little world of my own" />
+    <meta name="twitter:description" content="Favorite words, cinematic photos, and beloved books." />
+    <meta name="twitter:image" content="https://dori-homepage.mind-pixels.com/og.png" />
+    <link rel="preload" href="/sphinx-hero.webp" as="image" type="image/webp" />
     <link rel="icon" href="data:," />
   </head>
   <body>
-    <main class="holding">
-      <p class="holding__kicker">Diary · Photo · Library</p>
-      <h1>Something magical is being made here.</h1>
-      <div class="holding__rule"></div>
-      <p>Come back soon.</p>
+    <a class="skip-link" href="#main">Skip to Dori's world</a>
+
+    <main id="main">
+      <section class="hero" id="home" aria-labelledby="site-title">
+        <img class="hero__image" src="/sphinx-hero.webp" alt="A marble Greek sphinx with a woman's face, lion's body, and eagle wings beneath a moonlit sky" width="1672" height="940" />
+        <div class="hero__shade" aria-hidden="true"></div>
+        <div class="hero__grain" aria-hidden="true"></div>
+
+        <header class="wordmark">
+          <p class="wordmark__name" id="site-title">Dori</p>
+          <p class="wordmark__tagline">A little world of my own</p>
+        </header>
+
+        <nav class="portal-nav" aria-label="Enter a section">
+          <a class="portal portal--photo" href="#photo" data-open="photo">
+            <span class="portal__sigil" aria-hidden="true">✦</span>
+            <span class="portal__label">Photo</span>
+            <span class="portal__line" aria-hidden="true"></span>
+          </a>
+          <a class="portal portal--diary" href="#diary" data-open="diary">
+            <span class="portal__line" aria-hidden="true"></span>
+            <span class="portal__label">Diary</span>
+            <span class="portal__sigil portal__sigil--moon" aria-hidden="true">☾</span>
+          </a>
+          <a class="portal portal--library" href="#library" data-open="library">
+            <span class="portal__sigil" aria-hidden="true">◇</span>
+            <span class="portal__label">Library</span>
+            <span class="portal__line" aria-hidden="true"></span>
+          </a>
+        </nav>
+
+        <p class="hero__invitation">Choose a corner to begin</p>
+      </section>
+
+      <section class="realm realm--diary" id="diary" data-realm="diary" aria-labelledby="diary-title" hidden>
+        <header class="realm-header">
+          <button class="home-button" type="button" data-home aria-label="Return to the sphinx">
+            <span aria-hidden="true">✦</span> Dori
+          </button>
+          <p>01 · Diary</p>
+        </header>
+
+        <div class="realm-intro diary-intro">
+          <p class="kicker">Words worth keeping</p>
+          <h1 id="diary-title">My constellation<br />of thoughts</h1>
+          <p>Little sparks gathered from favorite boards, books, and days.</p>
+        </div>
+
+        <div class="board-filter" aria-label="Filter diary boards">
+          <button type="button" class="is-active" data-board="all" aria-pressed="true">All stars</button>
+          <button type="button" data-board="brave" aria-pressed="false">Brave things</button>
+          <button type="button" data-board="dream" aria-pressed="false">Dreamscapes</button>
+          <button type="button" data-board="gold" aria-pressed="false">Golden notes</button>
+        </div>
+
+        <div class="quote-grid" id="quote-grid">
+          <article class="quote-card quote-card--feature" data-board-card="brave">
+            <p class="quote-card__board">Brave things · 08</p>
+            <blockquote>Be brave enough to be bad at something new.</blockquote>
+            <p class="quote-card__note">A reminder for first tries.</p>
+          </article>
+          <article class="quote-card" data-board-card="dream">
+            <p class="quote-card__board">Dreamscapes · 14</p>
+            <blockquote>Leave a little room for wonder.</blockquote>
+            <p class="quote-card__note">Saved under moonlight.</p>
+          </article>
+          <article class="quote-card quote-card--blue" data-board-card="gold">
+            <p class="quote-card__board">Golden notes · 05</p>
+            <blockquote>Create the things you wish existed.</blockquote>
+            <p class="quote-card__note">For the next bright idea.</p>
+          </article>
+          <article class="quote-card" data-board-card="dream">
+            <p class="quote-card__board">Dreamscapes · 21</p>
+            <blockquote>Books are doors to places only you can find.</blockquote>
+            <p class="quote-card__note">A thought for the bookshelf.</p>
+          </article>
+        </div>
+
+        <details class="diary-composer">
+          <summary>Add a thought</summary>
+          <form id="diary-form">
+            <label for="new-thought">What do you want to remember?</label>
+            <textarea id="new-thought" maxlength="180" required placeholder="Write a little thought…"></textarea>
+            <div class="composer-row">
+              <label for="new-board">Board</label>
+              <select id="new-board">
+                <option value="brave">Brave things</option>
+                <option value="dream">Dreamscapes</option>
+                <option value="gold">Golden notes</option>
+              </select>
+              <button type="submit">Keep it</button>
+            </div>
+            <p class="local-note">Saved only in this browser.</p>
+          </form>
+        </details>
+      </section>
+
+      <section class="realm realm--photo" id="photo" data-realm="photo" aria-labelledby="photo-title" hidden>
+        <header class="realm-header">
+          <button class="home-button" type="button" data-home aria-label="Return to the sphinx">
+            <span aria-hidden="true">✦</span> Dori
+          </button>
+          <p>02 · Photo</p>
+        </header>
+
+        <div class="realm-intro photo-intro">
+          <p class="kicker">MV style lab</p>
+          <h1 id="photo-title">Make a scene</h1>
+          <p>Choose a photo and give it a dreamy music-video mood. Everything stays on this device.</p>
+        </div>
+
+        <div class="photo-studio">
+          <div class="photo-stage" id="photo-stage">
+            <div class="photo-empty" id="photo-empty">
+              <span aria-hidden="true">☾</span>
+              <p>Your photo becomes<br />the main character.</p>
+            </div>
+            <canvas id="photo-canvas" width="1200" height="900" aria-label="Styled photo preview" hidden></canvas>
+            <p class="photo-timestamp" id="photo-timestamp">BLUE HOUR · 00:17</p>
+          </div>
+
+          <div class="photo-tools">
+            <label class="upload-button" for="photo-input"><span aria-hidden="true">◎</span> Take or choose a photo</label>
+            <input id="photo-input" type="file" accept="image/*" capture="user" />
+
+            <fieldset class="mood-picker">
+              <legend>Choose a mood</legend>
+              <button type="button" class="is-active" data-mood="blue" aria-pressed="true"><span class="swatch swatch--blue"></span> Blue Hour</button>
+              <button type="button" data-mood="gold" aria-pressed="false"><span class="swatch swatch--gold"></span> Golden Film</button>
+              <button type="button" data-mood="dream" aria-pressed="false"><span class="swatch swatch--dream"></span> Dream Bloom</button>
+            </fieldset>
+
+            <button class="save-photo" id="save-photo" type="button" disabled>Save styled photo</button>
+            <p class="local-note"><span aria-hidden="true">◇</span> Photos never leave your device.</p>
+          </div>
+        </div>
+      </section>
+
+      <section class="realm realm--library" id="library" data-realm="library" aria-labelledby="library-title" hidden>
+        <header class="realm-header">
+          <button class="home-button" type="button" data-home aria-label="Return to the sphinx">
+            <span aria-hidden="true">✦</span> Dori
+          </button>
+          <p>03 · Library</p>
+        </header>
+
+        <div class="realm-intro library-intro">
+          <p class="kicker">18 treasures · 4 reminders</p>
+          <h1 id="library-title">The bookshelf</h1>
+          <p>Pick a spine to open the note tucked inside.</p>
+        </div>
+
+        <div class="library-room">
+          <div class="bookshelf" aria-label="Dori's books">
+            <button class="book book--navy is-selected" type="button" data-book="wild" aria-pressed="true">
+              <span class="book__label">Reading</span><span class="book__title">The Wild Robot</span>
+            </button>
+            <button class="book book--gold book--short" type="button" data-book="wrinkle" aria-pressed="false">
+              <span class="book__label">Discuss</span><span class="book__title">A Wrinkle in Time</span>
+            </button>
+            <button class="book book--black book--tall" type="button" data-book="moon" aria-pressed="false">
+              <span class="book__label">Favorite</span><span class="book__title">The Girl Who Drank the Moon</span>
+            </button>
+            <button class="book book--mist book--short" type="button" data-book="garden" aria-pressed="false">
+              <span class="book__label">Return Tue</span><span class="book__title">The Secret Garden</span>
+            </button>
+            <button class="book book--navy book--thin" type="button" data-book="reach" aria-pressed="false">
+              <span class="book__label">Wish list</span><span class="book__title">When You Reach Me</span>
+            </button>
+            <button class="book book--gold" type="button" data-book="anne" aria-pressed="false">
+              <span class="book__label">Next</span><span class="book__title">Anne of Green Gables</span>
+            </button>
+            <span class="shelf-edge" aria-hidden="true"></span>
+          </div>
+
+          <aside class="book-note" aria-live="polite">
+            <p class="book-note__kicker">A note tucked inside</p>
+            <h2 id="book-title">The Wild Robot</h2>
+            <p id="book-copy">Continue at chapter 23. Roz is learning what it means to belong.</p>
+            <button type="button" id="book-reminder">Mark for tonight</button>
+          </aside>
+        </div>
+      </section>
     </main>
+
+    <script is:inline>
+      const hero = document.getElementById('home');
+      const realms = [...document.querySelectorAll('[data-realm]')];
+      const portals = [...document.querySelectorAll('[data-open]')];
+
+      function openRealm(name, updateHistory = true) {
+        const realm = document.querySelector(`[data-realm="${name}"]`);
+        if (!realm) return;
+        hero.hidden = true;
+        realms.forEach((item) => item.hidden = item !== realm);
+        document.body.dataset.view = name;
+        if (updateHistory) history.pushState({ realm: name }, '', `#${name}`);
+        requestAnimationFrame(() => realm.querySelector('h1')?.focus?.({ preventScroll: true }));
+        window.scrollTo({ top: 0, behavior: 'instant' });
+      }
+
+      function openHome(updateHistory = true) {
+        realms.forEach((realm) => realm.hidden = true);
+        hero.hidden = false;
+        delete document.body.dataset.view;
+        if (updateHistory) history.pushState({}, '', location.pathname);
+        window.scrollTo({ top: 0, behavior: 'instant' });
+        document.querySelector('.portal--photo')?.focus({ preventScroll: true });
+      }
+
+      portals.forEach((portal) => portal.addEventListener('click', (event) => {
+        event.preventDefault();
+        openRealm(portal.dataset.open);
+      }));
+      document.querySelectorAll('[data-home]').forEach((button) => button.addEventListener('click', () => openHome()));
+      addEventListener('popstate', () => {
+        const name = location.hash.slice(1);
+        name ? openRealm(name, false) : openHome(false);
+      });
+      addEventListener('keydown', (event) => {
+        if (event.key === 'Escape' && hero.hidden) openHome();
+      });
+
+      const initialRealm = location.hash.slice(1);
+      if (['diary', 'photo', 'library'].includes(initialRealm)) openRealm(initialRealm, false);
+
+      const boardButtons = [...document.querySelectorAll('[data-board]')];
+      boardButtons.forEach((button) => button.addEventListener('click', () => {
+        const board = button.dataset.board;
+        boardButtons.forEach((item) => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        document.querySelectorAll('[data-board-card]').forEach((card) => {
+          card.hidden = board !== 'all' && card.dataset.boardCard !== board;
+        });
+      }));
+
+      const diaryForm = document.getElementById('diary-form');
+      const quoteGrid = document.getElementById('quote-grid');
+      const savedThoughts = JSON.parse(localStorage.getItem('dori-diary') || '[]');
+      const boardNames = { brave: 'Brave things', dream: 'Dreamscapes', gold: 'Golden notes' };
+
+      function addThoughtCard(thought) {
+        const card = document.createElement('article');
+        card.className = `quote-card ${thought.board === 'dream' ? 'quote-card--blue' : ''}`;
+        card.dataset.boardCard = thought.board;
+        const label = document.createElement('p');
+        label.className = 'quote-card__board';
+        label.textContent = `${boardNames[thought.board]} · Mine`;
+        const quote = document.createElement('blockquote');
+        quote.textContent = thought.text;
+        const note = document.createElement('p');
+        note.className = 'quote-card__note';
+        note.textContent = 'Saved in this browser.';
+        card.append(label, quote, note);
+        quoteGrid.prepend(card);
+      }
+      savedThoughts.forEach(addThoughtCard);
+
+      diaryForm.addEventListener('submit', (event) => {
+        event.preventDefault();
+        const text = document.getElementById('new-thought').value.trim();
+        const board = document.getElementById('new-board').value;
+        if (!text) return;
+        const thought = { text, board };
+        savedThoughts.unshift(thought);
+        localStorage.setItem('dori-diary', JSON.stringify(savedThoughts.slice(0, 24)));
+        addThoughtCard(thought);
+        diaryForm.reset();
+        document.querySelector('.diary-composer').open = false;
+        document.querySelector('[data-board="all"]').click();
+      });
+
+      const input = document.getElementById('photo-input');
+      const canvas = document.getElementById('photo-canvas');
+      const context = canvas.getContext('2d');
+      const empty = document.getElementById('photo-empty');
+      const savePhoto = document.getElementById('save-photo');
+      const timestamp = document.getElementById('photo-timestamp');
+      let sourceImage = null;
+      let mood = 'blue';
+
+      const moods = {
+        blue: { filter: 'contrast(1.13) saturate(.72) hue-rotate(8deg) brightness(.92)', caption: 'BLUE HOUR · 00:17', color: 'rgba(54, 107, 160, .18)' },
+        gold: { filter: 'sepia(.34) saturate(1.16) contrast(1.05) brightness(1.03)', caption: 'GOLDEN FILM · TAKE 03', color: 'rgba(188, 121, 34, .15)' },
+        dream: { filter: 'saturate(.8) contrast(.92) brightness(1.08) hue-rotate(18deg)', caption: 'DREAM BLOOM · SCENE 09', color: 'rgba(147, 106, 190, .16)' }
+      };
+
+      function renderPhoto() {
+        if (!sourceImage) return;
+        const width = canvas.width;
+        const height = canvas.height;
+        const scale = Math.max(width / sourceImage.naturalWidth, height / sourceImage.naturalHeight);
+        const drawWidth = sourceImage.naturalWidth * scale;
+        const drawHeight = sourceImage.naturalHeight * scale;
+        context.clearRect(0, 0, width, height);
+        context.filter = moods[mood].filter;
+        context.drawImage(sourceImage, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+        context.filter = 'none';
+        const wash = context.createLinearGradient(0, 0, width, height);
+        wash.addColorStop(0, moods[mood].color);
+        wash.addColorStop(.56, 'rgba(0,0,0,0)');
+        wash.addColorStop(1, 'rgba(3,6,12,.18)');
+        context.fillStyle = wash;
+        context.fillRect(0, 0, width, height);
+        timestamp.textContent = moods[mood].caption;
+      }
+
+      input.addEventListener('change', () => {
+        const file = input.files?.[0];
+        if (!file) return;
+        const url = URL.createObjectURL(file);
+        const image = new Image();
+        image.onload = () => {
+          sourceImage = image;
+          renderPhoto();
+          canvas.hidden = false;
+          empty.hidden = true;
+          savePhoto.disabled = false;
+          URL.revokeObjectURL(url);
+        };
+        image.src = url;
+      });
+
+      document.querySelectorAll('[data-mood]').forEach((button) => button.addEventListener('click', () => {
+        mood = button.dataset.mood;
+        document.querySelectorAll('[data-mood]').forEach((item) => {
+          const active = item === button;
+          item.classList.toggle('is-active', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        renderPhoto();
+      }));
+
+      savePhoto.addEventListener('click', () => {
+        canvas.toBlob((blob) => {
+          if (!blob) return;
+          const link = document.createElement('a');
+          link.download = `dori-${mood}.png`;
+          link.href = URL.createObjectURL(blob);
+          link.click();
+          setTimeout(() => URL.revokeObjectURL(link.href), 1000);
+        }, 'image/png');
+      });
+
+      const books = {
+        wild: ['The Wild Robot', 'Continue at chapter 23. Roz is learning what it means to belong.'],
+        wrinkle: ['A Wrinkle in Time', 'Ask Mom about the tesseract after chapter 5.'],
+        moon: ['The Girl Who Drank the Moon', 'Favorite line saved on the Moonlight board.'],
+        garden: ['The Secret Garden', 'Return this one to the library on Tuesday.'],
+        reach: ['When You Reach Me', 'Look for this one on the next library visit.'],
+        anne: ['Anne of Green Gables', 'This is next after The Wild Robot.']
+      };
+      let selectedBook = 'wild';
+      const reminderButton = document.getElementById('book-reminder');
+
+      function showBook(key) {
+        selectedBook = key;
+        document.querySelectorAll('[data-book]').forEach((item) => {
+          const active = item.dataset.book === key;
+          item.classList.toggle('is-selected', active);
+          item.setAttribute('aria-pressed', String(active));
+        });
+        document.getElementById('book-title').textContent = books[key][0];
+        document.getElementById('book-copy').textContent = books[key][1];
+        const reminders = JSON.parse(localStorage.getItem('dori-book-reminders') || '{}');
+        reminderButton.textContent = reminders[key] ? 'Marked for tonight ✓' : 'Mark for tonight';
+        reminderButton.classList.toggle('is-marked', Boolean(reminders[key]));
+      }
+      document.querySelectorAll('[data-book]').forEach((book) => book.addEventListener('click', () => showBook(book.dataset.book)));
+      reminderButton.addEventListener('click', () => {
+        const reminders = JSON.parse(localStorage.getItem('dori-book-reminders') || '{}');
+        reminders[selectedBook] = !reminders[selectedBook];
+        localStorage.setItem('dori-book-reminders', JSON.stringify(reminders));
+        showBook(selectedBook);
+      });
+      showBook('wild');
+    </script>
   </body>
 </html>
