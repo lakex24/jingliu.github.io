@@ -3,6 +3,106 @@ import '@fontsource-variable/cormorant/wght.css';
 import '@fontsource-variable/cormorant/wght-italic.css';
 import '@fontsource/ibm-plex-mono/400.css';
 import '../styles/global.css';
+
+const pinterestQuotes = [
+  {
+    board: 'dream',
+    text: "It's about who stands in the rain with you when they also have a choice to be dry. Remember that.",
+    pin: '453808099976868561'
+  },
+  {
+    board: 'dream',
+    text: 'We romanticize the stars, but forget the dark is what made them visible.',
+    pin: '453808099976868589'
+  },
+  {
+    board: 'dream',
+    text: 'I asked God for flowers and He gave me rain. When you understand this, everything starts to make sense.',
+    pin: '453808099976868590'
+  },
+  {
+    board: 'dream',
+    text: 'Dead people receive more flowers than the living ones because regret is stronger than gratitude.',
+    credit: 'Anne Frank, as pinned',
+    pin: '453808099976868592'
+  },
+  {
+    board: 'dream',
+    text: "You can be the prettiest rose ever, but if they like lilies, it wouldn't matter.",
+    pin: '453808099976868602'
+  },
+  {
+    board: 'dream',
+    text: "There's a ‘hell’ in hello, ‘good’ in goodbye, ‘lie’ in believe, ‘over’ in lover, ‘end’ in friend, and an ‘if’ in life.",
+    pin: '453808099976824480'
+  },
+  {
+    board: 'dream',
+    text: 'Evil is just “live” spelled backwards.',
+    pin: '453808099976874243'
+  },
+  {
+    board: 'dream',
+    text: 'You say you love rain but you open your umbrella. You say you love the sun but you find a shadow spot. You say you love wind but you close your windows. This is why I am afraid when you say you love me.',
+    credit: 'William Shakespeare, as pinned',
+    pin: '453808099976913740'
+  },
+  {
+    board: 'gold',
+    text: 'Forgiveness is taking the knife out of your own back and not using it to hurt anyone else, no matter how they hurt you.',
+    pin: '453808099976824473'
+  },
+  {
+    board: 'gold',
+    text: "Don't let anyone who hasn't been in your shoes tell you how to tie your laces.",
+    pin: '453808099976868562'
+  },
+  {
+    board: 'gold',
+    text: 'The truth is… everyone will hurt you. You just have to find the ones worth suffering for.',
+    pin: '453808099976868564'
+  },
+  {
+    board: 'gold',
+    text: 'The day a blind man sees, the first thing he throws away is the stick that has helped him all his life.',
+    credit: 'Unknown, as pinned',
+    pin: '453808099976868586'
+  },
+  {
+    board: 'gold',
+    text: 'Be careful who you trust. Salt and sugar look the same.',
+    pin: '453808099976868605'
+  },
+  {
+    board: 'gold',
+    text: "Don't set yourself on fire to keep others warm.",
+    pin: '453808099976868607'
+  },
+  {
+    board: 'gold',
+    text: "Sometimes the grass is greener because it's fake.",
+    credit: 'Lindsey Lee and Co., as pinned',
+    pin: '453808099976868610'
+  },
+  {
+    board: 'gold',
+    text: "It's not the stab in the back that kills you. It's when you turn around and see who's holding the knife.",
+    credit: 'Harley Quinn, as pinned',
+    pin: '453808099976868624'
+  },
+  {
+    board: 'gold',
+    text: 'The villain will always be the villain if the hero tells the story.',
+    credit: 'Unknown, as pinned',
+    pin: '453808099976868629'
+  },
+  {
+    board: 'gold',
+    text: "Who betrays you once will betray you a thousand times. There's no need to drink the whole sea to realize it's salty.",
+    credit: 'Popular saying, as pinned',
+    pin: '453808099976882248'
+  }
+];
 ---
 <!doctype html>
 <html lang="en">
@@ -75,33 +175,32 @@ import '../styles/global.css';
         </div>
 
         <div class="board-filter" aria-label="Filter diary boards">
-          <button type="button" class="is-active" data-board="all" aria-pressed="true">All stars</button>
-          <button type="button" data-board="brave" aria-pressed="false">Brave things</button>
-          <button type="button" data-board="dream" aria-pressed="false">Dreamscapes</button>
+          <button type="button" class="is-active" data-board="dream" aria-pressed="true">Dreamscapes</button>
           <button type="button" data-board="gold" aria-pressed="false">Golden notes</button>
         </div>
 
         <div class="quote-grid" id="quote-grid">
-          <article class="quote-card quote-card--feature" data-board-card="brave">
-            <p class="quote-card__board">Brave things · 08</p>
-            <blockquote>Be brave enough to be bad at something new.</blockquote>
-            <p class="quote-card__note">A reminder for first tries.</p>
-          </article>
-          <article class="quote-card" data-board-card="dream">
-            <p class="quote-card__board">Dreamscapes · 14</p>
-            <blockquote>Leave a little room for wonder.</blockquote>
-            <p class="quote-card__note">Saved under moonlight.</p>
-          </article>
-          <article class="quote-card quote-card--blue" data-board-card="gold">
-            <p class="quote-card__board">Golden notes · 05</p>
-            <blockquote>Create the things you wish existed.</blockquote>
-            <p class="quote-card__note">For the next bright idea.</p>
-          </article>
-          <article class="quote-card" data-board-card="dream">
-            <p class="quote-card__board">Dreamscapes · 21</p>
-            <blockquote>Books are doors to places only you can find.</blockquote>
-            <p class="quote-card__note">A thought for the bookshelf.</p>
-          </article>
+          {pinterestQuotes.map((quote, index) => (
+            <article
+              class:list={[
+                'quote-card',
+                quote.board === 'dream' && 'quote-card--blue',
+                (index === 0 || index === 8) && 'quote-card--feature'
+              ]}
+              data-board-card={quote.board}
+            >
+              <p class="quote-card__board">
+                {quote.board === 'dream' ? 'Dreamscapes' : 'Golden notes'} · {String(
+                  pinterestQuotes.slice(0, index + 1).filter((item) => item.board === quote.board).length
+                ).padStart(2, '0')}
+              </p>
+              <blockquote>{quote.text}</blockquote>
+              <p class="quote-card__note">
+                {quote.credit && <span>{quote.credit} · </span>}
+                <a href={`https://www.pinterest.com/pin/${quote.pin}/`} target="_blank" rel="noreferrer">View pin</a>
+              </p>
+            </article>
+          ))}
         </div>
 
         <details class="diary-composer">
@@ -112,7 +211,6 @@ import '../styles/global.css';
             <div class="composer-row">
               <label for="new-board">Board</label>
               <select id="new-board">
-                <option value="brave">Brave things</option>
                 <option value="dream">Dreamscapes</option>
                 <option value="gold">Golden notes</option>
               </select>
@@ -261,14 +359,17 @@ import '../styles/global.css';
           item.setAttribute('aria-pressed', String(active));
         });
         document.querySelectorAll('[data-board-card]').forEach((card) => {
-          card.hidden = board !== 'all' && card.dataset.boardCard !== board;
+          card.hidden = card.dataset.boardCard !== board;
         });
       }));
 
       const diaryForm = document.getElementById('diary-form');
       const quoteGrid = document.getElementById('quote-grid');
-      const savedThoughts = JSON.parse(localStorage.getItem('dori-diary') || '[]');
-      const boardNames = { brave: 'Brave things', dream: 'Dreamscapes', gold: 'Golden notes' };
+      const savedThoughts = JSON.parse(localStorage.getItem('dori-diary') || '[]').map((thought) => ({
+        ...thought,
+        board: thought.board === 'dream' ? 'dream' : 'gold'
+      }));
+      const boardNames = { dream: 'Dreamscapes', gold: 'Golden notes' };
 
       function addThoughtCard(thought) {
         const card = document.createElement('article');
@@ -298,8 +399,10 @@ import '../styles/global.css';
         addThoughtCard(thought);
         diaryForm.reset();
         document.querySelector('.diary-composer').open = false;
-        document.querySelector('[data-board="all"]').click();
+        document.querySelector(`[data-board="${board}"]`).click();
       });
+
+      document.querySelector('[data-board="dream"]').click();
 
       const input = document.getElementById('photo-input');
       const canvas = document.getElementById('photo-canvas');
