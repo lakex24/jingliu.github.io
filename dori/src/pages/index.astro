@@ -457,6 +457,7 @@ const greekLetters = [
       renderGreekLine();
 
       const boardButtons = [...document.querySelectorAll('[data-board]')];
+      const newBoardSelect = document.getElementById('new-board');
       boardButtons.forEach((button) => button.addEventListener('click', () => {
         const board = button.dataset.board;
         boardButtons.forEach((item) => {
@@ -470,6 +471,7 @@ const greekLetters = [
         diaryRealm.classList.toggle('is-dreamscape', board === 'dream');
         diaryRealm.classList.toggle('is-golden-notes', board === 'gold');
         document.getElementById('gold-font-switcher').hidden = board !== 'gold';
+        newBoardSelect.value = board;
       }));
 
       const diaryForm = document.getElementById('diary-form');
@@ -616,7 +618,7 @@ const greekLetters = [
       diaryForm.addEventListener('submit', (event) => {
         event.preventDefault();
         const text = document.getElementById('new-thought').value.trim();
-        const board = document.getElementById('new-board').value;
+        const board = newBoardSelect.value;
         if (!text) return;
         const thought = { id: makeThoughtId(), text, board };
         savedThoughts.unshift(thought);
