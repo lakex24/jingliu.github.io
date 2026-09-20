@@ -436,23 +436,23 @@ const greekLetters = [
 
       <section class="realm realm--library" id="library" data-realm="library" aria-labelledby="library-title" hidden>
         <header class="realm-header">
-          <button class="home-button home-button--icon" type="button" data-home aria-label="Return to the home page" title="Return to the home page">
-            <span class="house-icon" aria-hidden="true">
-              <span class="house-icon__chimney"></span>
-              <span class="house-icon__roof"></span>
-              <span class="house-icon__body">
-                <span class="house-icon__window house-icon__window--left"></span>
-                <span class="house-icon__door"></span>
-                <span class="house-icon__window house-icon__window--right"></span>
-              </span>
-            </span>
-          </button>
           <div class="realm-header__actions">
-            <p>03 · Library</p>
+            <button class="home-button home-button--icon" type="button" data-home aria-label="Return to the home page" title="Return to the home page">
+              <span class="house-icon" aria-hidden="true">
+                <span class="house-icon__chimney"></span>
+                <span class="house-icon__roof"></span>
+                <span class="house-icon__body">
+                  <span class="house-icon__window house-icon__window--left"></span>
+                  <span class="house-icon__door"></span>
+                  <span class="house-icon__window house-icon__window--right"></span>
+                </span>
+              </span>
+            </button>
             <a class="picture-frame-button" href="/gallery/" aria-label="Open the picture frame page" title="Open the picture frame page">
               <span class="picture-frame-icon" aria-hidden="true"></span>
             </a>
           </div>
+          <p>03 · Library</p>
         </header>
 
         <div class="realm-intro library-intro">
@@ -1187,7 +1187,7 @@ const greekLetters = [
       const mythContext = mythCanvas.getContext('2d');
       const mythAnswers = {};
       const mythPortraitSources = {
-        creature: '/mythmaker/creature-realistic-v1.png',
+        creature: '/mythmaker/creature-unisex-realistic-v2.png',
         god: '/mythmaker/god-realistic-v1.png',
         goddess: '/mythmaker/goddess-realistic-v1.png',
         girl: '/mythmaker/mortal-girl-realistic-v1.png',
@@ -1216,8 +1216,8 @@ const greekLetters = [
 
       const mythNames = {
         creature: {
-          moon: ['Nymera', 'Veluna', 'Astryss', 'Lunelle'],
-          sun: ['Solara', 'Aureli', 'Pyrella', 'Calixa']
+          moon: ['Aster', 'Nyx', 'Echo', 'Zephyr'],
+          sun: ['Sol', 'Phoenix', 'Lux', 'Halo']
         },
         god: {
           moon: ['Orion', 'Leandros', 'Evander', 'Atlas'],
