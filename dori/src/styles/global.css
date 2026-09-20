@@ -215,11 +215,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .swatch { width: 28px; height: 28px; flex: 0 0 auto; border-radius: 50%; background: linear-gradient(135deg, #9fc4e8, #183050); }
 .swatch--gold { background: linear-gradient(135deg, #efd99f, #714716); }
 .swatch--dream { background: linear-gradient(135deg, #d2b8eb, #536f9a); }
-.swatch--rose { background: linear-gradient(135deg, #ffd0dc, #a6466d); }
 .swatch--neon { background: linear-gradient(135deg, #38d9ff, #8b35d6 58%, #ff4fa0); }
 .swatch--noir { background: linear-gradient(135deg, #f1f4f7, #20252d); }
 .swatch--retro { background: linear-gradient(135deg, #e7c481, #81452c); }
-.swatch--frost { background: linear-gradient(135deg, #e0fbff, #5188ae); }
 .save-photo { min-height: 48px; border: 1px solid var(--ghost); background: transparent; color: var(--ghost-bright); font-family: var(--mono); font-size: .61rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 .save-photo:disabled { opacity: .35; cursor: not-allowed; }
 
