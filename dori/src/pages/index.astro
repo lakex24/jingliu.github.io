@@ -283,7 +283,7 @@ const pinterestQuotes = [
               <button type="button" id="move-book-left">← Move left</button>
               <button type="button" id="move-book-right">Move right →</button>
             </div>
-            <p id="book-copy">Continue at chapter 23. A new adventure is waiting.</p>
+            <p id="book-copy" hidden></p>
             <button type="button" id="book-reminder">Mark for tonight</button>
           </aside>
         </div>
@@ -575,7 +575,7 @@ const pinterestQuotes = [
       });
 
       const books = {
-        wild: 'Continue at chapter 23. A new adventure is waiting.',
+        wild: '',
         wrinkle: 'Ask Mom about the strange idea after chapter 5.',
         moon: 'Favorite line saved on the Moonlight board.',
         garden: 'Keep this one close for a slow, quiet afternoon.',
@@ -632,7 +632,9 @@ const pinterestQuotes = [
         });
         applyBookTitle(key);
         bookTitleInput.value = bookTitles[key] || '';
-        document.getElementById('book-copy').textContent = books[key];
+        const bookCopy = document.getElementById('book-copy');
+        bookCopy.textContent = books[key];
+        bookCopy.hidden = !books[key];
         const reminders = JSON.parse(localStorage.getItem('dori-book-reminders') || '{}');
         reminderButton.textContent = reminders[key] ? 'Marked for tonight ✓' : 'Mark for tonight';
         reminderButton.classList.toggle('is-marked', Boolean(reminders[key]));

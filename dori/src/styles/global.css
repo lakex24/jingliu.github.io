@@ -159,6 +159,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .book--tall { height: 398px; }
 .book--short { height: 292px; }
 .book--thin { width: 12%; }
+.book:nth-of-type(1) { height: 398px; }
+.book:nth-of-type(2) { height: 377px; }
+.book:nth-of-type(3) { height: 356px; }
+.book:nth-of-type(4) { height: 335px; }
+.book:nth-of-type(5) { height: 314px; }
+.book:nth-of-type(6) { height: 293px; }
 .book--gold { --book-edge: #28180b; --book-base: #6a431e; --book-light: #946b36; --book-foil: #efd494; }
 .book--black { --book-edge: #060507; --book-base: #17131a; --book-light: #342a37; --book-foil: #c7a359; }
 .book--mist { --book-edge: #273237; --book-base: #718487; --book-light: #a5b2ab; --book-foil: #8a641d; --book-ink: #17150f; }
@@ -215,6 +221,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .book { min-width: 41px; height: 240px; padding-inline: .42rem; }
   .book--tall { height: 278px; }
   .book--short { height: 210px; }
+  .book:nth-of-type(1) { height: 278px; }
+  .book:nth-of-type(2) { height: 264px; }
+  .book:nth-of-type(3) { height: 250px; }
+  .book:nth-of-type(4) { height: 236px; }
+  .book:nth-of-type(5) { height: 222px; }
+  .book:nth-of-type(6) { height: 208px; }
   .book__title { font-size: .88rem; }
   .book__label { font-size: .39rem; }
 }
