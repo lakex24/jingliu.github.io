@@ -454,9 +454,23 @@ const greekLetters = [
           if (!response.ok) throw new Error('Weather unavailable');
           const weather = (await response.json()).current;
           const [kind, label] = weatherKind(Number(weather.weather_code));
+          const isDay = Number(weather.is_day) === 1;
           hero.dataset.weather = kind;
-          hero.dataset.day = String(Number(weather.is_day));
-          heroImage.alt = `A marble Greek sphinx beneath ${label}`;
+          if (isDay) {
+            const daylightImage = new Image();
+            daylightImage.src = '/sphinx-hero-day-v1.webp';
+            try {
+              await daylightImage.decode();
+              heroImage.src = daylightImage.src;
+              hero.dataset.day = '1';
+            } catch {
+              hero.dataset.day = '0';
+            }
+          } else {
+            heroImage.src = '/sphinx-hero.webp';
+            hero.dataset.day = '0';
+          }
+          heroImage.alt = `A marble Greek sphinx beneath ${label} ${isDay ? 'in daylight' : 'at night'}`;
           weatherStatus.textContent = `The sphinx scene is reflecting ${label} near you.`;
         } catch {
           weatherStatus.textContent = 'Live weather is unavailable, so the original moonlit sky is showing.';
