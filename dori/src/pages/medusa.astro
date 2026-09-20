@@ -10,32 +10,38 @@ import '@fontsource/ibm-plex-mono/400.css';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Medusa’s Temple — Dori</title>
-    <meta name="description" content="A living Medusa with a human neck, emerald dragon body, and golden wings waits in a moonlit temple." />
+    <meta name="description" content="Two changing Greek tragedies are hidden in Medusa’s eyes. Find the carved delta to enter the inner temple." />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#05080d" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Medusa’s Temple — Dori" />
-    <meta property="og:description" content="A living Medusa with a human neck, emerald dragon body, and golden wings waits in a moonlit temple." />
+    <meta property="og:description" content="Two changing Greek tragedies are hidden in Medusa’s eyes. Find the carved delta to enter the inner temple." />
     <meta property="og:url" content="https://dori-homepage.mind-pixels.com/medusa/" />
-    <meta property="og:image" content="https://dori-homepage.mind-pixels.com/medusa-dragon-organic-sleeping-v6.webp" />
+    <meta property="og:image" content="https://dori-homepage.mind-pixels.com/medusa-dragon-organic-awake-v6.webp" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Medusa’s Temple — Dori" />
-    <meta name="twitter:description" content="A living Medusa with a human neck, emerald dragon body, and golden wings waits in a moonlit temple." />
-    <meta name="twitter:image" content="https://dori-homepage.mind-pixels.com/medusa-dragon-organic-sleeping-v6.webp" />
-    <link rel="preload" href="/medusa-dragon-organic-sleeping-v6.webp" as="image" type="image/webp" />
+    <meta name="twitter:description" content="Two changing Greek tragedies are hidden in Medusa’s eyes. Find the carved delta to enter the inner temple." />
+    <meta name="twitter:image" content="https://dori-homepage.mind-pixels.com/medusa-dragon-organic-awake-v6.webp" />
     <link rel="preload" href="/medusa-dragon-organic-awake-v6.webp" as="image" type="image/webp" />
     <link rel="icon" href="data:," />
   </head>
   <body>
     <main class="medusa-chamber" aria-labelledby="medusa-title">
       <div class="medusa-scene">
-        <img class="medusa-chamber__image medusa-chamber__image--sleeping" src="/medusa-dragon-organic-sleeping-v6.webp" alt="Medusa with closed eyes, a human neck blending naturally into green dragon scales, and golden wings in the moonlit ruins of a great Greek temple" width="1672" height="941" draggable="false" />
-        <img class="medusa-chamber__image medusa-chamber__image--awake" src="/medusa-dragon-organic-awake-v6.webp" alt="" width="1672" height="941" draggable="false" />
+        <img class="medusa-chamber__image" src="/medusa-dragon-organic-awake-v6.webp" alt="Medusa with a human neck blending naturally into green dragon scales and golden wings in the moonlit ruins of a great Greek temple" width="1672" height="941" draggable="false" />
+
+        <button class="eye-portal eye-portal--left" type="button" data-eye="left">
+          <img class="eye-portal__scene" alt="" draggable="false" />
+          <span class="eye-portal__letter" aria-hidden="true"></span>
+        </button>
+        <button class="eye-portal eye-portal--right" type="button" data-eye="right">
+          <img class="eye-portal__scene" alt="" draggable="false" />
+          <span class="eye-portal__letter" aria-hidden="true"></span>
+        </button>
       </div>
       <div class="medusa-chamber__shade" aria-hidden="true"></div>
       <div class="medusa-chamber__grain" aria-hidden="true"></div>
 
-      <button class="medusa-awaken" type="button" aria-label="Wake Medusa and confirm with Face ID or device unlock" aria-pressed="false"></button>
       <span class="medusa-status" id="medusa-status" aria-live="polite"></span>
 
       <a class="medusa-return" href="/#library" aria-label="Return to the Library">
@@ -50,93 +56,83 @@ import '@fontsource/ibm-plex-mono/400.css';
 
     <script>
       const chamber = document.querySelector('.medusa-chamber');
-      const awakenButton = document.querySelector('.medusa-awaken');
+      const eyePortals = [...document.querySelectorAll('.eye-portal')];
       const status = document.getElementById('medusa-status');
-      const passkeyStorageKey = 'dori-medusa-device-passkey';
+      const stories = [
+        { name: 'Orpheus and Eurydice', src: '/eye-tragedy-orpheus-v1.webp', letter: [15, 34] },
+        { name: 'Icarus above the Aegean', src: '/eye-tragedy-icarus-v1.webp', letter: [86, 72] },
+        { name: 'Antigone at Thebes', src: '/eye-tragedy-antigone-v1.webp', letter: [82, 31] },
+        { name: 'Cassandra at Troy', src: '/eye-tragedy-cassandra-v1.webp', letter: [18, 27] },
+        { name: 'King Midas in the golden garden', src: '/eye-tragedy-midas-v1.webp', letter: [81, 28] },
+        { name: 'Niobe at the mountain shrine', src: '/eye-tragedy-niobe-v1.webp', letter: [84, 34] }
+      ];
+      const otherLetters = ['Α', 'Β', 'Γ', 'Λ', 'Ω', 'Σ', 'Θ', 'Κ'];
 
-      function bytesToBase64Url(bytes) {
-        let binary = '';
-        bytes.forEach((byte) => { binary += String.fromCharCode(byte); });
-        return btoa(binary).replaceAll('+', '-').replaceAll('/', '_').replace(/=+$/, '');
-      }
-
-      function base64UrlToBytes(value) {
-        const base64 = value.replaceAll('-', '+').replaceAll('_', '/').padEnd(Math.ceil(value.length / 4) * 4, '=');
-        const binary = atob(base64);
-        return Uint8Array.from(binary, (character) => character.charCodeAt(0));
-      }
-
-      async function confirmWithDevice() {
-        if (!('PublicKeyCredential' in window) || !navigator.credentials) throw new Error('unsupported');
-        const hasPlatformAuthenticator = await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable();
-        if (!hasPlatformAuthenticator) throw new Error('unavailable');
-
-        const challenge = crypto.getRandomValues(new Uint8Array(32));
-        const savedCredentialId = localStorage.getItem(passkeyStorageKey);
-
-        if (savedCredentialId) {
-          const assertion = await navigator.credentials.get({
-            publicKey: {
-              challenge,
-              allowCredentials: [{ id: base64UrlToBytes(savedCredentialId), type: 'public-key', transports: ['internal'] }],
-              userVerification: 'required',
-              timeout: 60000
-            }
-          });
-          if (!assertion) throw new Error('not-confirmed');
-          return;
+      function randomIndex(max) {
+        if (window.crypto?.getRandomValues) {
+          const value = new Uint32Array(1);
+          window.crypto.getRandomValues(value);
+          return value[0] % max;
         }
+        return Math.floor(Math.random() * max);
+      }
 
-        const credential = await navigator.credentials.create({
-          publicKey: {
-            challenge,
-            rp: { name: 'Dori’s Inner Temple' },
-            user: {
-              id: crypto.getRandomValues(new Uint8Array(32)),
-              name: 'dori-inner-temple',
-              displayName: 'Dori’s Inner Temple'
-            },
-            pubKeyCredParams: [
-              { type: 'public-key', alg: -7 },
-              { type: 'public-key', alg: -257 }
-            ],
-            authenticatorSelection: {
-              authenticatorAttachment: 'platform',
-              residentKey: 'preferred',
-              userVerification: 'required'
-            },
-            timeout: 60000,
-            attestation: 'none'
+      function chooseNewPair() {
+        const lastPair = sessionStorage.getItem('dori-medusa-last-scenes');
+        let pair;
+        let signature;
+        let attempts = 0;
+
+        do {
+          const first = randomIndex(stories.length);
+          let second = randomIndex(stories.length - 1);
+          if (second >= first) second += 1;
+          pair = [stories[first], stories[second]];
+          signature = `${first}-${second}`;
+          attempts += 1;
+        } while (signature === lastPair && attempts < 16);
+
+        sessionStorage.setItem('dori-medusa-last-scenes', signature);
+        return pair;
+      }
+
+      const selectedStories = chooseNewPair();
+      const lastDeltaSide = sessionStorage.getItem('dori-medusa-last-delta-side');
+      const deltaSide = lastDeltaSide === '0' ? 1 : lastDeltaSide === '1' ? 0 : randomIndex(2);
+      sessionStorage.setItem('dori-medusa-last-delta-side', String(deltaSide));
+
+      eyePortals.forEach((portal, index) => {
+        const story = selectedStories[index];
+        const isDelta = index === deltaSide;
+        const image = portal.querySelector('.eye-portal__scene');
+        const letter = portal.querySelector('.eye-portal__letter');
+        const greekLetter = isDelta ? 'Δ' : otherLetters[randomIndex(otherLetters.length)];
+
+        if (image instanceof HTMLImageElement) image.src = story.src;
+        if (letter) {
+          letter.textContent = greekLetter;
+          letter.style.setProperty('--letter-x', `${story.letter[0] + randomIndex(7) - 3}%`);
+          letter.style.setProperty('--letter-y', `${story.letter[1] + randomIndex(7) - 3}%`);
+          letter.style.setProperty('--letter-turn', `${randomIndex(11) - 5}deg`);
+        }
+        portal.dataset.correct = String(isDelta);
+        portal.setAttribute('aria-label', `${story.name}. The hidden Greek letter is ${isDelta ? 'Delta' : greekLetter}.`);
+
+        portal.addEventListener('click', () => {
+          if (portal.dataset.correct === 'true') {
+            eyePortals.forEach((eye) => { eye.disabled = true; });
+            sessionStorage.setItem('dori-inner-temple-unlocked', 'true');
+            chamber?.classList.add('is-confirmed');
+            if (status) status.textContent = 'Delta found. The inner temple is opening.';
+            window.setTimeout(() => window.location.assign('/inner-temple/'), 500);
+            return;
           }
+
+          portal.classList.remove('is-wrong');
+          void portal.offsetWidth;
+          portal.classList.add('is-wrong');
+          if (status) status.textContent = 'That carving is not delta. Look closely at the other story.';
         });
-        if (!credential) throw new Error('not-confirmed');
-        localStorage.setItem(passkeyStorageKey, bytesToBase64Url(new Uint8Array(credential.rawId)));
-      }
-
-      awakenButton?.addEventListener('click', async () => {
-        if (!chamber || awakenButton.disabled) return;
-        chamber.classList.add('is-awake');
-        awakenButton.disabled = true;
-        awakenButton.setAttribute('aria-pressed', 'true');
-        awakenButton.setAttribute('aria-label', 'Confirming with Face ID or device unlock');
-        if (status) status.textContent = 'Waiting for device confirmation.';
-
-        try {
-          await confirmWithDevice();
-          sessionStorage.setItem('dori-inner-temple-unlocked', 'true');
-          chamber.classList.add('is-confirmed');
-          if (status) status.textContent = 'Confirmed. The inner temple is opening.';
-          window.setTimeout(() => window.location.assign('/inner-temple/'), 500);
-        } catch (error) {
-          chamber.classList.remove('is-awake', 'is-confirmed');
-          awakenButton.disabled = false;
-          awakenButton.setAttribute('aria-pressed', 'false');
-          awakenButton.setAttribute('aria-label', 'Wake Medusa and confirm with Face ID or device unlock');
-          if (status) status.textContent = 'Device confirmation was not completed.';
-          if (error instanceof Error && (error.message === 'unsupported' || error.message === 'unavailable')) {
-            window.alert('Face ID, Touch ID, or device unlock is not available in this browser.');
-          }
-        }
       });
     </script>
   </body>
@@ -155,19 +151,27 @@ import '@fontsource/ibm-plex-mono/400.css';
 
   .medusa-chamber { position: relative; isolation: isolate; min-height: 100svh; overflow: hidden; background: var(--medusa-night); }
   .medusa-chamber::after { content: ''; position: absolute; inset: 0; z-index: 4; pointer-events: none; opacity: 0; background: radial-gradient(circle at 50% 48%, rgba(255,240,174,.78), rgba(223,167,54,.34) 30%, rgba(131,75,9,.12) 55%, transparent 72%); mix-blend-mode: screen; }
-  .medusa-scene { position: absolute; inset: 0; z-index: 0; animation: medusa-arrive 1.6s ease-out both; }
-  .medusa-chamber__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; user-select: none; transition: opacity .48s ease, filter .48s ease; }
-  .medusa-chamber__image--awake { opacity: 0; filter: brightness(.92); }
-  .medusa-chamber.is-awake .medusa-chamber__image--sleeping { opacity: 0; filter: brightness(1.04); }
-  .medusa-chamber.is-awake .medusa-chamber__image--awake { opacity: 1; filter: brightness(1); }
+  .medusa-scene { position: absolute; z-index: 0; top: 50%; left: 50%; width: max(100vw, calc(100svh * 1.77683)); height: max(100svh, calc(100vw / 1.77683)); transform: translate(-50%, -50%); animation: medusa-arrive 1.6s ease-out both; }
+  .medusa-chamber__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: fill; user-select: none; }
   .medusa-chamber.is-confirmed::after { animation: medusa-golden-confirm .5s ease-out both; }
   .medusa-chamber.is-confirmed .medusa-scene { filter: sepia(.52) saturate(1.5) brightness(1.14); transition: filter .12s ease; }
   .medusa-chamber__shade { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(2,5,10,.38), transparent 28% 68%, rgba(2,5,10,.72)), linear-gradient(90deg, rgba(2,5,10,.54), transparent 26% 72%, rgba(2,5,10,.2)); }
   .medusa-chamber__grain { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .13; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); }
 
-  .medusa-awaken { position: absolute; z-index: 3; inset-block: 0; left: 50%; width: min(64vw, 960px); border: 0; background: transparent; cursor: pointer; transform: translateX(-50%); }
-  .medusa-awaken:disabled { cursor: wait; }
-  .medusa-awaken:focus-visible { outline: 2px solid var(--medusa-ghost); outline-offset: -12px; border-radius: 48%; }
+  .eye-portal { position: absolute; z-index: 3; top: 39.1%; width: 6.7%; height: 5.4%; padding: 0; overflow: hidden; border: 1px solid rgba(223,204,153,.52); border-radius: 54% 46% 52% 48% / 48% 48% 52% 52%; background: #071019; box-shadow: 0 0 10px rgba(195,221,239,.34), inset 0 0 12px rgba(0,0,0,.62); cursor: pointer; transform: translate(-50%, -50%); transition: box-shadow .22s ease, filter .22s ease, transform .22s ease; animation: eye-portal-appear 1.1s .55s ease-out both; }
+  .eye-portal--left { left: 48.1%; transform: translate(-50%, -50%) rotate(1deg); }
+  .eye-portal--right { left: 57.05%; transform: translate(-50%, -50%) rotate(-1deg); }
+  .eye-portal__scene { position: absolute; inset: -20%; width: 140%; height: 140%; object-fit: cover; object-position: center 43%; filter: saturate(1.26) contrast(1.08) brightness(.95); user-select: none; transition: filter .22s ease, transform .6s ease; }
+  .eye-portal__letter { --letter-x: 50%; --letter-y: 50%; --letter-turn: 0deg; position: absolute; z-index: 2; left: var(--letter-x); top: var(--letter-y); color: rgba(218,213,185,.46); font-family: Georgia, 'Times New Roman', serif; font-size: clamp(.46rem, .82vw, .92rem); font-weight: 700; line-height: 1; text-shadow: -1px -1px 0 rgba(24,18,12,.46), 1px 1px 0 rgba(255,242,197,.16); transform: translate(-50%, -50%) rotate(var(--letter-turn)); mix-blend-mode: luminosity; }
+  .eye-portal::after { content: ''; position: absolute; z-index: 3; inset: 0; pointer-events: none; border-radius: inherit; background: radial-gradient(ellipse at 34% 26%, rgba(255,255,255,.22), transparent 17%), linear-gradient(180deg, rgba(0,0,0,.44), transparent 35% 68%, rgba(0,0,0,.55)); box-shadow: inset 0 0 9px 2px rgba(0,0,0,.7); }
+  .eye-portal:hover { z-index: 4; filter: brightness(1.18); box-shadow: 0 0 20px rgba(208,230,246,.62), 0 0 8px rgba(231,195,111,.34), inset 0 0 9px rgba(0,0,0,.5); }
+  .eye-portal--left:hover { transform: translate(-50%, -50%) rotate(1deg) scale(1.18); }
+  .eye-portal--right:hover { transform: translate(-50%, -50%) rotate(-1deg) scale(1.18); }
+  .eye-portal:hover .eye-portal__scene { filter: saturate(1.34) contrast(1.04) brightness(1.04); transform: scale(1.05); }
+  .eye-portal:hover .eye-portal__letter { color: rgba(232,225,191,.62); }
+  .eye-portal:focus-visible { z-index: 4; outline: 2px solid var(--medusa-ghost); outline-offset: 3px; }
+  .eye-portal:disabled { cursor: wait; }
+  .eye-portal.is-wrong { animation: eye-denied .42s ease-in-out; }
   .medusa-status { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; border: 0; }
 
   .medusa-return { position: absolute; z-index: 5; top: clamp(1.2rem, 3vw, 2.5rem); left: clamp(1rem, 3.5vw, 3.5rem); display: flex; align-items: center; gap: .75rem; min-height: 46px; padding: .55rem .85rem; border: 1px solid rgba(230,203,136,.45); border-radius: 999px; background: rgba(3,7,12,.46); color: var(--medusa-gold); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .62rem; letter-spacing: .16em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
@@ -179,8 +183,19 @@ import '@fontsource/ibm-plex-mono/400.css';
   .medusa-title h1 { margin: 0; color: #f0dfb3; font-size: clamp(3.2rem, 8vw, 7.5rem); font-weight: 400; letter-spacing: .04em; line-height: .78; }
 
   @keyframes medusa-arrive {
-    from { opacity: 0; transform: scale(1.035); filter: brightness(.65); }
-    to { opacity: 1; transform: scale(1); filter: brightness(1); }
+    from { opacity: 0; transform: translate(-50%, -50%) scale(1.035); filter: brightness(.65); }
+    to { opacity: 1; transform: translate(-50%, -50%) scale(1); filter: brightness(1); }
+  }
+
+  @keyframes eye-portal-appear {
+    from { opacity: 0; filter: brightness(0); }
+    to { opacity: 1; filter: brightness(1); }
+  }
+
+  @keyframes eye-denied {
+    0%, 100% { filter: brightness(1); }
+    35% { filter: brightness(.46) sepia(.65) hue-rotate(318deg); }
+    65% { filter: brightness(.78) sepia(.3) hue-rotate(318deg); }
   }
 
   @keyframes medusa-golden-confirm {
@@ -191,15 +206,13 @@ import '@fontsource/ibm-plex-mono/400.css';
   }
 
   @media (max-width: 680px) {
-    .medusa-chamber__image { object-position: 50% center; }
-    .medusa-awaken { width: 82vw; }
     .medusa-return { top: 1rem; left: 1rem; }
     .medusa-title { right: 1rem; bottom: 1.4rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
     .medusa-scene { animation: none; }
-    .medusa-chamber__image { transition: none; }
+    .eye-portal, .eye-portal__scene { animation: none; transition: none; }
     .medusa-chamber.is-confirmed::after { animation-duration: .5s; }
     .medusa-return { transition: none; }
   }
