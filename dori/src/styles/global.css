@@ -106,8 +106,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .realm--diary.is-greek-room .font-switcher,
 .realm--diary.is-greek-room .quote-grid,
 .realm--diary.is-greek-room .diary-composer { display: none !important; }
-.realm--diary.is-dreamscape .quote-card { overflow: hidden; border-color: rgba(169,201,232,.32); background: linear-gradient(145deg, rgba(4,8,14,.82), rgba(5,10,18,.62)), var(--dream-bg) center / cover no-repeat; box-shadow: 0 18px 48px rgba(0,0,0,.3); backdrop-filter: blur(2px); }
-.realm--diary.is-dreamscape .quote-card--feature { border-color: rgba(198,161,91,.5); background: linear-gradient(145deg, rgba(5,9,15,.76), rgba(4,8,14,.54)), var(--dream-bg) center / cover no-repeat; }
+.realm--diary.is-dreamscape .quote-card { overflow: hidden; border-color: rgba(234,211,153,.78); background: linear-gradient(145deg, rgba(4,8,14,.58), rgba(5,10,18,.34)), var(--dream-bg) center / cover no-repeat; box-shadow: 0 18px 48px rgba(0,0,0,.3), inset 0 0 0 1px rgba(255,239,196,.08), 0 0 20px rgba(198,161,91,.1); backdrop-filter: blur(1px); }
+.realm--diary.is-dreamscape .quote-card--feature { border-color: rgba(234,211,153,.92); background: linear-gradient(145deg, rgba(5,9,15,.52), rgba(4,8,14,.28)), var(--dream-bg) center / cover no-repeat; box-shadow: 0 22px 56px rgba(0,0,0,.34), inset 0 0 0 1px rgba(255,239,196,.12), 0 0 26px rgba(198,161,91,.14); }
 .realm--diary.is-dreamscape .quote-card blockquote { color: #fffaf0; text-shadow: 0 2px 12px rgba(0,0,0,.92), 0 0 28px rgba(0,0,0,.62); }
 .realm--diary.is-dreamscape .quote-card__board,
 .realm--diary.is-dreamscape .quote-card__note { color: rgba(219,234,250,.86); text-shadow: 0 1px 7px rgba(0,0,0,.95); }
