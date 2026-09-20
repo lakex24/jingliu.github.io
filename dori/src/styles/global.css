@@ -110,7 +110,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .realm--diary.is-greek-room .greek-keyboard { margin-top: clamp(2.5rem, 8vh, 6rem); background: linear-gradient(145deg, rgba(24,16,17,.68), rgba(7,10,18,.7)); box-shadow: 0 30px 90px rgba(0,0,0,.5), inset 0 1px rgba(255,239,196,.12); }
 .greek-keyboard__display { margin-bottom: 1.5rem; }
 #greek-output { min-height: 3.6rem; display: flex; align-items: flex-end; padding: 0 .35rem .55rem; border-bottom: 1px solid var(--gold-bright); color: #ffe19a; font-family: var(--display); font-size: clamp(1.8rem, 4vw, 3.2rem); letter-spacing: .12em; line-height: 1; overflow-wrap: anywhere; text-shadow: 0 0 6px rgba(255,225,154,.72), 0 0 18px rgba(234,211,153,.5), 0 0 34px rgba(198,161,91,.24); }
-#greek-output.is-unlocked { color: #fff0ba; animation: greek-password-glow 1.5s ease both; }
+#greek-output.is-unlocked { color: #fff0ba; animation: greek-password-glow 1s ease both; }
 @keyframes greek-password-glow { 0% { text-shadow: 0 0 5px rgba(255,225,154,.55); } 35%, 75% { text-shadow: 0 0 8px rgba(255,240,186,.98), 0 0 24px rgba(234,211,153,.9), 0 0 52px rgba(198,161,91,.62); } 100% { text-shadow: 0 0 6px rgba(255,225,154,.72), 0 0 18px rgba(234,211,153,.5); } }
 .greek-password-toggle { width: fit-content; display: flex; align-items: center; gap: .5rem; margin: .75rem 0 0 auto; color: var(--gold-bright); font-family: var(--mono); font-size: .54rem; letter-spacing: .09em; text-transform: uppercase; cursor: pointer; }
 .greek-password-toggle input { width: 16px; height: 16px; margin: 0; accent-color: var(--gold); cursor: pointer; }
