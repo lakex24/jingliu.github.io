@@ -348,6 +348,19 @@ const pinterestQuotes = [
         localStorage.setItem('dori-diary', JSON.stringify(savedThoughts));
         localStorage.setItem(diaryMergeKey, '1');
       }
+
+      function makeThoughtId() {
+        return crypto.randomUUID?.() || `note-${Date.now()}-${Math.random().toString(16).slice(2)}`;
+      }
+
+      let addedThoughtIds = false;
+      savedThoughts = savedThoughts.map((thought) => {
+        if (thought.id) return thought;
+        addedThoughtIds = true;
+        return { ...thought, id: makeThoughtId() };
+      });
+      if (addedThoughtIds) localStorage.setItem('dori-diary', JSON.stringify(savedThoughts));
+
       const boardNames = { dream: 'Dreamscapes', gold: 'Golden notes' };
       const goldFontButtons = [...document.querySelectorAll('[data-gold-font]')];
       let goldFont = localStorage.getItem('dori-golden-notes-font') || 'classic';
@@ -383,6 +396,22 @@ const pinterestQuotes = [
         note.className = 'quote-card__note';
         note.textContent = 'Saved in this browser.';
         card.append(label, quote, note);
+
+        if (thought.board === 'gold') {
+          const deleteButton = document.createElement('button');
+          deleteButton.className = 'delete-note';
+          deleteButton.type = 'button';
+          deleteButton.textContent = 'Delete note';
+          deleteButton.setAttribute('aria-label', 'Delete this Golden Note');
+          deleteButton.addEventListener('click', () => {
+            if (!window.confirm('Delete this Golden Note? This cannot be undone.')) return;
+            savedThoughts = savedThoughts.filter((item) => item.id !== thought.id);
+            localStorage.setItem('dori-diary', JSON.stringify(savedThoughts));
+            card.remove();
+          });
+          card.append(deleteButton);
+        }
+
         quoteGrid.prepend(card);
       }
       savedThoughts.forEach(addThoughtCard);
@@ -393,7 +422,7 @@ const pinterestQuotes = [
         const text = document.getElementById('new-thought').value.trim();
         const board = document.getElementById('new-board').value;
         if (!text) return;
-        const thought = { text, board };
+        const thought = { id: makeThoughtId(), text, board };
         savedThoughts.unshift(thought);
         localStorage.setItem('dori-diary', JSON.stringify(savedThoughts.slice(0, 24)));
         addThoughtCard(thought);
