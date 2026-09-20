@@ -10,26 +10,32 @@ import '@fontsource/ibm-plex-mono/400.css';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width" />
     <title>Medusa’s Temple — Dori</title>
-    <meta name="description" content="A secret moonlit temple where Medusa sleeps with her eyes closed." />
+    <meta name="description" content="A living Medusa with an emerald dragon body and golden wings waits in a moonlit temple." />
     <meta name="robots" content="noindex, nofollow" />
     <meta name="theme-color" content="#05080d" />
     <meta property="og:type" content="website" />
     <meta property="og:title" content="Medusa’s Temple — Dori" />
-    <meta property="og:description" content="A secret moonlit temple where Medusa sleeps with her eyes closed." />
+    <meta property="og:description" content="A living Medusa with an emerald dragon body and golden wings waits in a moonlit temple." />
     <meta property="og:url" content="https://dori-homepage.mind-pixels.com/medusa/" />
-    <meta property="og:image" content="https://dori-homepage.mind-pixels.com/medusa-temple-living-v3.webp" />
+    <meta property="og:image" content="https://dori-homepage.mind-pixels.com/medusa-dragon-sleeping-v4.webp" />
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:title" content="Medusa’s Temple — Dori" />
-    <meta name="twitter:description" content="A secret moonlit temple where Medusa sleeps with her eyes closed." />
-    <meta name="twitter:image" content="https://dori-homepage.mind-pixels.com/medusa-temple-living-v3.webp" />
-    <link rel="preload" href="/medusa-temple-living-v3.webp" as="image" type="image/webp" />
+    <meta name="twitter:description" content="A living Medusa with an emerald dragon body and golden wings waits in a moonlit temple." />
+    <meta name="twitter:image" content="https://dori-homepage.mind-pixels.com/medusa-dragon-sleeping-v4.webp" />
+    <link rel="preload" href="/medusa-dragon-sleeping-v4.webp" as="image" type="image/webp" />
+    <link rel="preload" href="/medusa-dragon-awake-v4.webp" as="image" type="image/webp" />
     <link rel="icon" href="data:," />
   </head>
   <body>
     <main class="medusa-chamber" aria-labelledby="medusa-title">
-      <img class="medusa-chamber__image" src="/medusa-temple-living-v3.webp" alt="A serene living Medusa crowned only with snakes, her eyes closed among the moonlit ruins of a great Greek temple" width="1672" height="941" />
+      <div class="medusa-scene">
+        <img class="medusa-chamber__image medusa-chamber__image--sleeping" src="/medusa-dragon-sleeping-v4.webp" alt="Medusa with closed eyes, a green dragon body, and golden wings in the moonlit ruins of a great Greek temple" width="1672" height="941" draggable="false" />
+        <img class="medusa-chamber__image medusa-chamber__image--awake" src="/medusa-dragon-awake-v4.webp" alt="" width="1672" height="941" draggable="false" />
+      </div>
       <div class="medusa-chamber__shade" aria-hidden="true"></div>
       <div class="medusa-chamber__grain" aria-hidden="true"></div>
+
+      <button class="medusa-awaken" type="button" aria-label="Open Medusa’s eyes" aria-pressed="false"></button>
 
       <a class="medusa-return" href="/#library" aria-label="Return to the Library">
         <span aria-hidden="true">←</span>
@@ -37,10 +43,23 @@ import '@fontsource/ibm-plex-mono/400.css';
       </a>
 
       <header class="medusa-title">
-        <p>The secret volume</p>
+        <p id="medusa-state" aria-live="polite">Press Medusa to wake her</p>
         <h1 id="medusa-title">Medusa</h1>
       </header>
     </main>
+
+    <script>
+      const chamber = document.querySelector('.medusa-chamber');
+      const awakenButton = document.querySelector('.medusa-awaken');
+      const stateLabel = document.getElementById('medusa-state');
+
+      awakenButton?.addEventListener('click', () => {
+        const isAwake = chamber?.classList.toggle('is-awake') ?? false;
+        awakenButton.setAttribute('aria-pressed', String(isAwake));
+        awakenButton.setAttribute('aria-label', isAwake ? 'Close Medusa’s eyes' : 'Open Medusa’s eyes');
+        if (stateLabel) stateLabel.textContent = isAwake ? 'Awake · press again to rest' : 'Press Medusa to wake her';
+      });
+    </script>
   </body>
 </html>
 
@@ -56,16 +75,23 @@ import '@fontsource/ibm-plex-mono/400.css';
   body { color: #f1eadc; font-family: 'Cormorant Variable', 'Cormorant Garamond', Georgia, serif; }
 
   .medusa-chamber { position: relative; isolation: isolate; min-height: 100svh; overflow: hidden; background: var(--medusa-night); }
-  .medusa-chamber__image { position: absolute; inset: 0; z-index: -3; width: 100%; height: 100%; object-fit: cover; object-position: center; animation: medusa-arrive 1.6s ease-out both; }
-  .medusa-chamber__shade { position: absolute; inset: 0; z-index: -2; pointer-events: none; background: linear-gradient(180deg, rgba(2,5,10,.38), transparent 28% 68%, rgba(2,5,10,.72)), linear-gradient(90deg, rgba(2,5,10,.54), transparent 26% 72%, rgba(2,5,10,.2)); }
-  .medusa-chamber__grain { position: absolute; inset: 0; z-index: -1; pointer-events: none; opacity: .13; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); }
+  .medusa-scene { position: absolute; inset: 0; z-index: 0; animation: medusa-arrive 1.6s ease-out both; }
+  .medusa-chamber__image { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; user-select: none; transition: opacity .48s ease, filter .48s ease; }
+  .medusa-chamber__image--awake { opacity: 0; filter: brightness(.92); }
+  .medusa-chamber.is-awake .medusa-chamber__image--sleeping { opacity: 0; filter: brightness(1.04); }
+  .medusa-chamber.is-awake .medusa-chamber__image--awake { opacity: 1; filter: brightness(1); }
+  .medusa-chamber__shade { position: absolute; inset: 0; z-index: 1; pointer-events: none; background: linear-gradient(180deg, rgba(2,5,10,.38), transparent 28% 68%, rgba(2,5,10,.72)), linear-gradient(90deg, rgba(2,5,10,.54), transparent 26% 72%, rgba(2,5,10,.2)); }
+  .medusa-chamber__grain { position: absolute; inset: 0; z-index: 2; pointer-events: none; opacity: .13; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); }
 
-  .medusa-return { position: absolute; z-index: 2; top: clamp(1.2rem, 3vw, 2.5rem); left: clamp(1rem, 3.5vw, 3.5rem); display: flex; align-items: center; gap: .75rem; min-height: 46px; padding: .55rem .85rem; border: 1px solid rgba(230,203,136,.45); border-radius: 999px; background: rgba(3,7,12,.46); color: var(--medusa-gold); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .62rem; letter-spacing: .16em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .medusa-awaken { position: absolute; z-index: 3; inset-block: 0; left: 50%; width: min(64vw, 960px); border: 0; background: transparent; cursor: pointer; transform: translateX(-50%); }
+  .medusa-awaken:focus-visible { outline: 2px solid var(--medusa-ghost); outline-offset: -12px; border-radius: 48%; }
+
+  .medusa-return { position: absolute; z-index: 5; top: clamp(1.2rem, 3vw, 2.5rem); left: clamp(1rem, 3.5vw, 3.5rem); display: flex; align-items: center; gap: .75rem; min-height: 46px; padding: .55rem .85rem; border: 1px solid rgba(230,203,136,.45); border-radius: 999px; background: rgba(3,7,12,.46); color: var(--medusa-gold); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .62rem; letter-spacing: .16em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: color .2s ease, border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
   .medusa-return > span:first-child { font-size: 1.15rem; line-height: 1; }
   .medusa-return:hover { color: #fff0bf; border-color: var(--medusa-gold); box-shadow: 0 0 22px rgba(230,203,136,.2); transform: translateX(-2px); }
   .medusa-return:focus-visible { outline: 2px solid var(--medusa-ghost); outline-offset: 4px; }
 
-  .medusa-title { position: absolute; z-index: 1; right: clamp(1.2rem, 4vw, 4rem); bottom: clamp(1.2rem, 4vw, 3rem); text-align: right; text-shadow: 0 3px 22px rgba(0,0,0,.8); }
+  .medusa-title { position: absolute; z-index: 4; right: clamp(1.2rem, 4vw, 4rem); bottom: clamp(1.2rem, 4vw, 3rem); pointer-events: none; text-align: right; text-shadow: 0 3px 22px rgba(0,0,0,.8); }
   .medusa-title p { margin: 0 0 .35rem; color: rgba(200,223,242,.72); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: clamp(.48rem, .7vw, .62rem); letter-spacing: .2em; text-transform: uppercase; }
   .medusa-title h1 { margin: 0; color: #f0dfb3; font-size: clamp(3.2rem, 8vw, 7.5rem); font-weight: 400; letter-spacing: .04em; line-height: .78; }
 
@@ -76,12 +102,14 @@ import '@fontsource/ibm-plex-mono/400.css';
 
   @media (max-width: 680px) {
     .medusa-chamber__image { object-position: 50% center; }
+    .medusa-awaken { width: 82vw; }
     .medusa-return { top: 1rem; left: 1rem; }
     .medusa-title { right: 1rem; bottom: 1.4rem; }
   }
 
   @media (prefers-reduced-motion: reduce) {
-    .medusa-chamber__image { animation: none; }
+    .medusa-scene { animation: none; }
+    .medusa-chamber__image { transition: none; }
     .medusa-return { transition: none; }
   }
 </style>
