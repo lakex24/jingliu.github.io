@@ -404,6 +404,13 @@ const pinterestQuotes = [
         card.append(label, quote, note);
 
         if (thought.board === 'gold') {
+          const actions = document.createElement('div');
+          actions.className = 'note-actions';
+          const editButton = document.createElement('button');
+          editButton.className = 'edit-note';
+          editButton.type = 'button';
+          editButton.textContent = 'Edit note';
+          editButton.setAttribute('aria-label', 'Edit this Golden Note');
           const deleteButton = document.createElement('button');
           deleteButton.className = 'delete-note';
           deleteButton.type = 'button';
@@ -415,7 +422,63 @@ const pinterestQuotes = [
             localStorage.setItem('dori-diary', JSON.stringify(savedThoughts));
             card.remove();
           });
-          card.append(deleteButton);
+
+          editButton.addEventListener('click', () => {
+            if (card.querySelector('.note-editor')) return;
+            const editorPanel = document.createElement('div');
+            editorPanel.className = 'note-editor-panel';
+            const editor = document.createElement('textarea');
+            editor.className = 'note-editor';
+            editor.maxLength = 180;
+            editor.value = thought.text;
+            editor.setAttribute('aria-label', 'Edit Golden Note text');
+            const editorActions = document.createElement('div');
+            editorActions.className = 'note-editor-actions';
+            const saveButton = document.createElement('button');
+            saveButton.type = 'button';
+            saveButton.textContent = 'Save changes';
+            const cancelButton = document.createElement('button');
+            cancelButton.type = 'button';
+            cancelButton.textContent = 'Cancel';
+
+            function closeEditor() {
+              editorPanel.remove();
+              quote.hidden = false;
+              note.hidden = false;
+              actions.hidden = false;
+            }
+
+            function saveEdit() {
+              const text = editor.value.trim();
+              if (!text) {
+                editor.focus();
+                return;
+              }
+              thought.text = text;
+              savedThoughts = savedThoughts.map((item) => item.id === thought.id ? { ...item, text } : item);
+              localStorage.setItem('dori-diary', JSON.stringify(savedThoughts));
+              quote.textContent = text;
+              closeEditor();
+            }
+
+            saveButton.addEventListener('click', saveEdit);
+            cancelButton.addEventListener('click', closeEditor);
+            editor.addEventListener('keydown', (event) => {
+              if (event.key === 'Escape') closeEditor();
+              if ((event.metaKey || event.ctrlKey) && event.key === 'Enter') saveEdit();
+            });
+            editorActions.append(saveButton, cancelButton);
+            editorPanel.append(editor, editorActions);
+            quote.hidden = true;
+            note.hidden = true;
+            actions.hidden = true;
+            card.append(editorPanel);
+            editor.focus();
+            editor.setSelectionRange(editor.value.length, editor.value.length);
+          });
+
+          actions.append(editButton, deleteButton);
+          card.append(actions);
         }
 
         quoteGrid.prepend(card);
