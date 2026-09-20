@@ -255,17 +255,22 @@ const greekLetters = [
 
       <section class="realm realm--photo" id="photo" data-realm="photo" aria-labelledby="photo-title" hidden>
         <header class="realm-header">
-          <button class="home-button home-button--icon" type="button" data-home aria-label="Return to the home page" title="Return to the home page">
-            <span class="house-icon" aria-hidden="true">
-              <span class="house-icon__chimney"></span>
-              <span class="house-icon__roof"></span>
-              <span class="house-icon__body">
-                <span class="house-icon__window house-icon__window--left"></span>
-                <span class="house-icon__door"></span>
-                <span class="house-icon__window house-icon__window--right"></span>
+          <div class="realm-header__actions">
+            <button class="home-button home-button--icon" type="button" data-home aria-label="Return to the home page" title="Return to the home page">
+              <span class="house-icon" aria-hidden="true">
+                <span class="house-icon__chimney"></span>
+                <span class="house-icon__roof"></span>
+                <span class="house-icon__body">
+                  <span class="house-icon__window house-icon__window--left"></span>
+                  <span class="house-icon__door"></span>
+                  <span class="house-icon__window house-icon__window--right"></span>
+                </span>
               </span>
-            </span>
-          </button>
+            </button>
+            <a class="picture-frame-button" href="/gallery/" aria-label="Open the picture frame page" title="Open the picture frame page">
+              <span class="picture-frame-icon" aria-hidden="true"></span>
+            </a>
+          </div>
           <p>02 · Photo</p>
         </header>
 
@@ -436,22 +441,17 @@ const greekLetters = [
 
       <section class="realm realm--library" id="library" data-realm="library" aria-labelledby="library-title" hidden>
         <header class="realm-header">
-          <div class="realm-header__actions">
-            <button class="home-button home-button--icon" type="button" data-home aria-label="Return to the home page" title="Return to the home page">
-              <span class="house-icon" aria-hidden="true">
-                <span class="house-icon__chimney"></span>
-                <span class="house-icon__roof"></span>
-                <span class="house-icon__body">
-                  <span class="house-icon__window house-icon__window--left"></span>
-                  <span class="house-icon__door"></span>
-                  <span class="house-icon__window house-icon__window--right"></span>
-                </span>
+          <button class="home-button home-button--icon" type="button" data-home aria-label="Return to the home page" title="Return to the home page">
+            <span class="house-icon" aria-hidden="true">
+              <span class="house-icon__chimney"></span>
+              <span class="house-icon__roof"></span>
+              <span class="house-icon__body">
+                <span class="house-icon__window house-icon__window--left"></span>
+                <span class="house-icon__door"></span>
+                <span class="house-icon__window house-icon__window--right"></span>
               </span>
-            </button>
-            <a class="picture-frame-button" href="/gallery/" aria-label="Open the picture frame page" title="Open the picture frame page">
-              <span class="picture-frame-icon" aria-hidden="true"></span>
-            </a>
-          </div>
+            </span>
+          </button>
           <p>03 · Library</p>
         </header>
 
