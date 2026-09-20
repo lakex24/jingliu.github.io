@@ -52,6 +52,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .portal--diary .portal__line { transform: rotate(180deg); }
 .portal--diary .portal__line::before { left: auto; right: 0; }
 .portal--library { left: clamp(1.1rem, 3.5vw, 4rem); bottom: clamp(2rem, 8vw, 6.5rem); animation: fade-right .9s .65s ease-out both; }
+.portal--library .portal__label { color: #d8e2ec; font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive; font-size: clamp(1.25rem, 2vw, 1.75rem); font-weight: 400; letter-spacing: .035em; text-transform: none; text-shadow: 0 1px 0 rgba(255,255,255,.34), 0 0 14px rgba(185,215,238,.44), 0 2px 9px #000; }
+.portal--library:hover .portal__label { color: #f3f7fa; }
 @keyframes fade-right { from { opacity: 0; transform: translateX(-18px); } to { opacity: 1; transform: none; } }
 @keyframes fade-left { from { opacity: 0; transform: translateX(18px); } to { opacity: 1; transform: none; } }
 .hero__invitation { position: absolute; z-index: 5; right: clamp(1.2rem, 3vw, 3rem); bottom: clamp(1.2rem, 3vw, 2.2rem); margin: 0; color: rgba(219,234,250,.58); font-family: var(--mono); font-size: .56rem; letter-spacing: .18em; text-transform: uppercase; }
