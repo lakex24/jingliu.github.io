@@ -393,13 +393,17 @@ const greekLetters = [
       }
 
       function saveGreekLine(nextLine) {
+        greekOutput.classList.remove('is-unlocked');
         greekLine = Array.from(nextLine).slice(0, 48).join('');
         localStorage.setItem(greekLineKey, greekLine);
         renderGreekLine();
         const doorCode = greekLine.replace(/\s/g, '');
         if (greekDoorCodes.has(doorCode)) {
+          showGreekPassword.checked = true;
+          greekOutput.classList.add('is-unlocked');
+          renderGreekLine();
           localStorage.removeItem(greekLineKey);
-          window.setTimeout(() => window.location.assign('https://jingliu-preview.mind-pixels.com/'), 180);
+          window.setTimeout(() => window.location.assign('https://jingliu-preview.mind-pixels.com/'), 1500);
         }
       }
 
@@ -411,6 +415,7 @@ const greekLetters = [
         greekKeyButton.title = open ? 'Close the Greek writing room' : 'Open the Greek writing room';
         document.querySelector('.realm--diary').classList.toggle('is-greek-room', open);
         if (open) {
+          greekOutput.classList.remove('is-unlocked');
           showGreekPassword.checked = false;
           renderGreekLine();
           window.scrollTo({ top: 0, behavior: 'smooth' });

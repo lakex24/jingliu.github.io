@@ -115,6 +115,9 @@ p { margin: 0 0 1.1em; }
 .skip-link:focus { top: 12px; }
 
 .page { max-width: var(--page-max); margin: 0 auto; padding: 0 var(--gutter); }
+.return-to-dori { width: fit-content; min-height: var(--tap); display: inline-flex; align-items: center; gap: 0.45rem; margin-top: 0.35rem; color: var(--violet-deep); font-family: var(--font-quote-title); font-size: clamp(1.35rem, 2.5vw, 1.8rem); line-height: 1; text-decoration: none; text-shadow: 0 1px 0 rgba(255,255,255,.5); transition: color .2s ease, transform .2s ease; }
+.return-to-dori span { font-family: var(--font-body); font-size: .95rem; }
+.return-to-dori:hover { color: var(--magenta); transform: translateX(-2px); }
 .prose { max-width: var(--measure); }
 .prose img { border-radius: 4px; margin: 1.5rem 0 0.35rem; }
 .prose img + em, .prose p > em:only-child { display: block; font-family: var(--font-mono); font-style: normal; font-size: 0.78rem; letter-spacing: 0.08em; color: var(--ink-mute); margin-bottom: 1.5rem; }
