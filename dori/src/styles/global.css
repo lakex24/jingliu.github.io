@@ -190,11 +190,11 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .library-intro { margin-inline: auto; text-align: center; }
 .library-intro > p:last-child { margin-inline: auto; }
 .library-room { display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(260px, .48fr); gap: clamp(1.5rem, 3vw, 3.5rem); align-items: end; max-width: 1500px; margin: clamp(3rem, 6vw, 6rem) auto 0; }
-.bookshelf { position: relative; isolation: isolate; width: min(100%, 700px); min-height: 500px; justify-self: end; display: flex; align-items: flex-end; justify-content: center; gap: .45rem; margin-right: clamp(0rem, 2vw, 2rem); padding: 1.5rem 8% 2.5rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
+.bookshelf { position: relative; isolation: isolate; width: min(100%, 700px); min-height: 500px; justify-self: end; display: flex; align-items: flex-end; justify-content: center; gap: .2rem; margin-right: clamp(0rem, 2vw, 2rem); padding: 1.5rem 2% 2.5rem; border: 0; border-radius: 0; background: transparent; box-shadow: none; }
 .bookshelf::before { display: none; }
 .bookshelf::after { display: none; }
 .shelf-edge { display: none; }
-.book { --book-edge: #07111d; --book-base: #172f49; --book-light: #345a78; --book-foil: #d8b76f; --book-ink: #f1eadc; --resting-angle: 0deg; --texture-x: 0%; position: relative; z-index: 2; width: 11.5%; min-width: 54px; height: 350px; padding: 3rem .65rem 2.7rem; border: 1px solid rgba(216,183,111,.3); border-top-color: rgba(245,221,169,.46); border-right-color: rgba(247,229,188,.2); border-bottom: 4px solid rgba(12,7,4,.88); border-radius: 9px 11px 5px 6px; background: radial-gradient(ellipse at 68% 7%, rgba(255,255,255,.15), transparent 15%), radial-gradient(ellipse at 20% 78%, rgba(0,0,0,.24), transparent 30%), repeating-radial-gradient(ellipse at 24% 20%, rgba(255,255,255,.018) 0 1px, transparent 1px 5px), repeating-linear-gradient(92deg, transparent 0 2px, rgba(255,255,255,.014) 2px 3px, transparent 3px 7px), linear-gradient(90deg, color-mix(in srgb, var(--book-edge) 55%, transparent), transparent 42% 60%, color-mix(in srgb, var(--book-edge) 62%, transparent)), url('/antique-book-spines-v1.webp') var(--texture-x) center / 600% 100% no-repeat; background-blend-mode: screen, multiply, soft-light, overlay, multiply, normal; color: var(--book-ink); box-shadow: inset 4px 0 0 color-mix(in srgb, var(--book-foil) 12%, transparent), inset 7px 0 9px rgba(255,255,255,.025), inset -4px 0 rgba(243,225,184,.11), inset -13px 0 18px rgba(0,0,0,.34), inset 0 3px 2px rgba(255,255,255,.08), 3px 0 0 rgba(214,189,138,.08), 9px 13px 20px rgba(0,0,0,.58), 0 22px 18px rgba(0,0,0,.22), 0 30px 30px rgba(0,0,0,.42); writing-mode: vertical-rl; cursor: grab; transform: rotate(var(--resting-angle)); transform-origin: center bottom; transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, opacity .18s ease; }
+.book { --book-edge: #07111d; --book-base: #172f49; --book-light: #345a78; --book-foil: #d8b76f; --book-ink: #f1eadc; --resting-angle: 0deg; --texture-x: 0%; position: relative; z-index: 2; flex: 1 1 0; width: auto; min-width: 54px; height: 350px; padding: 3rem .65rem 2.7rem; border: 1px solid rgba(216,183,111,.3); border-top-color: rgba(245,221,169,.46); border-right-color: rgba(247,229,188,.2); border-bottom: 4px solid rgba(12,7,4,.88); border-radius: 9px 11px 5px 6px; background: radial-gradient(ellipse at 68% 7%, rgba(255,255,255,.15), transparent 15%), radial-gradient(ellipse at 20% 78%, rgba(0,0,0,.24), transparent 30%), repeating-radial-gradient(ellipse at 24% 20%, rgba(255,255,255,.018) 0 1px, transparent 1px 5px), repeating-linear-gradient(92deg, transparent 0 2px, rgba(255,255,255,.014) 2px 3px, transparent 3px 7px), linear-gradient(90deg, color-mix(in srgb, var(--book-edge) 55%, transparent), transparent 42% 60%, color-mix(in srgb, var(--book-edge) 62%, transparent)), url('/antique-book-spines-v1.webp') var(--texture-x) center / 600% 100% no-repeat; background-blend-mode: screen, multiply, soft-light, overlay, multiply, normal; color: var(--book-ink); box-shadow: inset 4px 0 0 color-mix(in srgb, var(--book-foil) 12%, transparent), inset 7px 0 9px rgba(255,255,255,.025), inset -4px 0 rgba(243,225,184,.11), inset -13px 0 18px rgba(0,0,0,.34), inset 0 3px 2px rgba(255,255,255,.08), 3px 0 0 rgba(214,189,138,.08), 9px 13px 20px rgba(0,0,0,.58), 0 22px 18px rgba(0,0,0,.22), 0 30px 30px rgba(0,0,0,.42); writing-mode: vertical-rl; cursor: grab; transform: rotate(var(--resting-angle)); transform-origin: center bottom; transition: transform .18s ease, box-shadow .18s ease, filter .18s ease, opacity .18s ease; }
 .book::before { content: ''; position: absolute; inset: 0; border-radius: inherit; background: linear-gradient(90deg, rgba(0,0,0,.38), transparent 13% 72%, rgba(0,0,0,.26)), linear-gradient(180deg, rgba(137,183,225,.09), transparent 18%, transparent 78%, rgba(222,173,91,.07)); box-shadow: inset 0 0 0 1px rgba(243,225,184,.08), inset 0 0 18px rgba(0,0,0,.17); pointer-events: none; }
 .book::after { content: ''; position: absolute; left: 8%; right: 8%; bottom: 3px; height: 3px; border-radius: 50%; background: linear-gradient(90deg, transparent, rgba(238,211,156,.34), transparent); filter: blur(.4px); pointer-events: none; }
 .book[data-book="wild"] { --texture-x: 0%; }
@@ -211,7 +211,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .book.is-dragging { opacity: .48; transform: translateY(-9px) scale(.96); }
 .book--tall { height: 410px; }
 .book--short { height: 310px; }
-.book--thin { width: 9%; }
+.book--thin { flex-grow: .8; width: auto; }
 .book:nth-of-type(1) { height: 410px; }
 .book:nth-of-type(2) { height: 390px; }
 .book:nth-of-type(3) { height: 370px; }
@@ -277,7 +277,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .composer-row { grid-template-columns: minmax(0, 1fr); }
   .photo-studio { margin-top: 2.5rem; }
   .photo-stage { aspect-ratio: 3 / 4; }
-  .bookshelf { min-height: 360px; gap: .22rem; padding: 1rem 4% 1.75rem; }
+  .bookshelf { min-height: 360px; gap: .12rem; padding: 1rem 2% 1.75rem; }
   .book { min-width: 34px; height: 244px; padding: 2.4rem .28rem 2.1rem; }
   .book--tall { height: 290px; }
   .book--short { height: 200px; }
