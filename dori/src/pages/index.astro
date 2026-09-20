@@ -145,6 +145,7 @@ const pinterestQuotes = [
 
         <div class="board-filter" aria-label="Filter diary boards">
           <button type="button" class="is-active" data-board="dream" aria-pressed="true">Dreamscapes</button>
+          <button type="button" data-board="gold" aria-pressed="false">Golden notes</button>
         </div>
 
         <div class="quote-grid" id="quote-grid">
@@ -180,6 +181,7 @@ const pinterestQuotes = [
               <label for="new-board">Board</label>
               <select id="new-board">
                 <option value="dream">Dreamscapes</option>
+                <option value="gold">Golden notes</option>
               </select>
               <button type="submit">Keep it</button>
             </div>
@@ -332,11 +334,14 @@ const pinterestQuotes = [
 
       const diaryForm = document.getElementById('diary-form');
       const quoteGrid = document.getElementById('quote-grid');
-      const savedThoughts = JSON.parse(localStorage.getItem('dori-diary') || '[]').map((thought) => ({
-        ...thought,
-        board: 'dream'
-      }));
-      const boardNames = { dream: 'Dreamscapes' };
+      const diaryMergeKey = 'dori-diary-golden-notes-reset';
+      let savedThoughts = JSON.parse(localStorage.getItem('dori-diary') || '[]');
+      if (!localStorage.getItem(diaryMergeKey)) {
+        savedThoughts = savedThoughts.map((thought) => ({ ...thought, board: 'dream' }));
+        localStorage.setItem('dori-diary', JSON.stringify(savedThoughts));
+        localStorage.setItem(diaryMergeKey, '1');
+      }
+      const boardNames = { dream: 'Dreamscapes', gold: 'Golden notes' };
 
       function addThoughtCard(thought) {
         const card = document.createElement('article');
