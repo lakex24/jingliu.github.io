@@ -51,6 +51,7 @@ a:active { opacity: 0.72; transition: opacity 0.08s ease; }
    page stays tappable); the new content then bleeds in like watercolour — an
    irregular, feathered blot spreading down from the top of the content. */
 ::view-transition-old(root), ::view-transition-new(root) { animation: none; }
+::view-transition { pointer-events: none; }
 main.ink {
   animation: ink-in 1.2s cubic-bezier(0.4, 0.05, 0.3, 1);
   -webkit-mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%20120'%3E%3Cfilter%20id='w'%20x='-40%'%20y='-60%'%20width='180%'%20height='220%'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.018'%20numOctaves='3'%20seed='11'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20scale='44'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3CfeGaussianBlur%20stdDeviation='7'/%3E%3C/filter%3E%3Ccircle%20cx='100'%20cy='0'%20r='78'%20fill='black'%20filter='url(%23w)'/%3E%3C/svg%3E"); mask-image: url("data:image/svg+xml,%3Csvg%20xmlns='http://www.w3.org/2000/svg'%20viewBox='0%200%20200%20120'%3E%3Cfilter%20id='w'%20x='-40%'%20y='-60%'%20width='180%'%20height='220%'%3E%3CfeTurbulence%20type='fractalNoise'%20baseFrequency='0.018'%20numOctaves='3'%20seed='11'/%3E%3CfeDisplacementMap%20in='SourceGraphic'%20scale='44'%20xChannelSelector='R'%20yChannelSelector='G'/%3E%3CfeGaussianBlur%20stdDeviation='7'/%3E%3C/filter%3E%3Ccircle%20cx='100'%20cy='0'%20r='78'%20fill='black'%20filter='url(%23w)'/%3E%3C/svg%3E");
