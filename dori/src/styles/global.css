@@ -64,6 +64,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 @keyframes realm-in { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
 .realm-header { display: flex; align-items: center; justify-content: space-between; min-height: 82px; border-bottom: 1px solid rgba(169,201,232,.16); }
 .realm-header p { margin: 0; color: var(--muted); font-family: var(--mono); font-size: .62rem; letter-spacing: .18em; text-transform: uppercase; }
+.realm-header__actions { display: flex; align-items: center; gap: .7rem; }
 .home-button { min-height: 46px; padding: .5rem .25rem; border: 0; background: transparent; color: var(--gold-bright); font-family: var(--mono); font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; }
 .home-button span { margin-right: .5rem; color: var(--ghost); }
 .realm-intro { margin-top: clamp(2.5rem, 6vw, 6rem); }
@@ -74,9 +75,25 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 
 /* Diary */
 .realm--diary::before { background: radial-gradient(circle at 82% 18%, rgba(92,132,176,.26), transparent 35%), radial-gradient(circle at 14% 80%, rgba(198,161,91,.1), transparent 32%); }
-.realm--diary.is-dreamscape::before { background: linear-gradient(180deg, rgba(6,8,13,.48), rgba(6,8,13,.7)), linear-gradient(90deg, rgba(6,8,13,.42), transparent 28% 72%, rgba(6,8,13,.42)), url('/dreamscapes-milky-way-v1.webp') center top / cover no-repeat; }
+.realm--diary.is-dreamscape::before { background: linear-gradient(180deg, rgba(6,8,13,.4), rgba(6,8,13,.68)), linear-gradient(90deg, rgba(6,8,13,.4), transparent 28% 72%, rgba(6,8,13,.4)), url('/dreamscapes-milky-way-v2.webp') center top / cover no-repeat; }
 .realm--diary.is-dreamscape .quote-card { border-color: rgba(169,201,232,.24); background: linear-gradient(145deg, rgba(14,25,40,.82), rgba(5,8,14,.72)); box-shadow: 0 18px 48px rgba(0,0,0,.22); backdrop-filter: blur(5px); }
 .realm--diary.is-dreamscape .quote-card--feature { border-color: rgba(198,161,91,.44); background: radial-gradient(circle at 50% 34%, rgba(169,201,232,.14), transparent 55%), rgba(6,10,17,.78); }
+.greek-key-button { min-height: 40px; display: flex; align-items: center; gap: .45rem; padding: .35rem .7rem; border: 1px solid rgba(198,161,91,.34); border-radius: 999px; background: rgba(198,161,91,.04); color: var(--gold-bright); font-family: var(--mono); font-size: .55rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease; }
+.greek-key-button svg { width: 30px; fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; filter: drop-shadow(0 0 5px rgba(234,211,153,.34)); }
+.greek-key-button:hover, .greek-key-button.is-active { border-color: var(--gold-bright); background: rgba(198,161,91,.1); box-shadow: 0 0 22px rgba(198,161,91,.12); }
+.greek-keyboard { max-width: 1080px; margin: 1.25rem auto 0; padding: clamp(1.1rem, 3vw, 2rem); border: 1px solid rgba(198,161,91,.4); background: linear-gradient(145deg, rgba(24,16,17,.9), rgba(7,10,18,.92)); box-shadow: 0 28px 70px rgba(0,0,0,.42), inset 0 1px rgba(255,239,196,.08); backdrop-filter: blur(16px); }
+.greek-keyboard__display { margin-bottom: 1.5rem; }
+.greek-keyboard__display > span { display: block; margin-bottom: .6rem; color: var(--gold); font-family: var(--mono); font-size: .54rem; letter-spacing: .16em; text-transform: uppercase; }
+#greek-output { min-height: 3.6rem; display: flex; align-items: flex-end; padding: 0 .35rem .55rem; border-bottom: 1px solid var(--gold-bright); color: #f4dc9d; font-family: var(--display); font-size: clamp(1.8rem, 4vw, 3.2rem); letter-spacing: .12em; line-height: 1; overflow-wrap: anywhere; text-shadow: 0 0 18px rgba(234,211,153,.28); }
+#greek-output.is-empty::before { content: 'Touch the golden cubes to write…'; color: rgba(169,201,232,.45); font-family: var(--display); font-size: clamp(1rem, 2vw, 1.25rem); font-style: italic; letter-spacing: .02em; }
+.greek-cubes { display: grid; grid-template-columns: repeat(12, minmax(48px, 1fr)); gap: clamp(.45rem, 1vw, .75rem); }
+.greek-cube { position: relative; aspect-ratio: 1; min-width: 0; border: 1px solid #f1d694; border-radius: 7px; background: linear-gradient(145deg, #f7dfa0 0%, #c79841 46%, #80551c 100%); color: #211509; font-size: clamp(1.2rem, 2vw, 1.75rem); font-weight: 600; cursor: pointer; box-shadow: inset 2px 2px 2px rgba(255,249,217,.65), inset -4px -5px 7px rgba(78,42,9,.42), 0 5px 0 #5a380e, 0 9px 16px rgba(0,0,0,.34); transition: transform .12s ease, filter .12s ease, box-shadow .12s ease; }
+.greek-cube::after { content: ''; position: absolute; inset: 4px; border: 1px solid rgba(255,243,198,.35); border-radius: 4px; pointer-events: none; }
+.greek-cube:hover { filter: brightness(1.1); transform: translateY(-2px); box-shadow: inset 2px 2px 2px rgba(255,249,217,.7), inset -4px -5px 7px rgba(78,42,9,.38), 0 7px 0 #5a380e, 0 12px 20px rgba(0,0,0,.38); }
+.greek-cube:active { transform: translateY(4px); box-shadow: inset 2px 2px 5px rgba(78,42,9,.3), inset -2px -2px 4px rgba(255,249,217,.38), 0 1px 0 #5a380e, 0 4px 8px rgba(0,0,0,.3); }
+.greek-keyboard__controls { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: .5rem; margin-top: 1.35rem; }
+.greek-keyboard__controls button { min-height: 38px; padding: .45rem .75rem; border: 1px solid rgba(198,161,91,.34); border-radius: 999px; background: transparent; color: var(--gold-bright); font-family: var(--mono); font-size: .52rem; letter-spacing: .09em; text-transform: uppercase; cursor: pointer; }
+.greek-keyboard__controls button:hover { border-color: var(--gold-bright); background: rgba(198,161,91,.08); }
 .diary-intro { margin-left: clamp(0rem, 7vw, 7rem); }
 .board-filter { display: flex; flex-wrap: wrap; justify-content: center; gap: .45rem; margin: clamp(2rem, 4vw, 3.5rem) 0 1.2rem; }
 .board-filter button { min-height: 42px; padding: .55rem .9rem; border: 1px solid rgba(169,201,232,.18); border-radius: 999px; background: transparent; color: var(--muted); font-family: var(--mono); font-size: .58rem; letter-spacing: .08em; text-transform: uppercase; cursor: pointer; }
@@ -190,6 +207,7 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .photo-studio, .library-room { grid-template-columns: minmax(0, 1fr); }
   .photo-tools { max-width: 540px; width: 100%; margin-inline: auto; }
   .book-note { max-width: 560px; width: 100%; margin-inline: auto; }
+  .greek-cubes { grid-template-columns: repeat(8, minmax(44px, 1fr)); }
 }
 
 @media (max-width: 680px) {
@@ -209,6 +227,13 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .hero__invitation { right: .9rem; bottom: 1rem; max-width: 8rem; text-align: right; line-height: 1.5; }
   .realm { padding-inline: 1rem; }
   .realm-header { min-height: 68px; }
+  .realm--diary .realm-header > p { display: none; }
+  .realm--diary .realm-header__actions { width: 100%; justify-content: space-between; }
+  .greek-key-button { padding-inline: .55rem; }
+  .greek-key-button span { display: none; }
+  .greek-keyboard { margin-top: .8rem; padding: 1rem; }
+  .greek-cubes { grid-template-columns: repeat(6, minmax(38px, 1fr)); gap: .55rem; }
+  .greek-cube { font-size: 1.3rem; }
   .realm-intro { margin-top: 3rem; }
   .realm-intro h1 { font-size: clamp(3.4rem, 18vw, 5.2rem); }
   .diary-intro { margin-left: 0; }

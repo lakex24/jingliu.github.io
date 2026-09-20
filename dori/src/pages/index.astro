@@ -72,6 +72,15 @@ const pinterestQuotes = [
     pin: '453808099976882248'
   }
 ];
+
+const greekLetters = [
+  ['Α', 'Alpha'], ['Β', 'Beta'], ['Γ', 'Gamma'], ['Δ', 'Delta'],
+  ['Ε', 'Epsilon'], ['Ζ', 'Zeta'], ['Η', 'Eta'], ['Θ', 'Theta'],
+  ['Ι', 'Iota'], ['Κ', 'Kappa'], ['Λ', 'Lambda'], ['Μ', 'Mu'],
+  ['Ν', 'Nu'], ['Ξ', 'Xi'], ['Ο', 'Omicron'], ['Π', 'Pi'],
+  ['Ρ', 'Rho'], ['Σ', 'Sigma'], ['Τ', 'Tau'], ['Υ', 'Upsilon'],
+  ['Φ', 'Phi'], ['Χ', 'Chi'], ['Ψ', 'Psi'], ['Ω', 'Omega']
+];
 ---
 <!doctype html>
 <html lang="en">
@@ -132,11 +141,40 @@ const pinterestQuotes = [
 
       <section class="realm realm--diary is-dreamscape" id="diary" data-realm="diary" aria-labelledby="diary-title" hidden>
         <header class="realm-header">
-          <button class="home-button" type="button" data-home aria-label="Return to the sphinx">
-            <span aria-hidden="true">✦</span> Dori
-          </button>
+          <div class="realm-header__actions">
+            <button class="home-button" type="button" data-home aria-label="Return to the sphinx">
+              <span aria-hidden="true">✦</span> Dori
+            </button>
+            <button class="greek-key-button" id="greek-key-button" type="button" aria-expanded="false" aria-controls="greek-keyboard">
+              <svg aria-hidden="true" viewBox="0 0 42 22">
+                <circle cx="10" cy="11" r="6.5"></circle>
+                <path d="M16.5 11H38M29 11v5M35 11v3"></path>
+              </svg>
+              <span>Greek key</span>
+            </button>
+          </div>
           <p>01 · Diary</p>
         </header>
+
+        <section class="greek-keyboard" id="greek-keyboard" aria-label="Greek letter keyboard" hidden>
+          <div class="greek-keyboard__display">
+            <span>Your secret Greek line</span>
+            <output id="greek-output" class="is-empty" aria-label="Greek message" aria-live="polite"></output>
+          </div>
+          <div class="greek-cubes" role="group" aria-label="Greek letters">
+            {greekLetters.map(([letter, name]) => (
+              <button class="greek-cube" type="button" data-greek-letter={letter} aria-label={`${name}, ${letter}`}>
+                <span>{letter}</span>
+              </button>
+            ))}
+          </div>
+          <div class="greek-keyboard__controls">
+            <button type="button" data-greek-action="space">Space</button>
+            <button type="button" data-greek-action="backspace">Backspace</button>
+            <button type="button" data-greek-action="clear">Clear</button>
+            <button type="button" data-greek-action="close">Close</button>
+          </div>
+        </section>
 
         <div class="realm-intro diary-intro">
           <p class="kicker">Words worth keeping</p>
@@ -331,6 +369,46 @@ const pinterestQuotes = [
 
       const initialRealm = location.hash.slice(1);
       if (['diary', 'photo', 'library'].includes(initialRealm)) openRealm(initialRealm, false);
+
+      const greekKeyButton = document.getElementById('greek-key-button');
+      const greekKeyboard = document.getElementById('greek-keyboard');
+      const greekOutput = document.getElementById('greek-output');
+      const greekLineKey = 'dori-greek-line';
+      let greekLine = localStorage.getItem(greekLineKey) || '';
+
+      function renderGreekLine() {
+        greekOutput.textContent = greekLine;
+        greekOutput.classList.toggle('is-empty', !greekLine);
+      }
+
+      function saveGreekLine(nextLine) {
+        greekLine = Array.from(nextLine).slice(0, 48).join('');
+        localStorage.setItem(greekLineKey, greekLine);
+        renderGreekLine();
+      }
+
+      function setGreekKeyboard(open) {
+        greekKeyboard.hidden = !open;
+        greekKeyButton.classList.toggle('is-active', open);
+        greekKeyButton.setAttribute('aria-expanded', String(open));
+      }
+
+      greekKeyButton.addEventListener('click', () => setGreekKeyboard(greekKeyboard.hidden));
+      document.querySelectorAll('[data-greek-letter]').forEach((button) => {
+        button.addEventListener('click', () => saveGreekLine(greekLine + button.dataset.greekLetter));
+      });
+      document.querySelector('[data-greek-action="space"]').addEventListener('click', () => {
+        if (greekLine && !greekLine.endsWith(' ')) saveGreekLine(`${greekLine} `);
+      });
+      document.querySelector('[data-greek-action="backspace"]').addEventListener('click', () => {
+        saveGreekLine(Array.from(greekLine).slice(0, -1).join(''));
+      });
+      document.querySelector('[data-greek-action="clear"]').addEventListener('click', () => saveGreekLine(''));
+      document.querySelector('[data-greek-action="close"]').addEventListener('click', () => {
+        setGreekKeyboard(false);
+        greekKeyButton.focus();
+      });
+      renderGreekLine();
 
       const boardButtons = [...document.querySelectorAll('[data-board]')];
       boardButtons.forEach((button) => button.addEventListener('click', () => {
