@@ -1188,7 +1188,26 @@ const greekLetters = [
         girl: '/mythmaker/mortal-girl-realistic-v1.png',
         boy: '/mythmaker/mortal-boy-realistic-v1.png'
       };
+      const mythBackgroundSources = {
+        'moon-stars': '/mythmaker/backgrounds/moon-stars-realistic-v2.png',
+        'sun-stars': '/mythmaker/backgrounds/sun-stars-realistic-v2.png',
+        'moon-sea': '/mythmaker/backgrounds/moon-sea-realistic-v2.png',
+        'sun-sea': '/mythmaker/backgrounds/sun-sea-realistic-v2.png'
+      };
+      const mythAccessorySources = {
+        wings: '/mythmaker/accessories/wings-realistic-v2.png',
+        horns: '/mythmaker/accessories/horns-realistic-v2.png',
+        crown: '/mythmaker/accessories/crown-realistic-v2.png',
+        thunderbolt: '/mythmaker/accessories/thunderbolt-realistic-v2.png',
+        helm: '/mythmaker/accessories/helm-realistic-v2.png',
+        cloak: '/mythmaker/accessories/cloak-realistic-v2.png',
+        bow: '/mythmaker/accessories/bow-realistic-v2.png',
+        sandals: '/mythmaker/accessories/sandals-realistic-v2.png',
+        shield: '/mythmaker/accessories/shield-realistic-v2.png'
+      };
       const mythPortraitImages = {};
+      const mythBackgroundImages = {};
+      const mythAccessoryImages = {};
 
       const mythNames = {
         creature: {
@@ -1335,6 +1354,13 @@ const greekLetters = [
             loadMythPortrait(button.dataset.mythAnswer).catch(() => {});
           }
           mythAnswers[question.dataset.mythQuestion] = button.dataset.mythAnswer;
+          if (question.dataset.mythQuestion === 'gift') {
+            loadMythImage(mythAccessoryImages, button.dataset.mythAnswer, mythAccessorySources[button.dataset.mythAnswer]).catch(() => {});
+          }
+          if (mythAnswers.light && mythAnswers.realm) {
+            const backgroundKey = `${mythAnswers.light}-${mythAnswers.realm}`;
+            loadMythImage(mythBackgroundImages, backgroundKey, mythBackgroundSources[backgroundKey]).catch(() => {});
+          }
           question.querySelectorAll('[data-myth-answer]').forEach((choice) => {
             const active = choice === button;
             choice.classList.toggle('is-selected', active);
@@ -1356,21 +1382,47 @@ const greekLetters = [
         }
       }
 
-      function loadMythPortrait(form) {
-        let image = mythPortraitImages[form];
+      function loadMythImage(cache, key, source) {
+        let image = cache[key];
         if (!image) {
           image = new Image();
           image.decoding = 'async';
-          image.src = mythPortraitSources[form];
-          mythPortraitImages[form] = image;
+          image.src = source;
+          cache[key] = image;
         }
         if (image.complete) {
-          return image.naturalWidth ? Promise.resolve(image) : Promise.reject(new Error(`Could not load ${form} portrait.`));
+          return image.naturalWidth ? Promise.resolve(image) : Promise.reject(new Error(`Could not load ${key} image.`));
         }
         return new Promise((resolve, reject) => {
           image.addEventListener('load', () => resolve(image), { once: true });
-          image.addEventListener('error', () => reject(new Error(`Could not load ${form} portrait.`)), { once: true });
+          image.addEventListener('error', () => reject(new Error(`Could not load ${key} image.`)), { once: true });
         });
+      }
+
+      function loadMythPortrait(form) {
+        return loadMythImage(mythPortraitImages, form, mythPortraitSources[form]);
+      }
+
+      function drawMythCover(image, width, height) {
+        const scale = Math.max(width / image.naturalWidth, height / image.naturalHeight);
+        const drawWidth = image.naturalWidth * scale;
+        const drawHeight = image.naturalHeight * scale;
+        mythContext.drawImage(image, (width - drawWidth) / 2, (height - drawHeight) / 2, drawWidth, drawHeight);
+      }
+
+      function drawMythAccessoryImage(image, gift, width, height) {
+        const placements = {
+          horns: { scale: .6, y: 0 },
+          crown: { scale: .45, y: -4 },
+          helm: { scale: .62, y: -40 }
+        };
+        const placement = placements[gift] || { scale: 1, y: 0 };
+        const drawWidth = width * placement.scale;
+        const drawHeight = height * placement.scale;
+        mythContext.save();
+        mythContext.globalAlpha = gift === 'cloak' ? .9 : 1;
+        mythContext.drawImage(image, (width - drawWidth) / 2, placement.y, drawWidth, drawHeight);
+        mythContext.restore();
       }
 
       function drawMythTemple(horizon, lightColor) {
@@ -1687,35 +1739,27 @@ const greekLetters = [
         const height = mythCanvas.height;
         const moonlit = mythAnswers.light === 'moon';
         const lightColor = moonlit ? '#b9d9ff' : '#ffd477';
-        const deepColor = moonlit ? '#17213f' : '#512b19';
-        const portraitImage = await loadMythPortrait(mythAnswers.form);
+        const backgroundKey = `${mythAnswers.light}-${mythAnswers.realm}`;
+        const [portraitImage, backgroundImage, accessoryImage] = await Promise.all([
+          loadMythPortrait(mythAnswers.form),
+          loadMythImage(mythBackgroundImages, backgroundKey, mythBackgroundSources[backgroundKey]),
+          loadMythImage(mythAccessoryImages, mythAnswers.gift, mythAccessorySources[mythAnswers.gift])
+        ]);
 
         mythContext.clearRect(0, 0, width, height);
-        const background = mythContext.createLinearGradient(0, 0, width, height);
-        background.addColorStop(0, deepColor);
-        background.addColorStop(.58, moonlit ? '#261f46' : '#2e1620');
-        background.addColorStop(1, '#05070d');
-        mythContext.fillStyle = background;
+        mythContext.imageSmoothingEnabled = true;
+        mythContext.imageSmoothingQuality = 'high';
+        drawMythCover(backgroundImage, width, height);
+
+        const subjectLight = mythContext.createRadialGradient(450, 390, 60, 450, 390, 430);
+        subjectLight.addColorStop(0, moonlit ? 'rgba(17,24,48,.08)' : 'rgba(63,35,22,.05)');
+        subjectLight.addColorStop(.62, 'rgba(4,7,16,.13)');
+        subjectLight.addColorStop(1, 'rgba(2,4,11,.34)');
+        mythContext.fillStyle = subjectLight;
         mythContext.fillRect(0, 0, width, height);
-
-        const aura = mythContext.createRadialGradient(450, 325, 10, 450, 325, 330);
-        aura.addColorStop(0, `${lightColor}72`);
-        aura.addColorStop(1, `${lightColor}00`);
-        mythContext.fillStyle = aura;
-        mythContext.fillRect(0, 0, width, height);
-
-        if (mythAnswers.realm === 'stars') drawMythStarRealm(seed, lightColor, moonlit);
-        else drawMythSeaRealm(seed, lightColor, moonlit);
-
-        mythContext.lineWidth = 4;
-        mythContext.strokeStyle = `${lightColor}82`;
-        mythContext.beginPath();
-        mythContext.arc(450, 340, 268, 0, Math.PI * 2);
-        mythContext.stroke();
 
         if (mythAnswers.gift === 'wings') {
-          drawMythWing(1, lightColor);
-          drawMythWing(-1, lightColor);
+          drawMythAccessoryImage(accessoryImage, mythAnswers.gift, width, height);
         }
 
         const maximumPortraitWidth = width * .98;
@@ -1736,7 +1780,9 @@ const greekLetters = [
         mythContext.fillStyle = portraitTint;
         mythContext.fillRect(0, 0, width, height);
 
-        drawMythAccessory(mythAnswers.gift, lightColor);
+        if (mythAnswers.gift !== 'wings') {
+          drawMythAccessoryImage(accessoryImage, mythAnswers.gift, width, height);
+        }
 
         mythContext.textAlign = 'center';
         mythContext.textBaseline = 'middle';
