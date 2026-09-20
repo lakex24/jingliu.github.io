@@ -203,14 +203,6 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .photo-adjustment input[type='range'] { width: 100%; margin: 0; accent-color: var(--gold); cursor: ew-resize; }
 .photo-adjustments button { min-height: 38px; border: 1px solid rgba(198,161,91,.44); background: transparent; color: var(--gold-bright); font-family: var(--mono); font-size: .52rem; letter-spacing: .09em; text-transform: uppercase; cursor: pointer; }
 .photo-adjustments button:hover { border-color: var(--gold-bright); background: rgba(198,161,91,.08); }
-.background-picker { display: grid; gap: .75rem; margin: 0; padding: 1rem; border: 1px solid rgba(169,201,232,.2); background: rgba(7,12,20,.6); }
-.background-picker legend { padding: 0 .35rem; color: var(--gold-bright); font-family: var(--mono); font-size: .58rem; letter-spacing: .1em; text-transform: uppercase; }
-.background-picker__choices { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: .45rem; }
-.background-picker button { min-height: 42px; display: flex; align-items: center; justify-content: center; padding: .5rem .6rem; border: 1px solid rgba(169,201,232,.2); background: transparent; color: var(--muted); font-family: var(--mono); font-size: .5rem; letter-spacing: .07em; text-align: center; text-transform: uppercase; cursor: pointer; }
-.background-picker button:hover, .background-picker button.is-active { border-color: var(--gold); background: rgba(198,161,91,.08); color: var(--gold-bright); }
-.background-picker input { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
-.background-picker__status { min-height: 1.25rem; margin: 0; color: var(--ghost); font-size: .88rem; font-style: italic; line-height: 1.35; }
-.background-picker[aria-busy='true'] .background-picker__choices { opacity: .55; }
 .mood-picker { display: grid; gap: .5rem; margin: 0; padding: 0; border: 0; }
 .mood-picker legend { margin-bottom: .65rem; }
 .mood-picker button { min-height: 48px; display: flex; align-items: center; gap: .75rem; padding: .55rem .7rem; border: 1px solid rgba(169,201,232,.17); background: transparent; color: #aab3c0; text-align: left; cursor: pointer; }
