@@ -72,8 +72,20 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .home-button { min-height: 46px; padding: .5rem .25rem; border: 0; background: transparent; color: var(--gold-bright); font-family: var(--mono); font-size: .72rem; letter-spacing: .2em; text-transform: uppercase; cursor: pointer; }
 .home-button span { margin-right: .5rem; color: var(--ghost); }
 .home-button--icon { width: 46px; display: grid; place-items: center; padding: 0; }
-.home-button--icon span { margin: 0; color: var(--gold-bright); font-family: Georgia, serif; font-size: 2rem; line-height: 1; text-shadow: 0 0 13px rgba(234,211,153,.38); transition: color .2s ease, text-shadow .2s ease, transform .2s ease; }
-.home-button--icon:hover span { color: #ffe6a8; text-shadow: 0 0 20px rgba(234,211,153,.62); transform: translateY(-1px); }
+.home-button--icon span { margin: 0; color: inherit; }
+.home-button--icon > span:not(.house-icon) { color: var(--gold-bright); font-family: Georgia, serif; font-size: 2rem; line-height: 1; text-shadow: 0 0 13px rgba(234,211,153,.38); transition: color .2s ease, text-shadow .2s ease, transform .2s ease; }
+.home-button--icon:hover > span:not(.house-icon) { color: #ffe6a8; text-shadow: 0 0 20px rgba(234,211,153,.62); transform: translateY(-1px); }
+.house-icon { position: relative; width: 35px; height: 35px; display: block; color: var(--gold-bright); filter: drop-shadow(0 0 6px rgba(234,211,153,.35)); transition: color .2s ease, filter .2s ease, transform .2s ease; }
+.house-icon__roof { position: absolute; z-index: 2; top: 4px; left: 7px; width: 23px; height: 23px; border-top: 2px solid currentColor; border-left: 2px solid currentColor; border-radius: 2px 0 0; transform: rotate(45deg); }
+.house-icon__chimney { position: absolute; z-index: 1; top: 4px; right: 5px; width: 6px; height: 11px; border: 1.5px solid currentColor; border-bottom: 0; background: rgba(6,8,13,.85); }
+.house-icon__body { position: absolute; z-index: 3; left: 5px; bottom: 1px; width: 26px; height: 21px; border: 2px solid currentColor; border-top: 0; background: linear-gradient(180deg, rgba(234,211,153,.12), rgba(198,161,91,.03)); }
+.house-icon__body::after { content: ''; position: absolute; left: -4px; right: -4px; bottom: -4px; height: 2px; border-radius: 2px; background: currentColor; box-shadow: 0 2px 8px rgba(234,211,153,.28); }
+.house-icon__door { position: absolute; left: 9px; bottom: 0; width: 7px; height: 12px; border: 1.5px solid currentColor; border-bottom: 0; border-radius: 3px 3px 0 0; }
+.house-icon__door::after { content: ''; position: absolute; top: 5px; right: 1px; width: 1.5px; height: 1.5px; border-radius: 50%; background: currentColor; }
+.house-icon__window { position: absolute; top: 5px; width: 5px; height: 6px; border: 1.25px solid currentColor; background: linear-gradient(90deg, transparent 42%, currentColor 42% 58%, transparent 58%), linear-gradient(transparent 42%, currentColor 42% 58%, transparent 58%); opacity: .9; }
+.house-icon__window--left { left: 2px; }
+.house-icon__window--right { right: 2px; }
+.home-button--icon:hover .house-icon { color: #ffe6a8; filter: drop-shadow(0 0 10px rgba(234,211,153,.65)); transform: translateY(-1px) scale(1.03); }
 .realm-intro { margin-top: clamp(2.5rem, 6vw, 6rem); }
 .kicker { margin: 0 0 1.1rem; color: var(--gold); font-family: var(--mono); font-size: .63rem; letter-spacing: .18em; text-transform: uppercase; }
 .realm-intro h1 { margin: 0; color: var(--ivory); font-size: clamp(3.5rem, 8vw, 7.5rem); font-weight: 400; letter-spacing: -.03em; line-height: .82; text-wrap: balance; }
