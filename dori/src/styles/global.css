@@ -233,9 +233,9 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .book--gold { --book-edge: #28180b; --book-base: #6a431e; --book-light: #946b36; --book-foil: #efd494; }
 .book--black { --book-edge: #060507; --book-base: #17131a; --book-light: #342a37; --book-foil: #c7a359; }
 .book--mist { --book-edge: #273237; --book-base: #718487; --book-light: #a5b2ab; --book-foil: #8a641d; --book-ink: #17150f; }
-.book.medusa-book { --book-edge: #241507; --book-base: #765020; --book-light: #b68942; --book-foil: #f0d18b; --texture-x: 80%; flex-grow: .72; min-width: 48px; height: 290px; cursor: pointer; text-decoration: none; filter: brightness(1.1) saturate(1.05); box-shadow: inset 4px 0 0 rgba(240,209,139,.18), inset 7px 0 9px rgba(255,255,255,.04), inset -4px 0 rgba(255,232,181,.15), inset -13px 0 18px rgba(0,0,0,.35), inset 0 3px 2px rgba(255,255,255,.1), 3px 0 0 rgba(214,189,138,.1), 9px 13px 20px rgba(0,0,0,.58), 0 0 18px rgba(211,164,76,.14); }
-.book.medusa-book:hover, .book.medusa-book:focus-visible { filter: brightness(1.2) saturate(1.08); box-shadow: inset 4px 0 0 rgba(240,209,139,.25), inset -4px 0 rgba(255,232,181,.2), inset -13px 0 18px rgba(0,0,0,.34), 11px 24px 28px rgba(0,0,0,.62), 0 0 0 1px var(--gold-bright), 0 0 25px rgba(211,164,76,.24); }
-.medusa-book__bands { position: absolute; z-index: 2; inset: 15% 13%; border-top: 2px solid rgba(240,209,139,.64); border-bottom: 2px solid rgba(240,209,139,.5); box-shadow: 0 2px rgba(45,24,5,.65), 0 -2px rgba(45,24,5,.52); pointer-events: none; }
+.book.medusa-book { --book-edge: #241507; --book-base: #765020; --book-light: #b68942; --book-foil: #f0d18b; --texture-x: 80%; flex-grow: .72; min-width: 48px; height: 290px; cursor: pointer; text-decoration: none; filter: brightness(.9) saturate(.92); transform: translateY(10px) rotate(.15deg); box-shadow: inset 4px 0 0 rgba(240,209,139,.12), inset 7px 0 9px rgba(255,255,255,.025), inset -4px 0 rgba(255,232,181,.1), inset -13px 0 18px rgba(0,0,0,.4), inset 0 3px 2px rgba(255,255,255,.07), 3px 0 0 rgba(214,189,138,.07), 9px 13px 20px rgba(0,0,0,.58), 0 0 12px rgba(211,164,76,.06); }
+.book.medusa-book:hover, .book.medusa-book:focus-visible { filter: brightness(1) saturate(.98); transform: translateY(-5px) rotate(-.2deg); box-shadow: inset 4px 0 0 rgba(240,209,139,.18), inset -4px 0 rgba(255,232,181,.14), inset -13px 0 18px rgba(0,0,0,.38), 11px 24px 28px rgba(0,0,0,.62), 0 0 0 1px rgba(234,211,153,.7), 0 0 18px rgba(211,164,76,.12); }
+.medusa-book__bands { position: absolute; z-index: 2; inset: 15% 13%; border-top: 2px solid rgba(240,209,139,.42); border-bottom: 2px solid rgba(240,209,139,.34); box-shadow: 0 2px rgba(45,24,5,.65), 0 -2px rgba(45,24,5,.52); pointer-events: none; }
 .book__title { position: relative; z-index: 1; color: var(--book-foil); font-family: "Snell Roundhand", "Segoe Script", "Brush Script MT", cursive; font-size: clamp(1.05rem, 1.9vw, 1.5rem); font-weight: 500; letter-spacing: .015em; line-height: 1.05; text-shadow: 0 1px 2px rgba(0,0,0,.72); }
 .book-note { min-height: 260px; padding: 2rem; border: 1px solid var(--line); background: rgba(198,161,91,.055); }
 .book-note__kicker { margin: 0 0 1rem; color: var(--gold); font-family: var(--mono); font-size: .56rem; letter-spacing: .14em; text-transform: uppercase; }
@@ -303,7 +303,8 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
   .book:nth-of-type(4) { height: 236px; }
   .book:nth-of-type(5) { height: 218px; }
   .book:nth-of-type(6) { height: 200px; }
-  .book.medusa-book { min-width: 28px; height: 184px; }
+  .book.medusa-book { min-width: 28px; height: 184px; transform: translateY(7px) rotate(.15deg); }
+  .book.medusa-book:hover, .book.medusa-book:focus-visible { transform: translateY(-3px) rotate(-.2deg); }
   .book__title { font-size: .88rem; }
 }
 
