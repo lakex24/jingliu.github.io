@@ -92,6 +92,7 @@ const pinterestQuotes = [
     <meta name="twitter:description" content="Favorite words, cinematic photos, and beloved books." />
     <meta name="twitter:image" content="https://dori-homepage.mind-pixels.com/og.png" />
     <link rel="preload" href="/sphinx-hero.webp" as="image" type="image/webp" />
+    <link rel="preload" href="/library-shelf-realistic-v1.webp" as="image" type="image/webp" />
     <link rel="icon" href="data:," />
   </head>
   <body>
@@ -129,7 +130,7 @@ const pinterestQuotes = [
         <p class="hero__invitation">Choose a corner to begin</p>
       </section>
 
-      <section class="realm realm--diary" id="diary" data-realm="diary" aria-labelledby="diary-title" hidden>
+      <section class="realm realm--diary is-dreamscape" id="diary" data-realm="diary" aria-labelledby="diary-title" hidden>
         <header class="realm-header">
           <button class="home-button" type="button" data-home aria-label="Return to the sphinx">
             <span aria-hidden="true">✦</span> Dori
@@ -253,23 +254,23 @@ const pinterestQuotes = [
 
         <div class="library-room">
           <div class="bookshelf" aria-label="Dori's books">
-            <button class="book book--navy is-selected" type="button" data-book="wild" aria-label="Untitled book · Reading" aria-pressed="true">
-              <span class="book__label">Reading</span><span class="book__title" aria-hidden="true"></span>
+            <button class="book book--navy is-selected" type="button" data-book="wild" aria-label="Untitled book" aria-pressed="true">
+              <span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--gold book--short" type="button" data-book="wrinkle" aria-label="Untitled book · Discuss" aria-pressed="false">
-              <span class="book__label">Discuss</span><span class="book__title" aria-hidden="true"></span>
+            <button class="book book--gold book--short" type="button" data-book="wrinkle" aria-label="Untitled book" aria-pressed="false">
+              <span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--black book--tall" type="button" data-book="moon" aria-label="Untitled book · Favorite" aria-pressed="false">
-              <span class="book__label">Favorite</span><span class="book__title" aria-hidden="true"></span>
+            <button class="book book--black book--tall" type="button" data-book="moon" aria-label="Untitled book" aria-pressed="false">
+              <span class="book__title" aria-hidden="true"></span>
             </button>
             <button class="book book--mist book--short" type="button" data-book="garden" aria-label="Untitled book" aria-pressed="false">
               <span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--navy book--thin" type="button" data-book="reach" aria-label="Untitled book · Wish list" aria-pressed="false">
-              <span class="book__label">Wish list</span><span class="book__title" aria-hidden="true"></span>
+            <button class="book book--navy book--thin" type="button" data-book="reach" aria-label="Untitled book" aria-pressed="false">
+              <span class="book__title" aria-hidden="true"></span>
             </button>
-            <button class="book book--gold" type="button" data-book="anne" aria-label="Untitled book · Next" aria-pressed="false">
-              <span class="book__label">Next</span><span class="book__title" aria-hidden="true"></span>
+            <button class="book book--gold" type="button" data-book="anne" aria-label="Untitled book" aria-pressed="false">
+              <span class="book__title" aria-hidden="true"></span>
             </button>
             <span class="shelf-edge" aria-hidden="true"></span>
           </div>
@@ -342,6 +343,7 @@ const pinterestQuotes = [
         document.querySelectorAll('[data-board-card]').forEach((card) => {
           card.hidden = card.dataset.boardCard !== board;
         });
+        document.querySelector('.realm--diary').classList.toggle('is-dreamscape', board === 'dream');
         document.getElementById('gold-font-switcher').hidden = board !== 'gold';
       }));
 
