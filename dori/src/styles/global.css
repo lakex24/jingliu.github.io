@@ -181,10 +181,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .composer-row button { min-height: 44px; padding: .65rem 1rem; border: 1px solid var(--gold); background: var(--gold); color: var(--night); font-family: var(--mono); font-size: .6rem; letter-spacing: .1em; text-transform: uppercase; cursor: pointer; }
 
 /* Photo */
+.realm--photo { --photo-accent-rgb: 70, 108, 154; }
+.realm--photo::before { background: radial-gradient(circle at 50% 53%, rgba(var(--photo-accent-rgb), .34), transparent 47%), radial-gradient(circle at 82% 15%, rgba(var(--photo-accent-rgb), .2), transparent 32%), radial-gradient(circle at 12% 82%, rgba(198,161,91,.08), transparent 28%); }
 .photo-intro { margin-inline: auto; text-align: center; }
 .photo-intro > p:last-child { margin-inline: auto; }
 .photo-studio { display: grid; grid-template-columns: minmax(360px, 1.45fr) minmax(250px, .55fr); gap: clamp(1.5rem, 4vw, 4rem); align-items: center; max-width: 1120px; margin: clamp(2.5rem, 5vw, 4.5rem) auto 0; }
-.photo-stage { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border: 1px solid var(--line); background: #0e1725; box-shadow: 0 30px 90px rgba(0,0,0,.45); }
+.photo-stage { position: relative; aspect-ratio: 4 / 3; overflow: hidden; border: 1px solid rgba(var(--photo-accent-rgb), .58); background: #0e1725; box-shadow: 0 30px 90px rgba(0,0,0,.45), 0 0 72px rgba(var(--photo-accent-rgb), .22); transition: border-color .35s ease, box-shadow .35s ease; }
 .photo-stage::after { content: ''; position: absolute; inset: 0; z-index: 3; pointer-events: none; background: repeating-linear-gradient(0deg, rgba(255,255,255,.018) 0 1px, transparent 1px 4px), linear-gradient(145deg, rgba(169,201,232,.08), transparent 48%); }
 .photo-stage.is-editing { cursor: grab; touch-action: none; user-select: none; }
 .photo-stage.is-dragging { cursor: grabbing; }

@@ -681,9 +681,14 @@ const greekLetters = [
       const empty = document.getElementById('photo-empty');
       const savePhoto = document.getElementById('save-photo');
       const timestamp = document.getElementById('photo-timestamp');
+      const photoRealm = document.getElementById('photo');
       const photoStage = document.getElementById('photo-stage');
       const photoAdjustments = document.getElementById('photo-adjustments');
       const photoControls = [...document.querySelectorAll('[data-photo-adjust]')];
+      const ambienceCanvas = document.createElement('canvas');
+      ambienceCanvas.width = 36;
+      ambienceCanvas.height = 36;
+      const ambienceContext = ambienceCanvas.getContext('2d', { willReadFrequently: true });
       let sourceImage = null;
       let mood = 'blue';
       let photoSettings = { zoom: 1, x: 0, y: 0, brightness: 1, contrast: 1 };
@@ -699,6 +704,38 @@ const greekLetters = [
         retro: { filter: 'sepia(.5) saturate(.85) contrast(1.08) brightness(.94)', caption: 'RETRO REEL · 1997', color: 'rgba(182, 108, 50, .15)' },
         frost: { filter: 'saturate(.62) hue-rotate(168deg) contrast(1.04) brightness(1.08)', caption: 'ICY MOON · 02:26', color: 'rgba(118, 204, 235, .17)' }
       };
+
+      function matchBackgroundToSubject() {
+        ambienceContext.clearRect(0, 0, 36, 36);
+        ambienceContext.drawImage(canvas, 0, 0, 36, 36);
+        const pixels = ambienceContext.getImageData(8, 5, 20, 27).data;
+        let red = 0;
+        let green = 0;
+        let blue = 0;
+        let totalWeight = 0;
+
+        for (let index = 0; index < pixels.length; index += 4) {
+          const r = pixels[index];
+          const g = pixels[index + 1];
+          const b = pixels[index + 2];
+          const brightest = Math.max(r, g, b);
+          const darkest = Math.min(r, g, b);
+          const lightness = (brightest + darkest) / 510;
+          if (lightness < .04 || lightness > .97) continue;
+          const colorfulness = (brightest - darkest) / 255;
+          const weight = .55 + colorfulness * 1.7;
+          red += r * weight;
+          green += g * weight;
+          blue += b * weight;
+          totalWeight += weight;
+        }
+
+        if (!totalWeight) return;
+        const sampled = [red, green, blue].map((channel) => channel / totalWeight);
+        const average = (sampled[0] + sampled[1] + sampled[2]) / 3;
+        const accent = sampled.map((channel) => Math.round(Math.max(18, Math.min(238, average + (channel - average) * 1.28))));
+        photoRealm.style.setProperty('--photo-accent-rgb', accent.join(', '));
+      }
 
       function renderPhoto() {
         if (!sourceImage) return;
@@ -733,6 +770,7 @@ const greekLetters = [
         context.fillStyle = wash;
         context.fillRect(0, 0, width, height);
         timestamp.textContent = moods[mood].caption;
+        matchBackgroundToSubject();
       }
 
       function syncPhotoControls() {
