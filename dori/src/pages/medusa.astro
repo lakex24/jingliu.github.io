@@ -64,10 +64,10 @@ import '@fontsource/ibm-plex-mono/400.css';
       const eyePortals = [...document.querySelectorAll('.eye-portal')];
       const status = document.getElementById('medusa-status');
       const stories = [
-        { name: 'Orpheus and Eurydice', src: '/eye-tragedy-orpheus-face-v2.webp', letter: [78, 34] },
-        { name: 'Antigone at Thebes', src: '/eye-tragedy-antigone-face-v2.webp', letter: [78, 34] },
-        { name: 'Cassandra at Troy', src: '/eye-tragedy-cassandra-face-v2.webp', letter: [78, 30] },
-        { name: 'Niobe at the mountain shrine', src: '/eye-tragedy-niobe-face-v2.webp', letter: [82, 32] }
+        { name: 'Orpheus and Eurydice', src: '/eye-tragedy-orpheus-face-v3.webp', letter: [72, 45] },
+        { name: 'Antigone at Thebes', src: '/eye-tragedy-antigone-face-v3.webp', letter: [72, 45] },
+        { name: 'Cassandra at Troy', src: '/eye-tragedy-cassandra-face-v3.webp', letter: [72, 43] },
+        { name: 'Niobe at the mountain shrine', src: '/eye-tragedy-niobe-face-v3.webp', letter: [74, 44] }
       ];
       const otherLetters = ['Α', 'Β', 'Γ', 'Λ', 'Ω', 'Σ', 'Θ', 'Κ'];
 
@@ -122,8 +122,8 @@ import '@fontsource/ibm-plex-mono/400.css';
         if (image instanceof HTMLImageElement) image.src = story.src;
         if (letter) {
           letter.textContent = greekLetter;
-          letter.style.setProperty('--letter-x', `${story.letter[0] + randomIndex(7) - 3}%`);
-          letter.style.setProperty('--letter-y', `${story.letter[1] + randomIndex(7) - 3}%`);
+          letter.style.setProperty('--letter-x', `${story.letter[0] + randomIndex(5) - 2}%`);
+          letter.style.setProperty('--letter-y', `${story.letter[1] + randomIndex(5) - 2}%`);
           letter.style.setProperty('--letter-turn', `${randomIndex(11) - 5}deg`);
         }
         portal.dataset.correct = String(isDelta);
@@ -177,7 +177,7 @@ import '@fontsource/ibm-plex-mono/400.css';
   .medusa-awaken:disabled { pointer-events: none; }
   .medusa-awaken:focus-visible { outline: 2px solid var(--medusa-ghost); outline-offset: -12px; border-radius: 48%; }
 
-  .eye-portal { position: absolute; z-index: 3; top: 39.05%; width: 5.7%; height: 4%; padding: 0; overflow: hidden; border: 0; background: #071019; box-shadow: 0 0 8px rgba(195,221,239,.28), inset 0 0 8px rgba(0,0,0,.58); cursor: pointer; clip-path: polygon(0 52%, 10% 39%, 27% 27%, 49% 22%, 70% 29%, 88% 40%, 100% 52%, 88% 64%, 69% 72%, 48% 77%, 27% 71%, 10% 63%); opacity: 0; pointer-events: none; transition: opacity .42s ease .18s, box-shadow .22s ease, filter .22s ease, transform .42s ease .18s; }
+  .eye-portal { position: absolute; z-index: 3; top: 39.05%; width: 5.35%; height: 4.45%; padding: 0; overflow: hidden; border: 0; background: #071019; box-shadow: 0 0 8px rgba(195,221,239,.28), inset 0 0 8px rgba(0,0,0,.58); cursor: pointer; clip-path: polygon(0 52%, 10% 34%, 28% 16%, 50% 8%, 72% 16%, 90% 34%, 100% 52%, 90% 68%, 72% 84%, 50% 92%, 28% 84%, 10% 68%); opacity: 0; pointer-events: none; transition: opacity .42s ease .18s, box-shadow .22s ease, filter .22s ease, transform .42s ease .18s; }
   .eye-portal--left { left: 48.1%; transform: translate(-50%, -50%) rotate(1deg) scaleY(.06); }
   .eye-portal--right { left: 57.05%; transform: translate(-50%, -50%) rotate(-1deg) scaleY(.06); }
   .medusa-chamber.is-awake .eye-portal { opacity: 1; pointer-events: auto; }
