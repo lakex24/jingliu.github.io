@@ -125,6 +125,12 @@ button:focus-visible, a:focus-visible, summary:focus-visible, input:focus-visibl
 .house-icon__window--left { left: 2px; }
 .house-icon__window--right { right: 2px; }
 .home-button--icon:hover .house-icon { color: #ffe6a8; filter: drop-shadow(0 0 10px rgba(234,211,153,.65)); transform: translateY(-1px) scale(1.03); }
+.picture-frame-button { width: 46px; height: 46px; display: grid; place-items: center; color: #cbd5df; text-decoration: none; border-radius: 50%; transition: color .2s ease, background .2s ease, transform .2s ease; }
+.picture-frame-button:hover { color: #f3f7fb; background: rgba(205,220,233,.07); transform: translateY(-1px); }
+.picture-frame-button:focus-visible { outline: 2px solid #dce7f0; outline-offset: 3px; }
+.picture-frame-icon { position: relative; width: 31px; height: 27px; display: block; border: 3px ridge currentColor; border-radius: 2px; background: linear-gradient(145deg, rgba(235,243,249,.14), rgba(91,111,130,.04)); box-shadow: inset 0 0 0 2px rgba(3,6,10,.86), 0 0 10px rgba(183,210,232,.26); }
+.picture-frame-icon::before { content: ''; position: absolute; inset: 4px; border: 1px solid rgba(224,235,244,.68); background: radial-gradient(circle at 72% 30%, #e8f2f9 0 1.5px, transparent 2px), linear-gradient(145deg, transparent 45%, rgba(190,211,226,.72) 46% 57%, transparent 58%), linear-gradient(35deg, transparent 42%, rgba(126,158,183,.72) 43% 60%, transparent 61%); box-shadow: inset 0 0 7px rgba(150,188,218,.18); }
+.picture-frame-icon::after { content: ''; position: absolute; top: -7px; left: 50%; width: 7px; height: 7px; border-top: 1.5px solid currentColor; border-left: 1.5px solid currentColor; transform: translateX(-50%) rotate(45deg); opacity: .82; }
 .realm-intro { margin-top: clamp(2.5rem, 6vw, 6rem); }
 .kicker { margin: 0 0 1.1rem; color: var(--gold); font-family: var(--mono); font-size: .63rem; letter-spacing: .18em; text-transform: uppercase; }
 .realm-intro h1 { margin: 0; color: var(--ivory); font-size: clamp(3.5rem, 8vw, 7.5rem); font-weight: 400; letter-spacing: -.03em; line-height: .82; text-wrap: balance; }

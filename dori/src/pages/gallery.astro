@@ -1,0 +1,38 @@
+---
+import '@fontsource-variable/cormorant/wght.css';
+import '@fontsource/ibm-plex-mono/400.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width" />
+    <title>Picture Frame — Dori</title>
+    <meta name="description" content="Dori’s picture frame page." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#05080d" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <main class="blank-gallery" aria-label="Picture frame page">
+      <a class="gallery-back" href="/" aria-label="Return to the home page">
+        <span aria-hidden="true">←</span>
+        <span>Back home</span>
+      </a>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root { color-scheme: dark; }
+  * { box-sizing: border-box; }
+  html, body { min-width: 320px; min-height: 100%; margin: 0; }
+  body { background: #05080d; color: #dce7f0; font-family: 'Cormorant Variable', Georgia, serif; }
+  .blank-gallery { position: relative; min-height: 100svh; overflow: hidden; background: radial-gradient(circle at 78% 12%, rgba(79,112,144,.12), transparent 30%), linear-gradient(150deg, #080c13, #030508 72%); }
+  .blank-gallery::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .12; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.8' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.22'/%3E%3C/svg%3E"); }
+  .gallery-back { position: absolute; z-index: 1; top: clamp(1.2rem, 3vw, 2.4rem); left: clamp(1.2rem, 4vw, 3.5rem); min-height: 46px; display: inline-flex; align-items: center; gap: .65rem; padding: .65rem .9rem; border: 1px solid rgba(207,220,232,.38); color: #dce7f0; background: rgba(5,8,13,.38); font-family: 'IBM Plex Mono', monospace; font-size: .64rem; letter-spacing: .13em; text-decoration: none; text-transform: uppercase; box-shadow: inset 0 0 0 1px rgba(255,255,255,.03), 0 0 18px rgba(167,202,230,.08); backdrop-filter: blur(8px); transition: border-color .2s ease, color .2s ease, background .2s ease, transform .2s ease; }
+  .gallery-back > span:first-child { font-family: Georgia, serif; font-size: 1.45rem; line-height: .7; }
+  .gallery-back:hover { border-color: rgba(231,240,247,.72); color: #fff; background: rgba(170,197,218,.08); transform: translateX(-2px); }
+  .gallery-back:focus-visible { outline: 2px solid #dce7f0; outline-offset: 4px; }
+</style>
