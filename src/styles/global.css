@@ -130,7 +130,7 @@ p { margin: 0 0 1.1em; }
 /* Highlighted phrase (==text== / <mark>): accent colour, teal underline, a little air around it. */
 .prose mark, mark {
   background: none; color: var(--violet-deep); font-weight: 500;
-  text-decoration: underline dotted; text-decoration-color: var(--magenta); text-decoration-thickness: 2px; text-underline-offset: 0.34em;
+  text-decoration: underline dotted; text-decoration-color: #e0b84a; text-decoration-thickness: 1px; text-underline-offset: 0.34em;
   margin-inline: 0.22em;
 }
 :lang(zh) .prose { line-height: 1.95; letter-spacing: 0.01em; }
