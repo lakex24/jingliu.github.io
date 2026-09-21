@@ -8,5 +8,5 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   build: { format: 'directory' },
-  integrations: [sitemap({ filter: (page) => !page.includes('/magic/') })],
+  integrations: [sitemap({ filter: (page) => !page.includes('/magic/') && !page.includes('/preview/') })],
 });

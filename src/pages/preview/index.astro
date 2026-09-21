@@ -1,0 +1,46 @@
+---
+import Base from '../../layouts/Base.astro';
+// Live preview target for the notes editor (supercompose). The editor embeds
+// this page in an iframe and posts { title, description, date, lang, body }
+// messages; the page renders them with the exact article layout and styles.
+// Hidden: noindex, excluded from the sitemap, nothing without a message.
+---
+<Base title="Preview" description="Article preview." section="/startups/" heading="Notes for founders" headingHref="/startups/#notes" noindex>
+  <article id="preview" hidden>
+    <header class="article-head">
+      <span class="mono" id="p-date"></span>
+      <h1 id="p-title"></h1>
+    </header>
+    <div class="prose" id="p-body"></div>
+    <nav class="article-nav" aria-label="Notes">
+      <span class="button" aria-hidden="true">← All notes</span>
+    </nav>
+  </article>
+  <p class="note" id="p-waiting">Waiting for the editor…</p>
+</Base>
+
+<script>
+  import { marked } from 'marked';
+  // Editors allowed to drive this page.
+  const ALLOWED = new Set(['https://supercompose.mind-pixels.com', 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:6689']);
+  const fmt = (date: string, lang: string) => {
+    const d = new Date(date + 'T00:00:00Z');
+    return isNaN(d.valueOf()) ? '' : d.toLocaleDateString(lang === 'zh' ? 'zh-CN' : 'en-US', { year: 'numeric', month: 'long', timeZone: 'UTC' });
+  };
+  const render = (m: any) => {
+    const art = document.getElementById('preview')!;
+    (document.getElementById('p-title')!).textContent = m.title || '';
+    (document.getElementById('p-date')!).textContent = fmt(m.date || '', m.lang || 'zh');
+    (document.getElementById('p-body')!).innerHTML = marked.parse(m.body || '', { async: false }) as string;
+    art.setAttribute('lang', m.lang || 'zh');
+    document.documentElement.lang = m.lang || 'zh';
+    art.hidden = false;
+    (document.getElementById('p-waiting')!).hidden = true;
+  };
+  window.addEventListener('message', (e) => {
+    if (!ALLOWED.has(e.origin)) return;
+    if (e.data && e.data.type === 'article-preview') render(e.data.article);
+  });
+  // Tell the parent we are ready so it can send the current draft.
+  if (window.parent !== window) window.parent.postMessage({ type: 'article-preview-ready' }, '*');
+</script>
