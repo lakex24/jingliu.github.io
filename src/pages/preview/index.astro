@@ -18,6 +18,13 @@ import Base from '../../layouts/Base.astro';
 
 <script>
   import { marked } from 'marked';
+  // `==text==` → <mark> (Cmd+U highlight in the compose editor).
+  marked.use({ extensions: [{
+    name: 'mark', level: 'inline',
+    start: (src: string) => src.indexOf('=='),
+    tokenizer(src: string) { const m = /^==([^=\n]+?)==/.exec(src); if (m) return { type: 'mark', raw: m[0], text: m[1] }; return undefined; },
+    renderer(token: any) { return `<mark>${token.text.replace(/&/g, '&amp;').replace(/</g, '&lt;')}</mark>`; },
+  }] });
   // Editors allowed to drive this page.
   const ALLOWED = new Set(['https://supercompose.mind-pixels.com', 'http://localhost:5173', 'http://127.0.0.1:5173', 'http://localhost:6689']);
   const fmt = (date: string, lang: string) => {

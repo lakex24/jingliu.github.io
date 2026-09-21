@@ -127,6 +127,12 @@ p { margin: 0 0 1.1em; }
 .prose hr { border: 0; border-top: 1px solid var(--line); margin: 2.5rem 0; }
 .prose blockquote { margin: 1.5rem 0; padding-left: 1rem; border-left: 2px solid var(--violet); color: var(--ink-soft); }
 .prose a { overflow-wrap: anywhere; }
+/* Highlighted phrase (==text== / <mark>): accent colour, teal underline, a little air around it. */
+.prose mark, mark {
+  background: none; color: var(--violet-deep); font-weight: 500;
+  text-decoration: underline; text-decoration-color: var(--teal); text-decoration-thickness: 1.5px; text-underline-offset: 0.2em;
+  margin-inline: 0.22em;
+}
 :lang(zh) .prose { line-height: 1.95; letter-spacing: 0.01em; }
 
 /* ---- Masthead ---- */
