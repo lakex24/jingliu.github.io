@@ -31,7 +31,7 @@ import Base from '../../layouts/Base.astro';
     const art = document.getElementById('preview')!;
     (document.getElementById('p-title')!).textContent = m.title || '';
     (document.getElementById('p-date')!).textContent = fmt(m.date || '', m.lang || 'zh');
-    (document.getElementById('p-body')!).innerHTML = marked.parse(m.body || '', { async: false }) as string;
+    (document.getElementById('p-body')!).innerHTML = marked.parse(m.body || '', { async: false, gfm: true, breaks: true }) as string;
     art.setAttribute('lang', m.lang || 'zh');
     document.documentElement.lang = m.lang || 'zh';
     art.hidden = false;
