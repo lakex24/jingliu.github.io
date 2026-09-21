@@ -1,6 +1,6 @@
 ---
 title: "为什么要创业 ？—— 利他"
-description: "这是一个非常个人的问题。"
+description: "To be or not to be?"
 date: 2026-09-21
 lang: zh
 order: 0
