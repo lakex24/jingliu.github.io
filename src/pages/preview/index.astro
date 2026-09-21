@@ -5,16 +5,13 @@ import Base from '../../layouts/Base.astro';
 // messages; the page renders them with the exact article layout and styles.
 // Hidden: noindex, excluded from the sitemap, nothing without a message.
 ---
-<Base title="Preview" description="Article preview." section="/startups/" heading="Notes for founders" headingHref="/startups/#notes" noindex>
+<Base title="Preview" description="Article preview." section="/startups/" noindex bare>
   <article id="preview" hidden>
     <header class="article-head">
       <span class="mono" id="p-date"></span>
       <h1 id="p-title"></h1>
     </header>
     <div class="prose" id="p-body"></div>
-    <nav class="article-nav" aria-label="Notes">
-      <span class="button" aria-hidden="true">← All notes</span>
-    </nav>
   </article>
   <p class="note" id="p-waiting">Waiting for the editor…</p>
 </Base>

@@ -32,8 +32,10 @@ interface Props {
   noindex?: boolean;
   /** Colour theme for this page; 'dark' switches the tokens (see global.css). */
   theme?: 'light' | 'dark';
+  /** Article only: no header, nav, title block or footer (used by /preview/). */
+  bare?: boolean;
 }
-const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage, noindex = false, theme = 'light' } = Astro.props;
+const { title, description = site.description, section, home = false, heading, headingHref, lang = 'en', ogImage, noindex = false, theme = 'light', bare = false } = Astro.props;
 const fullTitle = title ? `${title} — ${site.name}` : site.name;
 const canonical = new URL(Astro.url.pathname, Astro.site);
 ---
@@ -74,7 +76,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
   <body>
     <a class="skip-link" href="#main">Skip to content</a>
     <div class="page">
-      {home ? (
+      {bare ? null : home ? (
         <header class="masthead">
           <h1 class="welcome"><span class="welcome__text">{site.welcome}</span></h1>
           <nav class="nav nav--home" aria-label="Primary">
@@ -110,7 +112,7 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         </header>
       )}
       <main id="main" tabindex="-1">
-        {!home && (
+        {!home && !bare && (
           <div class="page-title">
             {headingHref
               ? <p class="crumb mono"><a href={headingHref}>{heading}</a></p>
@@ -120,14 +122,14 @@ const canonical = new URL(Astro.url.pathname, Astro.site);
         )}
         <slot />
       </main>
-      <footer class:list={['footer', 'mono', { 'footer--home': home || section !== '/career/' }]}>
+      {!bare && <footer class:list={['footer', 'mono', { 'footer--home': home || section !== '/career/' }]}>
         {home
           ? <span class="footer__home">{site.footerLine} <Ministry /> {new Date().getFullYear()}</span>
           : <>
               <span><a href="/">{site.footerLine}</a> · {new Date().getFullYear()}</span>
               {section === '/career/' && <span><a href={site.social.linkedin} rel="me noopener">LinkedIn</a> · <a href={site.social.scholar} rel="me noopener">Scholar</a> · <a href="/rss.xml">RSS</a></span>}
             </>}
-      </footer>
+      </footer>}
     </div>
   </body>
 </html>
