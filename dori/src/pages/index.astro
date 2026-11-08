@@ -1192,7 +1192,7 @@ const greekLetters = [
       const mythContext = mythCanvas.getContext('2d');
       const mythAnswers = {};
       const mythPortraitSources = {
-        creature: '/mythmaker/creature-unisex-anime-v1.png',
+        creature: '/mythmaker/creature-unisex-anime-v2.png',
         god: '/mythmaker/god-anime-v1.png',
         goddess: '/mythmaker/goddess-anime-v1.png',
         girl: '/mythmaker/mortal-girl-anime-v1.png',
@@ -1424,14 +1424,17 @@ const greekLetters = [
         const placements = {
           horns: { scale: .6, y: 0 },
           crown: { scale: .45, y: -4 },
-          helm: { scale: .62, y: -40 }
+          helm: { scale: .62, y: -40 },
+          cloak: { scale: .95, y: 100 },
+          shield: { scale: .55, x: .25, y: 450 }
         };
-        const placement = placements[gift] || { scale: 1, y: 0 };
+        const placement = placements[gift] || { scale: 1, x: 0, y: 0 };
         const drawWidth = width * placement.scale;
         const drawHeight = height * placement.scale;
+        const drawX = (width - drawWidth) / 2 + width * (placement.x || 0);
         mythContext.save();
         mythContext.globalAlpha = gift === 'cloak' ? .9 : 1;
-        mythContext.drawImage(image, (width - drawWidth) / 2, placement.y, drawWidth, drawHeight);
+        mythContext.drawImage(image, drawX, placement.y, drawWidth, drawHeight);
         mythContext.restore();
       }
 
@@ -1768,7 +1771,8 @@ const greekLetters = [
         mythContext.fillStyle = subjectLight;
         mythContext.fillRect(0, 0, width, height);
 
-        if (mythAnswers.gift === 'wings') {
+        const accessoryBehindPortrait = mythAnswers.gift === 'wings' || mythAnswers.gift === 'cloak';
+        if (accessoryBehindPortrait) {
           drawMythAccessoryImage(accessoryImage, mythAnswers.gift, width, height);
         }
 
@@ -1790,7 +1794,7 @@ const greekLetters = [
         mythContext.fillStyle = portraitTint;
         mythContext.fillRect(0, 0, width, height);
 
-        if (mythAnswers.gift !== 'wings') {
+        if (!accessoryBehindPortrait) {
           drawMythAccessoryImage(accessoryImage, mythAnswers.gift, width, height);
         }
 
