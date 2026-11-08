@@ -181,11 +181,15 @@ import '@fontsource/ibm-plex-mono/400.css';
 
         drafts.forEach((draft) => {
           const latest = latestVersion(draft);
-          const card = document.createElement('button');
+          const card = document.createElement('article');
           card.className = 'story-card';
-          card.type = 'button';
           card.dataset.draftId = draft.id;
-          card.setAttribute('aria-label', `Open ${storyLabel(draft)}`);
+
+          const openButton = document.createElement('button');
+          openButton.className = 'story-card__open';
+          openButton.type = 'button';
+          openButton.dataset.openDraftId = draft.id;
+          openButton.setAttribute('aria-label', `Open ${storyLabel(draft)}`);
 
           const preview = document.createElement('span');
           preview.className = 'story-card__preview';
@@ -195,7 +199,15 @@ import '@fontsource/ibm-plex-mono/400.css';
           title.className = 'story-card__title';
           title.textContent = storyLabel(draft);
 
-          card.append(preview, title);
+          const deleteButton = document.createElement('button');
+          deleteButton.className = 'story-card__delete';
+          deleteButton.type = 'button';
+          deleteButton.dataset.deleteDraftId = draft.id;
+          deleteButton.setAttribute('aria-label', `Delete ${storyLabel(draft)}`);
+          deleteButton.textContent = 'Delete draft';
+
+          openButton.append(preview, title);
+          card.append(openButton, deleteButton);
           storyCards.append(card);
         });
       };
@@ -266,9 +278,21 @@ import '@fontsource/ibm-plex-mono/400.css';
 
       addButton?.addEventListener('click', () => openEditor());
       storyCards?.addEventListener('click', (event) => {
-        const card = (event.target as HTMLElement).closest<HTMLButtonElement>('.story-card');
-        if (!card) return;
-        const draft = drafts.find((item) => item.id === card.dataset.draftId);
+        const target = event.target as HTMLElement;
+        const deleteButton = target.closest<HTMLButtonElement>('[data-delete-draft-id]');
+        if (deleteButton) {
+          const draft = drafts.find((item) => item.id === deleteButton.dataset.deleteDraftId);
+          if (!draft) return;
+          if (!window.confirm(`Delete “${storyLabel(draft)}”? This cannot be undone.`)) return;
+          drafts = drafts.filter((item) => item.id !== draft.id);
+          saveCollection();
+          renderCollection();
+          return;
+        }
+
+        const openButton = target.closest<HTMLButtonElement>('[data-open-draft-id]');
+        if (!openButton) return;
+        const draft = drafts.find((item) => item.id === openButton.dataset.openDraftId);
         if (draft) openEditor(draft);
       });
       keepButton?.addEventListener('click', () => saveCurrentWriting(true));
@@ -330,7 +354,7 @@ import '@fontsource/ibm-plex-mono/400.css';
 
   .stories__home { position: absolute; top: clamp(1rem, 3vw, 2.5rem); left: clamp(1rem, 3vw, 2.8rem); display: inline-flex; align-items: center; gap: .7rem; min-height: 44px; padding: .55rem .85rem; border: 1px solid rgba(213,182,111,.46); border-radius: 999px; background: rgba(4,7,11,.5); color: var(--gold-bright); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .61rem; letter-spacing: .15em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
   .stories__home:hover { border-color: var(--gold-bright); box-shadow: 0 0 22px rgba(213,182,111,.2); transform: translateX(-2px); }
-  .stories__home:focus-visible, .story-box__add:focus-visible, .story-card:focus-visible, .story-editor button:focus-visible, .story-editor input:focus-visible, .story-editor textarea:focus-visible { outline: 2px solid var(--ghost); outline-offset: 4px; }
+  .stories__home:focus-visible, .story-box__add:focus-visible, .story-card__open:focus-visible, .story-card__delete:focus-visible, .story-editor button:focus-visible, .story-editor input:focus-visible, .story-editor textarea:focus-visible { outline: 2px solid var(--ghost); outline-offset: 4px; }
 
   .stories__header { position: absolute; top: clamp(1.2rem, 4vw, 2.8rem); left: 50%; width: min(86vw, 720px); text-align: center; transform: translateX(-50%); }
   .stories__header p { margin: 0 0 .7rem; color: rgba(196,220,237,.66); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .58rem; letter-spacing: .19em; text-transform: uppercase; }
@@ -353,14 +377,17 @@ import '@fontsource/ibm-plex-mono/400.css';
   .story-cards { display: none; }
   .stories--has-drafts .story-grid { grid-template-columns: repeat(auto-fit, minmax(300px, 360px)); place-items: stretch; justify-content: start; justify-self: start; gap: clamp(1.2rem, 3vw, 2.3rem); width: min(94vw, 1150px); padding: 1rem 0 3rem; }
   .stories--has-drafts .story-cards { display: contents; }
-  .stories--has-drafts .story-box { width: 100%; height: 220px; min-height: 220px; }
-  .story-card { position: relative; display: grid; height: 220px; min-height: 220px; grid-template-rows: 1fr auto; overflow: hidden; padding: 0; border: 1px solid rgba(213,182,111,.58); background: linear-gradient(145deg, rgba(8,14,22,.9), rgba(3,7,12,.84)); color: #f4eddf; cursor: pointer; box-shadow: 0 24px 60px rgba(0,0,0,.48), inset 0 0 0 7px rgba(213,182,111,.025); text-align: left; backdrop-filter: blur(12px); transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
+  .stories--has-drafts .story-box { width: 100%; height: 260px; min-height: 260px; }
+  .story-card { position: relative; display: grid; height: 260px; min-height: 260px; grid-template-rows: 1fr auto; overflow: hidden; padding: 0; border: 1px solid rgba(213,182,111,.58); background: linear-gradient(145deg, rgba(8,14,22,.9), rgba(3,7,12,.84)); color: #f4eddf; box-shadow: 0 24px 60px rgba(0,0,0,.48), inset 0 0 0 7px rgba(213,182,111,.025); text-align: left; backdrop-filter: blur(12px); transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
   .story-card::before, .story-card::after { content: ''; position: absolute; z-index: 2; width: 26px; height: 26px; pointer-events: none; border-color: rgba(213,182,111,.7); }
   .story-card::before { top: 8px; left: 8px; border-top: 1px solid; border-left: 1px solid; }
   .story-card::after { right: 8px; bottom: 8px; border-right: 1px solid; border-bottom: 1px solid; }
+  .story-card__open { display: grid; min-width: 0; grid-template-rows: 1fr auto; overflow: hidden; padding: 0; border: 0; background: transparent; color: inherit; cursor: pointer; text-align: left; }
   .story-card__preview { position: relative; display: -webkit-box; min-height: 160px; overflow: hidden; padding: 1.7rem 1.8rem 1.2rem; background: radial-gradient(circle at 50% 10%, rgba(196,220,237,.09), transparent 48%), linear-gradient(180deg, rgba(11,21,31,.62), rgba(5,9,15,.28)); color: rgba(244,237,223,.82); font-family: 'Cormorant Variable', Georgia, serif; font-size: 1.15rem; font-style: italic; line-height: 1.4; -webkit-box-orient: vertical; -webkit-line-clamp: 4; }
   .story-card__preview::first-letter { color: var(--gold-bright); font-size: 2.1em; line-height: .8; }
   .story-card__title { position: relative; z-index: 1; display: block; min-height: 59px; padding: .95rem 1.7rem; border-top: 1px solid rgba(213,182,111,.35); background: rgba(2,6,10,.58); color: var(--gold-bright); font-size: 1.35rem; font-weight: 520; line-height: 1.05; text-align: center; }
+  .story-card__delete { position: relative; z-index: 3; min-height: 42px; padding: .62rem 1rem; border: 0; border-top: 1px solid rgba(196,220,237,.16); background: rgba(6,9,15,.82); color: rgba(196,220,237,.72); cursor: pointer; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .52rem; letter-spacing: .13em; text-transform: uppercase; transition: color .2s ease, background .2s ease; }
+  .story-card__delete:hover { background: rgba(111,39,45,.28); color: #ffd5d5; }
   .story-card:hover { border-color: var(--gold-bright); box-shadow: 0 30px 80px rgba(0,0,0,.6), 0 0 30px rgba(213,182,111,.12); transform: translateY(-5px); }
 
   .story-editor { width: min(92vw, 680px); max-height: min(88svh, 760px); padding: 0; border: 1px solid rgba(213,182,111,.76); color: #f4eddf; background: rgba(4,8,13,.94); box-shadow: 0 35px 120px rgba(0,0,0,.84), 0 0 50px rgba(213,182,111,.14); backdrop-filter: blur(18px); }
@@ -396,7 +423,7 @@ import '@fontsource/ibm-plex-mono/400.css';
     .stories__header h1 { font-size: clamp(2.4rem, 12vw, 3.8rem); }
     .story-box { min-height: 200px; }
     .stories--has-drafts .story-grid { grid-template-columns: minmax(0, 340px); width: calc(100vw - 2.5rem); margin-left: 0; }
-    .stories--has-drafts .story-box, .story-card { height: 200px; min-height: 200px; }
+    .stories--has-drafts .story-box, .story-card { height: 240px; min-height: 240px; }
     .story-card__preview { min-height: 140px; }
     .story-editor__page { min-height: 80svh; }
     .story-editor__actions { align-items: stretch; flex-direction: column; }
