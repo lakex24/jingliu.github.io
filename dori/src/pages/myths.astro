@@ -1,0 +1,98 @@
+---
+import '@fontsource-variable/cormorant/wght.css';
+import '@fontsource-variable/cormorant/wght-italic.css';
+import '@fontsource/ibm-plex-mono/400.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Myths and Stories — Dori</title>
+    <meta name="description" content="Dori’s collection of myths and stories." />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="theme-color" content="#05080d" />
+    <link rel="preload" href="/greek-temple-writing-room-v1.webp" as="image" type="image/webp" />
+    <link rel="icon" href="data:," />
+  </head>
+  <body>
+    <main class="stories" aria-labelledby="stories-title">
+      <div class="stories__background" aria-hidden="true"></div>
+      <div class="stories__shade" aria-hidden="true"></div>
+      <div class="stories__grain" aria-hidden="true"></div>
+
+      <a class="stories__home" href="/" aria-label="Return to the home page">
+        <span aria-hidden="true">←</span>
+        <span>Home</span>
+      </a>
+
+      <header class="stories__header">
+        <p>Ancient doors · new worlds</p>
+        <h1 id="stories-title">Myths and Stories</h1>
+      </header>
+
+      <section class="story-box" aria-label="Story collection">
+        <span class="story-box__corner story-box__corner--one" aria-hidden="true"></span>
+        <span class="story-box__corner story-box__corner--two" aria-hidden="true"></span>
+        <span class="story-box__corner story-box__corner--three" aria-hidden="true"></span>
+        <span class="story-box__corner story-box__corner--four" aria-hidden="true"></span>
+        <button class="story-box__add" type="button" aria-label="Add a myth or story" title="Add a myth or story">
+          <span aria-hidden="true">+</span>
+        </button>
+      </section>
+    </main>
+  </body>
+</html>
+
+<style is:global>
+  :root {
+    --night: #05080d;
+    --gold: #d5b66f;
+    --gold-bright: #f0d99d;
+    --ghost: #c4dced;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { min-width: 320px; min-height: 100%; margin: 0; background: var(--night); }
+  body { color: #f4eddf; font-family: 'Cormorant Variable', 'Cormorant Garamond', Georgia, serif; }
+  button, a { -webkit-tap-highlight-color: transparent; }
+
+  .stories { position: relative; isolation: isolate; display: grid; min-height: 100svh; place-items: center; overflow: hidden; padding: clamp(6rem, 10vw, 8rem) 1.25rem 2rem; }
+  .stories__background { position: absolute; z-index: -3; inset: 0; background: url('/greek-temple-writing-room-v1.webp') center / cover no-repeat; filter: saturate(.74) brightness(.62) contrast(1.08); transform: scale(1.015); }
+  .stories__shade { position: absolute; z-index: -2; inset: 0; background: radial-gradient(circle at 50% 52%, rgba(36,62,81,.14), transparent 28%), linear-gradient(180deg, rgba(2,5,9,.66), rgba(2,5,9,.2) 35% 64%, rgba(2,5,9,.82)), linear-gradient(90deg, rgba(2,5,9,.55), transparent 30% 70%, rgba(2,5,9,.55)); }
+  .stories__grain { position: absolute; z-index: -1; inset: 0; pointer-events: none; opacity: .13; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); }
+
+  .stories__home { position: absolute; top: clamp(1rem, 3vw, 2.5rem); left: clamp(1rem, 3vw, 2.8rem); display: inline-flex; align-items: center; gap: .7rem; min-height: 44px; padding: .55rem .85rem; border: 1px solid rgba(213,182,111,.46); border-radius: 999px; background: rgba(4,7,11,.5); color: var(--gold-bright); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .61rem; letter-spacing: .15em; text-decoration: none; text-transform: uppercase; backdrop-filter: blur(10px); transition: border-color .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .stories__home:hover { border-color: var(--gold-bright); box-shadow: 0 0 22px rgba(213,182,111,.2); transform: translateX(-2px); }
+  .stories__home:focus-visible, .story-box__add:focus-visible { outline: 2px solid var(--ghost); outline-offset: 4px; }
+
+  .stories__header { position: absolute; top: clamp(1.2rem, 4vw, 2.8rem); left: 50%; width: min(86vw, 720px); text-align: center; transform: translateX(-50%); }
+  .stories__header p { margin: 0 0 .7rem; color: rgba(196,220,237,.66); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .58rem; letter-spacing: .19em; text-transform: uppercase; }
+  .stories__header h1 { margin: 0; color: var(--gold-bright); font-size: clamp(2.7rem, 7vw, 5.5rem); font-weight: 430; letter-spacing: .02em; line-height: .88; text-shadow: 0 3px 30px rgba(0,0,0,.72); }
+
+  .story-box { position: relative; display: grid; width: min(86vw, 520px); min-height: clamp(250px, 34vw, 340px); place-items: center; border: 1px solid rgba(213,182,111,.56); background: linear-gradient(145deg, rgba(8,14,22,.76), rgba(4,8,13,.62)); box-shadow: 0 35px 90px rgba(0,0,0,.52), 0 0 50px rgba(169,201,232,.08), inset 0 0 0 7px rgba(213,182,111,.035); backdrop-filter: blur(15px); }
+  .story-box::before { content: ''; position: absolute; inset: 15px; border: 1px solid rgba(196,220,237,.15); pointer-events: none; }
+  .story-box__corner { position: absolute; width: 32px; height: 32px; border-color: var(--gold); opacity: .72; }
+  .story-box__corner--one { top: 8px; left: 8px; border-top: 1px solid; border-left: 1px solid; }
+  .story-box__corner--two { top: 8px; right: 8px; border-top: 1px solid; border-right: 1px solid; }
+  .story-box__corner--three { bottom: 8px; left: 8px; border-bottom: 1px solid; border-left: 1px solid; }
+  .story-box__corner--four { right: 8px; bottom: 8px; border-right: 1px solid; border-bottom: 1px solid; }
+
+  .story-box__add { display: grid; width: clamp(88px, 13vw, 118px); aspect-ratio: 1; place-items: center; padding: 0; border: 1px solid var(--gold); border-radius: 50%; background: radial-gradient(circle, rgba(213,182,111,.13), rgba(5,9,15,.75)); color: var(--gold-bright); cursor: pointer; box-shadow: 0 0 32px rgba(213,182,111,.14), inset 0 0 20px rgba(196,220,237,.06); transition: color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .story-box__add span { display: block; font-family: 'Cormorant Variable', Georgia, serif; font-size: clamp(4.2rem, 9vw, 6.3rem); font-weight: 260; line-height: .7; transform: translateY(-.06em); }
+  .story-box__add:hover { background: radial-gradient(circle, rgba(213,182,111,.24), rgba(5,9,15,.8)); color: #fff0c2; box-shadow: 0 0 42px rgba(213,182,111,.28), inset 0 0 24px rgba(196,220,237,.08); transform: scale(1.045); }
+  .story-box__add:active { transform: scale(.98); }
+
+  @media (max-width: 620px) {
+    .stories { padding-top: 7.8rem; }
+    .stories__header { top: 4.6rem; }
+    .stories__header p { display: none; }
+    .stories__header h1 { font-size: clamp(2.4rem, 12vw, 3.8rem); }
+    .story-box { min-height: 280px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .stories__home, .story-box__add { transition: none; }
+  }
+</style>
