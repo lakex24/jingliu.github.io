@@ -61,6 +61,11 @@ import '@fontsource/ibm-plex-mono/400.css';
             <span>Your writing stays on this device.</span>
             <button class="story-editor__keep" value="save">Keep my draft</button>
           </div>
+          <div class="story-editor__versions" hidden>
+            <button class="story-editor__version-back" type="button" aria-label="Go to the previous draft" title="Previous draft">←</button>
+            <span class="story-editor__version-label">First draft</span>
+            <button class="story-editor__version-add" type="button" aria-label="Add another draft" title="Add another draft">+</button>
+          </div>
         </form>
       </dialog>
     </main>
@@ -72,14 +77,20 @@ import '@fontsource/ibm-plex-mono/400.css';
       const writingInput = document.querySelector<HTMLTextAreaElement>('#story-writing');
       const editorTitle = document.querySelector<HTMLElement>('#story-editor-title');
       const keepButton = document.querySelector<HTMLButtonElement>('.story-editor__keep');
+      const versionControls = document.querySelector<HTMLElement>('.story-editor__versions');
+      const versionBackButton = document.querySelector<HTMLButtonElement>('.story-editor__version-back');
+      const versionLabel = document.querySelector<HTMLElement>('.story-editor__version-label');
+      const versionAddButton = document.querySelector<HTMLButtonElement>('.story-editor__version-add');
       const storyCards = document.querySelector<HTMLElement>('.story-cards');
       const storiesPage = document.querySelector<HTMLElement>('.stories');
       const legacyDraftKey = 'dori-myths-story-draft';
       const draftsKey = 'dori-myths-story-drafts';
       const scratchKey = 'dori-myths-story-scratch';
-      type StoryDraft = { id: string; title: string; writing: string; updatedAt: number };
+      type DraftVersion = { title: string; writing: string; createdAt: number; updatedAt: number };
+      type StoryDraft = { id: string; versions: DraftVersion[]; updatedAt: number };
       let drafts: StoryDraft[] = [];
       let activeDraftId: string | null = null;
+      let activeVersionIndex = 0;
 
       const readObject = (key: string) => {
         try { return JSON.parse(localStorage.getItem(key) || 'null'); }
@@ -89,21 +100,79 @@ import '@fontsource/ibm-plex-mono/400.css';
       const makeId = () => globalThis.crypto?.randomUUID?.() || `story-${Date.now()}`;
       const saveCollection = () => localStorage.setItem(draftsKey, JSON.stringify(drafts));
 
+      const normalizeVersion = (value: any): DraftVersion => ({
+        title: typeof value?.title === 'string' ? value.title : '',
+        writing: typeof value?.writing === 'string' ? value.writing : '',
+        createdAt: typeof value?.createdAt === 'number' ? value.createdAt : Date.now(),
+        updatedAt: typeof value?.updatedAt === 'number' ? value.updatedAt : Date.now(),
+      });
+
+      const normalizeDraft = (value: any): StoryDraft | null => {
+        if (!value || typeof value.id !== 'string') return null;
+        const versions = Array.isArray(value.versions) && value.versions.length > 0
+          ? value.versions.map(normalizeVersion)
+          : [normalizeVersion(value)];
+        return {
+          id: value.id,
+          versions,
+          updatedAt: typeof value.updatedAt === 'number' ? value.updatedAt : Date.now(),
+        };
+      };
+
       const loadCollection = () => {
         const saved = readObject(draftsKey);
-        drafts = Array.isArray(saved) ? saved.filter((draft) => draft && typeof draft.id === 'string') : [];
+        drafts = Array.isArray(saved)
+          ? saved.map(normalizeDraft).filter((draft): draft is StoryDraft => Boolean(draft))
+          : [];
+
+        if (Array.isArray(saved) && saved.some((draft) => !Array.isArray(draft?.versions))) {
+          saveCollection();
+        }
 
         if (drafts.length === 0) {
           const legacy = readObject(legacyDraftKey);
           if (legacy && (legacy.title?.trim() || legacy.writing?.trim())) {
-            drafts = [{ id: makeId(), title: legacy.title || '', writing: legacy.writing || '', updatedAt: Date.now() }];
+            const now = Date.now();
+            drafts = [{
+              id: makeId(),
+              versions: [{ title: legacy.title || '', writing: legacy.writing || '', createdAt: now, updatedAt: now }],
+              updatedAt: now,
+            }];
             saveCollection();
             localStorage.removeItem(legacyDraftKey);
           }
         }
       };
 
-      const storyLabel = (draft: StoryDraft) => draft.title.trim() || 'Untitled Story';
+      const latestVersion = (draft: StoryDraft) => draft.versions[draft.versions.length - 1];
+      const storyLabel = (draft: StoryDraft) => latestVersion(draft).title.trim() || 'Untitled Story';
+      const versionStoryLabel = (version: DraftVersion) => version.title.trim() || 'Untitled Story';
+      const draftNames = ['First', 'Second', 'Third', 'Fourth', 'Fifth', 'Sixth', 'Seventh', 'Eighth', 'Ninth', 'Tenth', 'Eleventh', 'Twelfth'];
+      const draftLabel = (index: number) => {
+        if (draftNames[index]) return `${draftNames[index]} draft`;
+        const number = index + 1;
+        const lastTwo = number % 100;
+        const suffix = lastTwo >= 11 && lastTwo <= 13
+          ? 'th'
+          : ({ 1: 'st', 2: 'nd', 3: 'rd' } as Record<number, string>)[number % 10] || 'th';
+        return `${number}${suffix} draft`;
+      };
+
+      const activeDraft = () => drafts.find((item) => item.id === activeDraftId);
+
+      const updateVersionControls = () => {
+        if (!versionControls || !versionBackButton || !versionLabel || !versionAddButton) return;
+        const draft = activeDraft();
+        versionControls.hidden = !draft;
+        if (!draft) return;
+
+        versionLabel.textContent = draftLabel(activeVersionIndex);
+        versionBackButton.disabled = activeVersionIndex === 0;
+        const hasNextDraft = activeVersionIndex < draft.versions.length - 1;
+        const nextLabel = draftLabel(activeVersionIndex + 1);
+        versionAddButton.setAttribute('aria-label', hasNextDraft ? `Go to ${nextLabel}` : `Add ${nextLabel}`);
+        versionAddButton.title = hasNextDraft ? `Go to ${nextLabel}` : `Add ${nextLabel}`;
+      };
 
       const renderCollection = () => {
         if (!storyCards || !storiesPage) return;
@@ -111,6 +180,7 @@ import '@fontsource/ibm-plex-mono/400.css';
         storiesPage.classList.toggle('stories--has-drafts', drafts.length > 0);
 
         drafts.forEach((draft) => {
+          const latest = latestVersion(draft);
           const card = document.createElement('button');
           card.className = 'story-card';
           card.type = 'button';
@@ -119,7 +189,7 @@ import '@fontsource/ibm-plex-mono/400.css';
 
           const preview = document.createElement('span');
           preview.className = 'story-card__preview';
-          preview.textContent = draft.writing.trim() || 'A new story is waiting to be written…';
+          preview.textContent = latest.writing.trim() || 'A new story is waiting to be written…';
 
           const title = document.createElement('span');
           title.className = 'story-card__title';
@@ -133,12 +203,27 @@ import '@fontsource/ibm-plex-mono/400.css';
       const openEditor = (draft?: StoryDraft) => {
         if (!editor || !titleInput || !writingInput || !editorTitle) return;
         activeDraftId = draft?.id || null;
+        activeVersionIndex = draft ? draft.versions.length - 1 : 0;
         const scratch = !draft ? readObject(scratchKey) : null;
-        titleInput.value = draft?.title || (typeof scratch?.title === 'string' ? scratch.title : '');
-        writingInput.value = draft?.writing || (typeof scratch?.writing === 'string' ? scratch.writing : '');
-        editorTitle.textContent = draft ? storyLabel(draft) : 'New Myth or Story';
+        const version = draft?.versions[activeVersionIndex];
+        titleInput.value = version?.title || (typeof scratch?.title === 'string' ? scratch.title : '');
+        writingInput.value = version?.writing || (typeof scratch?.writing === 'string' ? scratch.writing : '');
+        editorTitle.textContent = version ? versionStoryLabel(version) : 'New Myth or Story';
+        updateVersionControls();
         editor.showModal();
         window.setTimeout(() => titleInput.focus(), 80);
+      };
+
+      const showActiveVersion = () => {
+        if (!titleInput || !writingInput || !editorTitle) return;
+        const draft = activeDraft();
+        const version = draft?.versions[activeVersionIndex];
+        if (!draft || !version) return;
+        titleInput.value = version.title;
+        writingInput.value = version.writing;
+        editorTitle.textContent = versionStoryLabel(version);
+        updateVersionControls();
+        window.setTimeout(() => writingInput.focus(), 40);
       };
 
       const saveCurrentWriting = (finishDraft = false) => {
@@ -146,11 +231,15 @@ import '@fontsource/ibm-plex-mono/400.css';
         const current = { title: titleInput.value, writing: writingInput.value };
 
         if (activeDraftId) {
-          const draft = drafts.find((item) => item.id === activeDraftId);
-          if (draft) {
-            Object.assign(draft, current, { updatedAt: Date.now() });
+          const draft = activeDraft();
+          const version = draft?.versions[activeVersionIndex];
+          if (draft && version) {
+            const now = Date.now();
+            Object.assign(version, current, { updatedAt: now });
+            draft.updatedAt = now;
             saveCollection();
             renderCollection();
+            if (editorTitle) editorTitle.textContent = versionStoryLabel(version);
           }
           return;
         }
@@ -160,12 +249,19 @@ import '@fontsource/ibm-plex-mono/400.css';
           return;
         }
 
-        const draft: StoryDraft = { id: makeId(), ...current, updatedAt: Date.now() };
+        const now = Date.now();
+        const draft: StoryDraft = {
+          id: makeId(),
+          versions: [{ ...current, createdAt: now, updatedAt: now }],
+          updatedAt: now,
+        };
         drafts.unshift(draft);
         activeDraftId = draft.id;
+        activeVersionIndex = 0;
         localStorage.removeItem(scratchKey);
         saveCollection();
         renderCollection();
+        updateVersionControls();
       };
 
       addButton?.addEventListener('click', () => openEditor());
@@ -176,6 +272,30 @@ import '@fontsource/ibm-plex-mono/400.css';
         if (draft) openEditor(draft);
       });
       keepButton?.addEventListener('click', () => saveCurrentWriting(true));
+      versionBackButton?.addEventListener('click', () => {
+        if (activeVersionIndex === 0) return;
+        saveCurrentWriting();
+        activeVersionIndex -= 1;
+        showActiveVersion();
+      });
+      versionAddButton?.addEventListener('click', () => {
+        saveCurrentWriting();
+        const draft = activeDraft();
+        const version = draft?.versions[activeVersionIndex];
+        if (!draft || !version) return;
+
+        if (activeVersionIndex < draft.versions.length - 1) {
+          activeVersionIndex += 1;
+        } else {
+          const now = Date.now();
+          draft.versions.push({ title: version.title, writing: version.writing, createdAt: now, updatedAt: now });
+          draft.updatedAt = now;
+          activeVersionIndex += 1;
+          saveCollection();
+          renderCollection();
+        }
+        showActiveVersion();
+      });
       titleInput?.addEventListener('input', () => saveCurrentWriting());
       writingInput?.addEventListener('input', () => saveCurrentWriting());
       editor?.addEventListener('close', () => saveCurrentWriting());
@@ -259,7 +379,14 @@ import '@fontsource/ibm-plex-mono/400.css';
   .story-editor__actions { position: relative; z-index: 1; display: flex; align-items: center; justify-content: space-between; gap: 1rem; margin-top: 1.2rem; }
   .story-editor__actions span { color: rgba(196,220,237,.48); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .55rem; letter-spacing: .08em; }
   .story-editor__keep { min-height: 44px; padding: .7rem 1rem; border: 1px solid rgba(213,182,111,.66); background: rgba(213,182,111,.08); color: var(--gold-bright); cursor: pointer; font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .57rem; letter-spacing: .13em; text-transform: uppercase; }
-  .story-editor__close:hover, .story-editor__keep:hover { border-color: var(--gold-bright); background: rgba(213,182,111,.16); }
+  .story-editor__versions { position: relative; z-index: 1; display: grid; grid-template-columns: 46px 1fr 46px; align-items: center; gap: 1rem; margin-top: 1.15rem; padding-top: 1rem; border-top: 1px solid rgba(213,182,111,.25); }
+  .story-editor__versions[hidden] { display: none; }
+  .story-editor__version-label { color: var(--gold-bright); font-family: 'Cormorant Variable', Georgia, serif; font-size: 1.35rem; font-style: italic; text-align: center; }
+  .story-editor__version-back, .story-editor__version-add { display: grid; width: 46px; height: 46px; place-items: center; padding: 0 0 .08em; border: 1px solid rgba(213,182,111,.58); border-radius: 50%; background: rgba(4,8,13,.52); color: var(--gold-bright); cursor: pointer; font: 300 1.75rem/1 'Cormorant Variable', Georgia, serif; transition: border-color .2s ease, background .2s ease, box-shadow .2s ease, transform .2s ease; }
+  .story-editor__version-add { justify-self: end; font-size: 2.25rem; }
+  .story-editor__version-back:disabled { visibility: hidden; }
+  .story-editor__close:hover, .story-editor__keep:hover, .story-editor__version-back:hover:not(:disabled), .story-editor__version-add:hover { border-color: var(--gold-bright); background: rgba(213,182,111,.16); }
+  .story-editor__version-back:hover:not(:disabled), .story-editor__version-add:hover { box-shadow: 0 0 22px rgba(213,182,111,.16); transform: scale(1.04); }
 
   @media (max-width: 620px) {
     .stories { padding-top: 7.8rem; }
