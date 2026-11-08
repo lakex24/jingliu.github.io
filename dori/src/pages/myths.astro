@@ -32,17 +32,19 @@ import '@fontsource/ibm-plex-mono/400.css';
         <h1 id="stories-title">Myths and Stories</h1>
       </header>
 
-      <section class="story-box" aria-label="Story collection">
-        <span class="story-box__corner story-box__corner--one" aria-hidden="true"></span>
-        <span class="story-box__corner story-box__corner--two" aria-hidden="true"></span>
-        <span class="story-box__corner story-box__corner--three" aria-hidden="true"></span>
-        <span class="story-box__corner story-box__corner--four" aria-hidden="true"></span>
-        <button class="story-box__add" type="button" aria-label="Add a myth or story" title="Add a myth or story">
-          <span aria-hidden="true">+</span>
-        </button>
-      </section>
+      <section class="story-grid" aria-label="Story collection">
+        <div class="story-box">
+          <span class="story-box__corner story-box__corner--one" aria-hidden="true"></span>
+          <span class="story-box__corner story-box__corner--two" aria-hidden="true"></span>
+          <span class="story-box__corner story-box__corner--three" aria-hidden="true"></span>
+          <span class="story-box__corner story-box__corner--four" aria-hidden="true"></span>
+          <button class="story-box__add" type="button" aria-label="Add a myth or story" title="Add a myth or story">
+            <span aria-hidden="true">+</span>
+          </button>
+        </div>
 
-      <section class="story-cards" aria-label="Saved myths and stories" aria-live="polite"></section>
+        <div class="story-cards" aria-label="Saved myths and stories" aria-live="polite"></div>
+      </section>
 
       <dialog class="story-editor" aria-labelledby="story-editor-title">
         <form class="story-editor__page" method="dialog">
@@ -201,7 +203,7 @@ import '@fontsource/ibm-plex-mono/400.css';
   button, a { -webkit-tap-highlight-color: transparent; }
 
   .stories { position: relative; isolation: isolate; display: grid; min-height: 100svh; place-items: center; overflow: hidden; padding: clamp(6rem, 10vw, 8rem) 1.25rem 2rem; }
-  .stories--has-drafts { display: block; overflow-x: hidden; overflow-y: auto; padding-top: clamp(13rem, 28vh, 18rem); }
+  .stories--has-drafts { overflow-x: hidden; overflow-y: auto; place-items: start center; padding-top: clamp(11rem, 24vh, 15rem); }
   .stories__background { position: absolute; z-index: -3; inset: 0; background: url('/greek-temple-writing-room-v1.webp') center / cover no-repeat; filter: saturate(.74) brightness(.62) contrast(1.08); transform: scale(1.015); }
   .stories__shade { position: absolute; z-index: -2; inset: 0; background: radial-gradient(circle at 50% 52%, rgba(36,62,81,.14), transparent 28%), linear-gradient(180deg, rgba(2,5,9,.66), rgba(2,5,9,.2) 35% 64%, rgba(2,5,9,.82)), linear-gradient(90deg, rgba(2,5,9,.55), transparent 30% 70%, rgba(2,5,9,.55)); }
   .stories__grain { position: absolute; z-index: -1; inset: 0; pointer-events: none; opacity: .13; mix-blend-mode: soft-light; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.75' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.24'/%3E%3C/svg%3E"); }
@@ -214,6 +216,7 @@ import '@fontsource/ibm-plex-mono/400.css';
   .stories__header p { margin: 0 0 .7rem; color: rgba(196,220,237,.66); font-family: 'IBM Plex Mono', ui-monospace, Menlo, monospace; font-size: .58rem; letter-spacing: .19em; text-transform: uppercase; }
   .stories__header h1 { margin: 0; color: var(--gold-bright); font-size: clamp(2.7rem, 7vw, 5.5rem); font-weight: 430; letter-spacing: .02em; line-height: .88; text-shadow: 0 3px 30px rgba(0,0,0,.72); }
 
+  .story-grid { display: grid; width: 100%; place-items: center; }
   .story-box { position: relative; display: grid; width: min(86vw, 520px); min-height: clamp(250px, 34vw, 340px); place-items: center; border: 1px solid rgba(213,182,111,.56); background: linear-gradient(145deg, rgba(8,14,22,.76), rgba(4,8,13,.62)); box-shadow: 0 35px 90px rgba(0,0,0,.52), 0 0 50px rgba(169,201,232,.08), inset 0 0 0 7px rgba(213,182,111,.035); backdrop-filter: blur(15px); }
   .story-box::before { content: ''; position: absolute; inset: 15px; border: 1px solid rgba(196,220,237,.15); pointer-events: none; }
   .story-box__corner { position: absolute; width: 32px; height: 32px; border-color: var(--gold); opacity: .72; }
@@ -227,15 +230,11 @@ import '@fontsource/ibm-plex-mono/400.css';
   .story-box__add:hover { background: radial-gradient(circle, rgba(213,182,111,.24), rgba(5,9,15,.8)); color: #fff0c2; box-shadow: 0 0 42px rgba(213,182,111,.28), inset 0 0 24px rgba(196,220,237,.08); transform: translate(-50%, -50%) scale(1.045); }
   .story-box__add:active { transform: translate(-50%, -50%) scale(.98); }
 
-  .stories--has-drafts .story-box { position: absolute; top: clamp(8.8rem, 14vw, 11rem); right: clamp(1.2rem, 5vw, 5rem); width: clamp(132px, 17vw, 190px); min-height: clamp(102px, 12vw, 138px); transition: width .4s ease, min-height .4s ease, top .4s ease, right .4s ease; }
-  .stories--has-drafts .story-box::before { inset: 9px; }
-  .stories--has-drafts .story-box__corner { width: 20px; height: 20px; }
-  .stories--has-drafts .story-box__add { width: clamp(58px, 7vw, 72px); }
-  .stories--has-drafts .story-box__add span { font-size: clamp(3.2rem, 5vw, 4.1rem); }
-
   .story-cards { display: none; }
-  .stories--has-drafts .story-cards { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 280px)); justify-content: center; gap: clamp(1.2rem, 3vw, 2.3rem); width: min(92vw, 980px); margin: 0 auto; padding: 1rem 0 3rem; }
-  .story-card { position: relative; display: grid; min-height: 350px; grid-template-rows: 1fr auto; overflow: hidden; padding: 0; border: 1px solid rgba(213,182,111,.58); background: linear-gradient(145deg, rgba(8,14,22,.9), rgba(3,7,12,.84)); color: #f4eddf; cursor: pointer; box-shadow: 0 24px 60px rgba(0,0,0,.48), inset 0 0 0 7px rgba(213,182,111,.025); text-align: left; backdrop-filter: blur(12px); transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
+  .stories--has-drafts .story-grid { grid-template-columns: repeat(auto-fit, minmax(220px, 280px)); place-items: stretch; justify-content: center; gap: clamp(1.2rem, 3vw, 2.3rem); width: min(92vw, 980px); padding: 1rem 0 3rem; }
+  .stories--has-drafts .story-cards { display: contents; }
+  .stories--has-drafts .story-box { width: 100%; height: 350px; min-height: 350px; }
+  .story-card { position: relative; display: grid; height: 350px; min-height: 350px; grid-template-rows: 1fr auto; overflow: hidden; padding: 0; border: 1px solid rgba(213,182,111,.58); background: linear-gradient(145deg, rgba(8,14,22,.9), rgba(3,7,12,.84)); color: #f4eddf; cursor: pointer; box-shadow: 0 24px 60px rgba(0,0,0,.48), inset 0 0 0 7px rgba(213,182,111,.025); text-align: left; backdrop-filter: blur(12px); transition: border-color .22s ease, box-shadow .22s ease, transform .22s ease; }
   .story-card::before, .story-card::after { content: ''; position: absolute; z-index: 2; width: 26px; height: 26px; pointer-events: none; border-color: rgba(213,182,111,.7); }
   .story-card::before { top: 8px; left: 8px; border-top: 1px solid; border-left: 1px solid; }
   .story-card::after { right: 8px; bottom: 8px; border-right: 1px solid; border-bottom: 1px solid; }
@@ -264,16 +263,13 @@ import '@fontsource/ibm-plex-mono/400.css';
 
   @media (max-width: 620px) {
     .stories { padding-top: 7.8rem; }
-    .stories--has-drafts { padding-top: 13.5rem; }
+    .stories--has-drafts { padding-top: 11.5rem; }
     .stories__header { top: 4.6rem; }
     .stories__header p { display: none; }
     .stories__header h1 { font-size: clamp(2.4rem, 12vw, 3.8rem); }
     .story-box { min-height: 280px; }
-    .stories--has-drafts .story-box { top: 9.2rem; right: 1rem; width: 118px; min-height: 88px; }
-    .stories--has-drafts .story-box__add { width: 54px; }
-    .stories--has-drafts .story-box__add span { font-size: 3rem; }
-    .stories--has-drafts .story-cards { grid-template-columns: minmax(0, 280px); }
-    .story-card { min-height: 330px; }
+    .stories--has-drafts .story-grid { grid-template-columns: minmax(0, 280px); }
+    .stories--has-drafts .story-box, .story-card { height: 330px; min-height: 330px; }
     .story-card__preview { min-height: 255px; }
     .story-editor__page { min-height: 80svh; }
     .story-editor__actions { align-items: stretch; flex-direction: column; }
