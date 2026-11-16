@@ -23,7 +23,7 @@
 .sl-deck { margin: 0.5rem 0 2rem; }
 .sl-head { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
 .sl-deckname { font: 400 1.15rem/1.3 var(--font-display); color: var(--violet-deep); }
-.sl-count { margin-left: auto; font: 0.75rem var(--font-mono); font-variant-numeric: tabular-nums; }
+.eqd .sl-count { margin-left: auto; font: 0.75rem var(--font-mono); font-variant-numeric: tabular-nums; }
 .eqd .sl-fs { width: 34px; height: 34px; min-height: 34px; padding: 0; display: grid; place-items: center; }
 .sl-frame { background: var(--paper-deep); border: 1px solid var(--line); border-radius: 14px; padding: 22px clamp(14px, 4vw, 44px) 14px; min-height: min(78vh, 760px); display: flex; flex-direction: column; }
 .sl-frame:fullscreen { border-radius: 0; border: 0; overflow-y: auto; padding: 4vh 6vw 2vh; background: var(--paper); }
