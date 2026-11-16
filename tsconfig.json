@@ -1,5 +1,15 @@
 {
   "extends": "astro/tsconfigs/strict.json",
-  "include": [".astro/types.d.ts", "**/*"],
-  "exclude": ["dist", "dori"]
+  "include": [
+    ".astro/types.d.ts",
+    "**/*"
+  ],
+  "exclude": [
+    "dist",
+    "dori"
+  ],
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  }
 }

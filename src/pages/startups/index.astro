@@ -19,6 +19,15 @@ const portfolio = [
   },
 ];
 const placeholders = 2; // reserved squares, no invented names
+// Interactive explainers: decks with live numbers (src/components/equity/).
+const explainers = [
+  {
+    href: '/startups/equity/', lang: 'zh', meta: '12 slides · 中文',
+    title: '一家公司的股票',
+    desc: '两个创始人 60/40，种子轮和期权池、409A、员工期权、提前行权和 83(b)，最后被收购或者倒闭：每个人拿多少、交多少税。',
+    en: 'How startup equity plays out, from incorporation to an exit — with an exit simulator.',
+  },
+];
 const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort((a, b) => a.data.order - b.data.order || a.data.date.valueOf() - b.data.date.valueOf());
 ---
 <Base title="Startups" description="Angel investments and notes for founders." section="/startups/" heading="Startups">
@@ -56,6 +65,25 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort((a,
     </ol>
   </section>
 
+  <section class="section vc" id="explainers" aria-labelledby="explainers-h">
+    <header class="vc__head">
+      <h2 id="explainers-h">Explainers</h2>
+      <span class="mono">{String(explainers.length).padStart(2, '0')} interactive</span>
+    </header>
+    <ol class="ex">
+      {explainers.map((x, i) => (
+        <li>
+          <a class="ex__card" href={x.href}>
+            <span class="mono ex__no">{String(i + 1).padStart(2, '0')} · {x.meta}</span>
+            <span class="ex__title" lang={x.lang}>{x.title} <Arrow /></span>
+            <span class="ex__desc" lang={x.lang}>{x.desc}</span>
+            <span class="ex__en">{x.en}</span>
+          </a>
+        </li>
+      ))}
+    </ol>
+  </section>
+
   <section class="section vc" id="notes" aria-labelledby="notes-h">
     <header class="vc__head">
       <h2 id="notes-h">Notes for founders</h2>
@@ -80,6 +108,16 @@ const notes = (await getCollection('notes', ({ data }) => !data.draft)).sort((a,
 </Base>
 
 <style>
+  /* Explainers: one wide card each, a step up from the notes register. */
+  .ex { list-style: none; margin: 0; padding: 0; display: grid; gap: 1rem; }
+  .ex__card { display: grid; gap: 0.45rem; padding: clamp(1.1rem, 2.5vw, 1.6rem); border: 1px solid var(--line); border-radius: 3px; background: var(--paper-deep); color: var(--ink); text-decoration: none; transition: border-color 0.25s ease, transform 0.3s ease; }
+  .ex__card:hover, .ex__card:focus-visible { border-color: var(--violet-deep); transform: translateY(-2px); }
+  .ex__no { color: var(--violet-deep); }
+  .ex__title { display: inline-flex; align-items: center; gap: 0.6rem; font-family: var(--font-display); font-size: clamp(1.6rem, 3vw, 2.2rem); line-height: 1.15; }
+  .ex__title :global(.arrow) { width: 1.1em; height: 0.36em; color: var(--violet-deep); }
+  .ex__card:hover .ex__title :global(.arrow) { transform: translateX(0.35em); }
+  .ex__desc { color: var(--ink-soft); max-width: 44rem; line-height: 1.7; }
+  .ex__en { color: var(--ink-mute); font-size: 0.9rem; font-style: italic; }
   /* Notes for founders: numbered register, same ledger feel as the portfolio. */
   .notes { list-style: none; margin: 0; padding: 0; }
   .notes__row { display: grid; grid-template-columns: 2.5rem minmax(0, 1fr); gap: 1rem; padding: 1rem 0.25rem 1.1rem; border-bottom: 1px solid var(--line); }
