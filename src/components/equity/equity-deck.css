@@ -131,3 +131,4 @@
 .eq-what { font-size: 0.76rem; }
 .eqd .eq-strip li.on button { color: var(--ink); }
 @media (max-width: 520px) { .eq-when { display: none; } .eq-what { font-size: 0.7rem; } }
+@media (max-width: 520px) { .eqd .sl-dotbtn { width: 15px; } .sl-nav { gap: 6px; } }
