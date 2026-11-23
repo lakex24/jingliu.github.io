@@ -1,63 +1,49 @@
 /**
- * The numbers behind the "一家公司的股票" deck: one made-up Silicon Valley startup, from incorporation
- * to an exit. Pure functions, no React, so the arithmetic can be tested on its own
+ * The numbers behind the "一家公司的股票" deck: one made-up Silicon Valley startup, from day 1 to an
+ * exit. Pure functions, no React, so the arithmetic can be tested on its own
  * (equityModel.test.ts, run with `node --test`).
+ *
+ * The story: two founders and 100,000,000 shares — 阿明 55%, 贝贝 30%, and 15% set aside on day 1 as
+ * the option pool. Seed: $5M at $10M pre ($0.10 a share). 小王 joins with 1,000,000 options at the
+ * 409A price of $0.03. Series A: $15M at $60M pre ($0.40 a share). The exit is in year 5.
  *
  * Simplifications, on purpose (the deck says so too):
  * - Preferred stock is 1x non-participating and the two rounds are paid side by side (pari passu).
- * - The whole option pool is granted at the seed-era strike ($0.30); unvested shares and options at an
- *   exit are taken over by the buyer and keep vesting, so only vested value is "paid now".
+ * - The whole pool is granted at the seed-era strike ($0.03).
  * - Taxes use flat top-bracket rates for a California resident. Real returns are progressive, have
  *   AMT, FICA, state residency rules and more. Investors' and the other employees' taxes are left out.
  */
 
 /** Years from incorporation. */
-export const T = { seed: 0.5, join: 0.75, seriesA: 2 } as const;
+export const T = { seed: 0.5, join: 0.75, seriesA: 2, exit: 5 } as const;
 
-export const FOUNDER_PRICE = 0.0001;
+export const FOUNDER_PRICE = 0.00001;
 export const FOUNDERS = [
-  { id: 'aming', name: '阿明', shares: 4_800_000 },
-  { id: 'beibei', name: '贝贝', shares: 3_200_000 },
+  { id: 'aming', name: '阿明', shares: 55_000_000 },
+  { id: 'beibei', name: '贝贝', shares: 30_000_000 },
 ] as const;
-export const FOUNDER_SHARES = 8_000_000;
+export const POOL_SHARES = 15_000_000;
+export const DAY1_SHARES = 100_000_000; // founders + the pool, set aside on day 1
 
-export const SEED = { pre: 10_000_000, raise: 5_000_000, poolPost: 0.10 };
-export const SERIES_A = { pre: 40_000_000, raise: 10_000_000 };
+export const SEED = { pre: 10_000_000, raise: 5_000_000 };
+export const SEED_PRICE = SEED.pre / DAY1_SHARES; // $0.10: the pool is already in the pre-money
+export const SEED_SHARES = Math.round(SEED.raise / SEED_PRICE); // 50,000,000
+export const SEED_TOTAL = DAY1_SHARES + SEED_SHARES; // 150,000,000
 
-/** Seed round with the pool counted in the pre-money (the "option pool shuffle"). */
-export function seedRound(poolInPre = true) {
-  const investorPct = SEED.raise / (SEED.pre + SEED.raise); // 1/3
-  if (poolInPre) {
-    const total = FOUNDER_SHARES / (1 - investorPct - SEED.poolPost);
-    const pool = total * SEED.poolPost;
-    const investor = total * investorPct;
-    return { total, pool, investor, price: SEED.raise / investor, founderValue: FOUNDER_SHARES * (SEED.raise / investor) };
-  }
-  // Pool created after the round: it dilutes the investor as well.
-  const price = SEED.pre / FOUNDER_SHARES;
-  const investor = SEED.raise / price;
-  const before = FOUNDER_SHARES + investor;
-  const total = before / (1 - SEED.poolPost);
-  return { total, pool: total - before, investor, price, founderValue: FOUNDER_SHARES * price };
-}
+export const SERIES_A = { pre: 60_000_000, raise: 15_000_000 };
+export const A_PRICE = SERIES_A.pre / SEED_TOTAL; // $0.40
+export const A_SHARES = Math.round(SERIES_A.raise / A_PRICE); // 37,500,000
+export const A_TOTAL = SEED_TOTAL + A_SHARES; // 187,500,000
 
-const seed = seedRound(true);
-export const SEED_SHARES = Math.round(seed.investor);
-export const POOL_SHARES = Math.round(seed.pool);
-export const SEED_PRICE = SEED.raise / SEED_SHARES;
-export const SEED_TOTAL = FOUNDER_SHARES + SEED_SHARES + POOL_SHARES;
-export const A_PRICE = SERIES_A.pre / SEED_TOTAL;
-export const A_SHARES = Math.round(SERIES_A.raise / A_PRICE);
-
-export const WANG = { grant: 100_000, strike: 0.30 };
+export const WANG = { grant: 1_000_000, strike: 0.03 };
 export const OTHER_OPTIONS = POOL_SHARES - WANG.grant;
 
 /** The common stock's 409A value over time (made up, but in the usual ratio to the preferred). */
 export function fmv409a(t: number): number {
   if (t < T.seed) return FOUNDER_PRICE;
-  if (t < T.seriesA) return 0.30;
-  if (t < 3.5) return 0.90;
-  return 1.60;
+  if (t < T.seriesA) return 0.03;
+  if (t < 3.5) return 0.12;
+  return 0.20;
 }
 
 /** Share of a 4-year grant vested `years` after the vesting start: nothing before the 1-year cliff,
@@ -70,24 +56,19 @@ export function vestedFraction(years: number): number {
 export type HolderId = 'aming' | 'beibei' | 'seed' | 'seriesA' | 'wang' | 'others';
 export type Holding = { id: HolderId; name: string; shares: number; kind: 'common' | 'preferred' | 'option'; strike?: number; pref?: number; vestStart?: number };
 
-/** Who owns what at time t (fully diluted, the pool fully granted). */
-export function capTable(t: number, wangExercisedEarly: boolean): Holding[] {
-  const rows: Holding[] = FOUNDERS.map((f) => ({ id: f.id, name: f.name, shares: f.shares, kind: 'common', vestStart: 0 }));
-  if (t >= T.seed) {
-    rows.push({ id: 'seed', name: '种子轮基金', shares: SEED_SHARES, kind: 'preferred', pref: SEED.raise });
-    rows.push({ id: 'others', name: '其他员工', shares: OTHER_OPTIONS, kind: 'option', strike: WANG.strike });
-  }
-  if (t >= T.join) {
-    rows.push(wangExercisedEarly
+/** Who owns what at the exit (fully diluted, the pool fully granted). */
+export function capTable(wangExercisedEarly: boolean): Holding[] {
+  return [
+    ...FOUNDERS.map((f): Holding => ({ id: f.id, name: f.name, shares: f.shares, kind: 'common', vestStart: 0 })),
+    wangExercisedEarly
       ? { id: 'wang', name: '小王', shares: WANG.grant, kind: 'common', vestStart: T.join }
-      : { id: 'wang', name: '小王', shares: WANG.grant, kind: 'option', strike: WANG.strike, vestStart: T.join });
-  } else if (t >= T.seed) {
-    // Before 小王 joins, his options are still unallocated pool.
-    rows[rows.length - 1] = { ...rows[rows.length - 1], shares: POOL_SHARES };
-  }
-  if (t >= T.seriesA) rows.push({ id: 'seriesA', name: 'A 轮基金', shares: A_SHARES, kind: 'preferred', pref: SERIES_A.raise });
-  return rows;
+      : { id: 'wang', name: '小王', shares: WANG.grant, kind: 'option', strike: WANG.strike, vestStart: T.join },
+    { id: 'others', name: '其他员工', shares: OTHER_OPTIONS, kind: 'option', strike: WANG.strike },
+    { id: 'seed', name: '种子基金', shares: SEED_SHARES, kind: 'preferred', pref: SEED.raise },
+    { id: 'seriesA', name: 'A 轮基金', shares: A_SHARES, kind: 'preferred', pref: SERIES_A.raise },
+  ];
 }
+export const PREF_STACK = SEED.raise + SERIES_A.raise; // $20M
 
 export type Payout = { id: HolderId; name: string; shares: number; pct: number; total: number; converted?: boolean };
 
@@ -161,8 +142,8 @@ export function capitalGainsTax(gain: number, held: number): Tax {
   const federal = share > 0
     ? remainder * (RATES.qsbsRemainder + RATES.niit) + above * (RATES.fedLtcg + RATES.niit)
     : gain * (RATES.fedLtcg + RATES.niit);
-  const note = share === 1 ? `持有满 5 年：QSBS 联邦免税（上限 $15M）${above > 0 ? '，超出部分按长期资本利得' : ''}`
-    : share > 0 ? `持有满 ${share === 0.75 ? 4 : 3} 年：QSBS 联邦免 ${share * 100}%，其余按 28%`
+  const note = share === 1 ? `持有满 5 年：QSBS，联邦免税（上限 $15M）${above > 0 ? '，超出的部分按长期资本利得' : ''}`
+    : share > 0 ? `持有满 ${share === 0.75 ? 4 : 3} 年：QSBS，联邦免 ${share * 100}%，其余按 28%`
     : '持有满 1 年：长期资本利得（不到 3 年，QSBS 还没生效）';
   return { federal, state, total: federal + state, qsbs: excluded * (RATES.fedLtcg + RATES.niit), note };
 }
@@ -174,48 +155,38 @@ export function ordinaryTax(income: number): Tax {
   return { federal, state, total: federal + state, qsbs: 0, note: '期权直接套现：差价全部算工资收入（普通所得税）' };
 }
 
-export type PersonResult = { id: HolderId; name: string; pct: number; total: number; vested: number; unvested: number; paid: number; tax: Tax | null; net: number | null };
+/** One person's result: `total` from the sale, `paid` out of pocket earlier, `tax`, and `net` =
+ *  total − tax − paid (what the whole adventure left them with). Funds have no tax or net here. */
+export type PersonResult = { id: HolderId; name: string; pct: number; total: number; paid: number; converted?: boolean; tax: Tax | null; net: number | null };
 
-/** The whole scenario: the exit `years` after incorporation for `exit` dollars (0 = the company shut down). */
-export function scenario(years: number, exit: number, wangEarly: boolean) {
-  const rows = capTable(years, wangEarly);
+/** The exit in year 5 for `exit` dollars (0 = the company shut down). Everyone is fully vested by then. */
+export function scenario(exit: number, wangEarly: boolean, years: number = T.exit) {
+  const rows = capTable(wangEarly);
   const { payouts, pps } = waterfall(rows, exit);
   const people: PersonResult[] = payouts.map((p) => {
-    const row = rows.find((r) => r.id === p.id)!;
-    const vf = row.vestStart != null ? vestedFraction(years - row.vestStart) : 1;
-    const vested = p.total * vf;
     let paid = 0, tax: Tax | null = null;
-    // Stock bought for cash: worth less than it cost (a shutdown, or a sale below the preferences)
-    // means the whole purchase is a loss, unvested shares included.
-    const stockTax = (cost: number, held: number) => (p.total < cost ? capitalGainsTax(p.total - cost, held) : capitalGainsTax(vested - cost * vf, held));
     if (p.id === 'aming' || p.id === 'beibei') {
-      paid = row.shares * FOUNDER_PRICE;
-      tax = stockTax(paid, years);
+      paid = p.shares * FOUNDER_PRICE;
+      tax = capitalGainsTax(p.total - paid, years);
     } else if (p.id === 'wang') {
-      if (wangEarly) {
-        paid = WANG.grant * WANG.strike;
-        tax = stockTax(paid, years - T.join);
-      } else {
-        tax = ordinaryTax(vested);
-      }
-      if (vf === 0 && p.total > 0) tax = { ...tax, note: '还没满 1 年 cliff：一股都没归属，现在拿不到' };
+      if (wangEarly) { paid = WANG.grant * WANG.strike; tax = capitalGainsTax(p.total - paid, years - T.join); }
+      else tax = ordinaryTax(p.total);
     } else if (p.id === 'seed') paid = SEED.raise;
     else if (p.id === 'seriesA') paid = SERIES_A.raise;
-    const net = tax ? vested - tax.total : null;
-    return { id: p.id, name: p.name, pct: p.pct, total: p.total, vested, unvested: p.total - vested, paid, tax, net };
+    const net = tax ? p.total - tax.total - paid : null;
+    return { id: p.id, name: p.name, pct: p.pct, total: p.total, paid, converted: p.converted, tax, net };
   });
-  const prefOut = payouts.filter((p) => p.converted === false && p.total < (rows.find((r) => r.id === p.id)?.pref ?? 0) + 1);
-  return { rows, pps, people, prefOut, totalPref: rows.reduce((s, r) => s + (r.pref ?? 0), 0) };
+  return { pps, people };
 }
 
 /** Without an 83(b): each month's vesting is income at that day's 409A value. */
 export function founderVestingWithout83b(shares: number) {
-  const years: { year: number; shares: number; income: number }[] = [];
-  for (let y = 1; y <= 4; y++) years.push({ year: y, shares: 0, income: 0 });
+  const years = [1, 2, 3, 4].map((year) => ({ year, shares: 0, income: 0, low: Infinity, high: 0 }));
   for (let m = 12; m <= 48; m++) {
     const n = m === 12 ? shares * 12 / 48 : shares / 48;
-    const y = Math.min(4, Math.ceil(m / 12));
-    years[y - 1].shares += n; years[y - 1].income += n * (fmv409a(m / 12) - FOUNDER_PRICE);
+    const r = years[Math.min(4, Math.ceil(m / 12)) - 1];
+    const fmv = fmv409a(m / 12);
+    r.shares += n; r.income += n * (fmv - FOUNDER_PRICE); r.low = Math.min(r.low, fmv); r.high = Math.max(r.high, fmv);
   }
   return years.map((r) => ({ ...r, tax: r.income * (RATES.fedOrdinary + RATES.ca) }));
 }

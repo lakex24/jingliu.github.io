@@ -1,6 +1,6 @@
 /**
- * The deck viewer for /startups/equity/: one slide at a time, turned with the arrow keys, a swipe,
- * the dots or the arrows; full screen on request. The current slide lives in `?s=<id>` (replaced, not
+ * The deck viewer for /startups/equity/: one slide per moment on the timeline across the top. Turn
+ * pages with the timeline, the arrow keys, a swipe or the arrows; full screen on request. The current slide lives in `?s=<id>` (replaced, not
  * pushed, so Back leaves the page). Rendered as a React island (client:load) — the rest of the site
  * stays static.
  */
@@ -77,15 +77,11 @@ export default function EquityDeckApp() {
       <div ref={frame} className="sl-frame" onTouchStart={onTouchStart} onTouchEnd={onTouchEnd}>
         <TimelineStrip slideId={slide.id} nav={nav} />
         <article key={slide.id} className="sl-slide" aria-label={`${idx + 1}. ${slide.title}`}>
-          {slide.render(nav)}
+          {slide.render()}
         </article>
         <nav className="sl-nav" aria-label="翻页">
           <button type="button" className="sl-arrow" onClick={() => step(-1)} disabled={idx === 0} aria-label="上一页">←</button>
-          <div className="sl-dots">
-            {slides.map((s, i) => (
-              <button key={s.id} type="button" className={`sl-dotbtn${i === idx ? ' on' : ''}`} onClick={() => goTo(i)} title={s.title} aria-label={`${i + 1}. ${s.title}`} aria-current={i === idx ? 'step' : undefined}><span /></button>
-            ))}
-          </div>
+          <span className="sl-where">{slide.title}</span>
           <button type="button" className="sl-arrow" onClick={() => step(1)} disabled={idx === slides.length - 1} aria-label="下一页">→</button>
         </nav>
       </div>

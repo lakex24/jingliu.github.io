@@ -1,60 +1,106 @@
 /**
- * Deck: 一家公司的股票 — one made-up startup from incorporation to an exit, to explain founder stock,
- * 83(b), a priced round and the option pool, 409A, an employee's options and early exercise, and what
- * everyone takes home (and owes) when the company is sold or shuts down. The numbers come from
- * ./equityModel.ts; the slides only show them.
+ * Deck: 一家公司的股票 — one made-up startup from day 1 to an exit, told as a row of moments on a
+ * timeline. Every slide is the same picture: the company drawn as a box, split by who owns it. Click a
+ * piece of the box to read what it is. The numbers come from ./equityModel.ts; the slides only show them.
  */
-import { useMemo, useState, type ReactNode } from 'react';
+import { useEffect, useMemo, useState, type ReactNode } from 'react';
 import {
-  A_PRICE, A_SHARES, FOUNDER_PRICE, OTHER_OPTIONS, POOL_SHARES, RATES, SEED_PRICE, SEED_SHARES, T, WANG,
-  capTable, founderVestingWithout83b, scenario, seedRound, vestedFraction, type HolderId,
+  A_PRICE, A_SHARES, A_TOTAL, DAY1_SHARES, FOUNDER_PRICE, OTHER_OPTIONS, POOL_SHARES, PREF_STACK, RATES, SEED,
+  SEED_PRICE, SEED_SHARES, SEED_TOTAL, SERIES_A, T, WANG, founderVestingWithout83b, scenario, vestedFraction,
+  type PersonResult,
 } from './equityModel';
 
-export type Slide = { id: string; title: string; when?: string; render: (nav: (id: string) => void) => ReactNode };
+export type Slide = { id: string; when: string; short: string; title: string; render: () => ReactNode };
 
-// ---------- formatting and small parts ----------
+// ---------- formatting ----------
 
-const money = (n: number, signed = false): string => {
-  const s = signed && n > 0 ? '+' : n < 0 ? '−' : '';
+const money = (n: number): string => {
+  const s = n < 0 ? '−' : '';
   const a = Math.abs(n);
-  if (a >= 1e9) return `${s}$${(a / 1e9).toFixed(a >= 1e10 ? 0 : 1)}B`;
-  if (a >= 1e6) return `${s}$${(a / 1e6).toFixed(a >= 1e8 ? 0 : a >= 1e7 ? 1 : 2)}M`;
+  const trim = (x: string) => x.replace(/\.0$/, '');
+  if (a >= 1e9) return `${s}$${trim((a / 1e9).toFixed(a >= 1e10 ? 0 : 1))}B`;
+  if (a >= 1e6) return `${s}$${trim((a / 1e6).toFixed(a >= 1e8 ? 0 : 1))}M`;
   if (a >= 1e4) return `${s}$${Math.round(a / 1e3).toLocaleString()}K`;
   return `${s}$${Math.round(a).toLocaleString()}`;
 };
 const dollars = (n: number) => `$${Math.round(n).toLocaleString()}`;
-const shares = (n: number) => Math.round(n).toLocaleString();
-const pct = (x: number, d = 1) => `${(x * 100).toFixed(d)}%`;
-const price = (n: number) => (n < 0.01 ? `$${n}` : `$${n.toFixed(n < 10 ? 2 : 0)}`);
-const yearLabel = (y: number) => (y < 1 ? `第 ${Math.round(y * 12)} 个月` : Number.isInteger(y) ? `第 ${y} 年` : `第 ${Math.floor(y)} 年半`);
+/** Share counts the Chinese way: 1 亿, 5,500 万, 31.25 万. */
+const gu = (n: number) => (n >= 1e8 ? `${(n / 1e8).toLocaleString(undefined, { maximumFractionDigits: 3 })} 亿股` : `${(n / 1e4).toLocaleString(undefined, { maximumFractionDigits: 2 })} 万股`);
+const pct = (x: number, d = 1) => `${(x * 100).toFixed(x > 0 && x < 0.01 ? 2 : d).replace(/\.0+$/, '')}%`;
+const price = (n: number) => (n < 0.01 ? `$${n}` : `$${n.toFixed(2)}`);
 
-const COLOR: Record<HolderId | 'pool', string> = {
+type CellId = 'aming' | 'beibei' | 'pool' | 'seed' | 'seriesA' | 'wang' | 'others';
+const COLOR: Record<CellId, string> = {
   aming: 'var(--eq-aming)', beibei: 'var(--eq-beibei)', seed: 'var(--eq-seed)', seriesA: 'var(--eq-a)',
-  others: 'var(--eq-pool)', pool: 'var(--eq-pool)', wang: 'var(--eq-wang)',
+  pool: 'var(--eq-pool)', others: 'var(--eq-pool)', wang: 'var(--eq-wang)',
 };
 
-type Seg = { id: HolderId | 'pool'; label: string; value: number };
-/** One stacked bar with a legend under it. */
-function Stack({ segs, caption, showValue }: { segs: Seg[]; caption?: string; showValue?: (v: number) => string }) {
-  const total = segs.reduce((s, x) => s + x.value, 0);
+// ---------- the company box ----------
+
+type Cell = { id: string; name: string; value: number; big: string; sub?: string; color?: string };
+type Col = { id: string; cells: Cell[] };
+const col = (c: Cell): Col => ({ id: c.id, cells: [c] });
+
+/**
+ * The company as a box: columns sized by value, a column may stack cells (the option pool, once 小王
+ * takes his share of it). With `from` (id → value at the previous moment), the box starts as it was
+ * and grows into the new split, so a funding round visibly dilutes everyone.
+ */
+function CompanyBox({ cols, from, selected, onSelect, label }: { cols: Col[]; from?: Record<string, number>; selected?: string | null; onSelect?: (id: string) => void; label: string }) {
+  const [settled, setSettled] = useState(!from);
+  useEffect(() => {
+    if (settled) return;
+    let b = 0; const a = requestAnimationFrame(() => { b = requestAnimationFrame(() => setSettled(true)); });
+    return () => { cancelAnimationFrame(a); cancelAnimationFrame(b); };
+  }, [settled]);
+  const v = (c: Cell) => (settled ? c.value : from?.[c.id] ?? 0);
+  const colValue = (k: Col) => k.cells.reduce((s, c) => s + v(c), 0);
+  const total = cols.reduce((s, k) => s + colValue(k), 0) || 1;
   return (
-    <figure className="eq-stack">
-      {caption && <figcaption>{caption}</figcaption>}
-      <div className="eq-bar" role="img" aria-label={segs.map((s) => `${s.label} ${pct(s.value / (total || 1))}`).join('，')}>
-        {total > 0 ? segs.filter((s) => s.value > 0).map((s) => (
-          <span key={s.id} style={{ width: `${(s.value / total) * 100}%`, background: COLOR[s.id] }} title={`${s.label} ${pct(s.value / total)}`} />
-        )) : <span className="eq-bar-empty">0</span>}
-      </div>
-      <div className="eq-legend">
-        {segs.filter((s) => s.value > 0).map((s) => (
-          <span key={s.id}><i style={{ background: COLOR[s.id] }} />{s.label} <b>{showValue ? showValue(s.value) : pct(s.value / total)}</b></span>
-        ))}
-      </div>
-    </figure>
+    <div className="eq-box" role="group" aria-label={label}>
+      {cols.map((k) => (
+        <div key={k.id} className="eq-col" style={{ flexBasis: `${(colValue(k) / total) * 100}%` }}>
+          {k.cells.map((c) => {
+            const inner = (<span className="eq-cell-in"><b className="eq-cell-name">{c.name}</b><span className="eq-cell-big">{c.big}</span>{c.sub && <span className="eq-cell-sub">{c.sub}</span>}</span>);
+            const style = { flexGrow: Math.max(v(c), 1e-9), background: c.color ?? COLOR[c.id as CellId] };
+            const cls = `eq-cell${k.cells.length > 1 ? ' stacked' : ''}${selected === c.id ? ' on' : ''}${v(c) <= 0 ? ' empty' : ''}`;
+            return onSelect
+              ? <button key={c.id} type="button" className={cls} style={style} onClick={() => onSelect(c.id)} aria-pressed={selected === c.id} aria-label={`${c.name} ${c.big}`}>{inner}</button>
+              : <div key={c.id} className={cls} style={style}>{inner}</div>;
+          })}
+        </div>
+      ))}
+    </div>
   );
 }
-const capSegs = (t: number): Seg[] => capTable(t, false).map((r) => ({ id: t < T.join && r.id === 'others' ? 'pool' : r.id, label: t < T.join && r.id === 'others' ? '期权池' : r.id === 'others' ? '期权池（员工）' : r.name, value: r.shares }));
 
+/** The box, a clickable legend (small pieces are hard to tap) and the explanation of the chosen piece. */
+function Explorer({ cols, from, explain, initial = null, hint = '点一下方块，看它是什么' }: { cols: Col[]; from?: Record<string, number>; explain: Record<string, ReactNode>; initial?: string | null; hint?: string }) {
+  const [sel, setSel] = useState<string | null>(initial);
+  const cells = cols.flatMap((k) => k.cells);
+  const chosen = cells.find((c) => c.id === sel);
+  const pick = (id: string) => setSel((s) => (s === id ? null : id));
+  return (
+    <>
+      <CompanyBox cols={cols} from={from} selected={sel} onSelect={pick} label="公司的股权，点一块看说明" />
+      <div className="eq-legend">
+        {cells.map((c) => (
+          <button key={c.id} type="button" className={sel === c.id ? 'on' : ''} onClick={() => pick(c.id)}>
+            <i style={{ background: COLOR[c.id as CellId] }} />{c.name} <b>{c.big}</b>
+          </button>
+        ))}
+      </div>
+      <div className={`eq-callout${chosen ? '' : ' hint'}`} aria-live="polite" style={chosen ? { borderLeftColor: COLOR[chosen.id as CellId] } : undefined}>
+        {chosen ? <><h3>{chosen.name}</h3>{explain[chosen.id]}</> : <p>{hint}</p>}
+      </div>
+    </>
+  );
+}
+
+const Facts = ({ items }: { items: [string, string][] }) => (
+  <dl className="eq-facts">{items.map(([k, v]) => <div key={k}><dt>{k}</dt><dd>{v}</dd></div>)}</dl>
+);
+const Note = ({ children, tone }: { children: ReactNode; tone?: 'warn' | 'good' }) => <p className={`eq-note${tone ? ` ${tone}` : ''}`}>{children}</p>;
 function Toggle<V extends string>({ value, options, onChange, label }: { value: V; options: { id: V; label: string }[]; onChange: (v: V) => void; label: string }) {
   return (
     <div className="viewswitch eq-toggle" role="radiogroup" aria-label={label}>
@@ -62,282 +108,134 @@ function Toggle<V extends string>({ value, options, onChange, label }: { value: 
     </div>
   );
 }
-const Stat = ({ label, value, sub }: { label: string; value: string; sub?: string }) => (
-  <div className="eq-stat"><span className="muted">{label}</span><b>{value}</b>{sub && <span className="muted eq-stat-sub">{sub}</span>}</div>
-);
-const Note = ({ children, tone }: { children: ReactNode; tone?: 'warn' | 'good' }) => <p className={`eq-note${tone ? ` ${tone}` : ''}`}>{children}</p>;
 
-// ---------- the timeline every slide shows ----------
+// ---------- the cap table at each moment ----------
 
-const MILESTONES = [
-  { slide: 'day0', when: '第 0 天', what: '成立公司' },
-  { slide: 'seed', when: '第 6 个月', what: '种子轮' },
-  { slide: 'wang', when: '第 9 个月', what: '小王加入' },
-  { slide: 'seriesA', when: '第 2 年', what: 'A 轮' },
-  { slide: 'exit', when: '第 ? 年', what: '退出' },
+const ownCell = (id: CellId, name: string, shares: number, total: number): Cell => ({ id, name, value: shares, big: pct(shares / total), sub: gu(shares) });
+const day1Cols = (): Col[] => [
+  col(ownCell('aming', '阿明', 55_000_000, DAY1_SHARES)),
+  col(ownCell('beibei', '贝贝', 30_000_000, DAY1_SHARES)),
+  col(ownCell('pool', '期权池', POOL_SHARES, DAY1_SHARES)),
 ];
-const MILESTONE_OF: Record<string, string> = { day0: 'day0', '83b': 'day0', seed: 'seed', '409a': 'seed', wang: 'wang', early: 'wang', seriesA: 'seriesA', exit: 'exit', shutdown: 'exit' };
-export function TimelineStrip({ slideId, nav }: { slideId: string; nav: (id: string) => void }) {
-  const at = MILESTONE_OF[slideId];
-  if (!at) return null;
-  const idx = MILESTONES.findIndex((m) => m.slide === at);
-  return (
-    <ol className="eq-strip" aria-label="时间线">
-      {MILESTONES.map((m, i) => (
-        <li key={m.slide} className={i === idx ? 'on' : i < idx ? 'past' : ''}>
-          <button type="button" onClick={() => nav(m.slide)}><span className="eq-dot" /><span className="eq-when">{m.when}</span><span className="eq-what">{m.what}</span></button>
-        </li>
-      ))}
-    </ol>
-  );
-}
+const seedCols = (): Col[] => [
+  col(ownCell('aming', '阿明', 55_000_000, SEED_TOTAL)),
+  col(ownCell('beibei', '贝贝', 30_000_000, SEED_TOTAL)),
+  col(ownCell('pool', '期权池', POOL_SHARES, SEED_TOTAL)),
+  col(ownCell('seed', '种子基金', SEED_SHARES, SEED_TOTAL)),
+];
+const poolCol = (total: number): Col => ({ id: 'poolcol', cells: [ownCell('wang', '小王', WANG.grant, total), ownCell('pool', '期权池', OTHER_OPTIONS, total)] });
+const wangCols = (): Col[] => [seedCols()[0], seedCols()[1], poolCol(SEED_TOTAL), seedCols()[3]];
+const aCols = (): Col[] => [
+  col(ownCell('aming', '阿明', 55_000_000, A_TOTAL)),
+  col(ownCell('beibei', '贝贝', 30_000_000, A_TOTAL)),
+  poolCol(A_TOTAL),
+  col(ownCell('seed', '种子基金', SEED_SHARES, A_TOTAL)),
+  col(ownCell('seriesA', 'A 轮基金', A_SHARES, A_TOTAL)),
+];
+const valuesOf = (cols: Col[]) => Object.fromEntries(cols.flatMap((k) => k.cells.map((c) => [c.id, c.value])));
 
 // ---------- slides ----------
 
-function Cover({ nav }: { nav: (id: string) => void }) {
-  const cast = [
-    { id: 'aming' as const, name: '阿明', role: '创始人 · CEO', line: '60%' },
-    { id: 'beibei' as const, name: '贝贝', role: '创始人 · CTO', line: '40%' },
-    { id: 'seed' as const, name: '种子轮基金', role: '第 6 个月', line: '投 $5M' },
-    { id: 'seriesA' as const, name: 'A 轮基金', role: '第 2 年', line: '投 $10M' },
-    { id: 'wang' as const, name: '小王', role: '第一个工程师', line: '10 万股期权' },
-  ];
-  return (
-    <div className="eq-cover">
-      <p className="eq-kicker">Startups · 讲解 01</p>
-      <h1>一家公司的股票</h1>
-      <p className="eq-lede">从创业第一天到被收购（或者倒闭），跟着一家虚构的硅谷公司走一遍：每一步谁拿了多少股、花了多少钱、最后每个人到手多少、交多少税。</p>
-      <div className="eq-cast">
-        {cast.map((c) => (
-          <div key={c.id} className="eq-person"><i style={{ background: COLOR[c.id] }} /><b>{c.name}</b><span className="muted">{c.role}</span><span>{c.line}</span></div>
-        ))}
-      </div>
-      <button type="button" className="primary eq-start" onClick={() => nav('timeline')}>开始 →</button>
-      <p className="muted eq-fine">数字是编的，规则是真的（美国联邦 + 加州，2026 年）。为了讲清楚做了简化，不是法律或税务建议。键盘 ← → 翻页，手机左右滑。</p>
-    </div>
-  );
-}
-
-function Timeline({ nav }: { nav: (id: string) => void }) {
-  const rows = [
-    { id: 'day0', when: '第 0 天', what: '成立公司', line: '8,000,000 股：阿明 60%，贝贝 40%，每股 $0.0001。30 天内交 83(b)。' },
-    { id: 'seed', when: '第 6 个月', what: '种子轮', line: '投前 $10M，融 $5M。先放一个 10% 的期权池。' },
-    { id: '409a', when: '第 6 个月', what: '409A 估值', line: '普通股 $0.30 一股，投资人买的优先股 $1.06。' },
-    { id: 'wang', when: '第 9 个月', what: '小王加入', line: '100,000 股期权，行权价 $0.30，4 年归属。要不要提前行权？' },
-    { id: 'seriesA', when: '第 2 年', what: 'A 轮', line: '投前 $40M，融 $10M。所有人被稀释 20%，409A 涨到 $0.90。' },
-    { id: 'exit', when: '第 ? 年', what: '被收购', line: '选一个年份和价格，看每个人拿多少、交多少税。' },
-    { id: 'shutdown', when: '第 ? 年', what: '或者倒闭', line: '钱怎么分、亏的钱能不能抵税。' },
-  ];
+function Day1() {
   return (
     <>
-      <h2>整条时间线</h2>
-      <ol className="eq-tl">
-        {rows.map((r) => (
-          <li key={r.id}><button type="button" onClick={() => nav(r.id)}>
-            <span className="eq-tl-when">{r.when}</span><b>{r.what}</b><span className="eq-tl-line">{r.line}</span>
-          </button></li>
-        ))}
-      </ol>
-    </>
-  );
-}
-
-function Day0() {
-  return (
-    <>
-      <h2>第 0 天：成立公司</h2>
-      <div className="eq-cols">
-        <div>
-          <ul className="eq-list">
-            <li>在特拉华州注册一家 <b>C-corp</b>（风投基本只投这种），授权 10,000,000 股，先发 <b>8,000,000 股</b>给两位创始人，剩下的以后用。</li>
-            <li>按公允价值买：每股 <b>$0.0001</b>。阿明 4,800,000 股付 <b>$480</b>，贝贝 3,200,000 股付 <b>$320</b>。这时公司就是一张白纸。</li>
-            <li>创始人的股份也要 <b>vesting</b>：4 年，1 年 cliff。如果贝贝第 8 个月就走了，公司可以按 $0.0001 把她的股份买回来，不会留下一个拿着 40% 却不干活的股东。投资人也一定会要求这一条。</li>
-            <li>所以创始人拿到的是<b>受限股票</b>（restricted stock）：股票已经在你名下，只是没归属的部分可能被回购。这一点决定了下一页的 83(b)。</li>
-          </ul>
-        </div>
-        <div>
-          <Stack segs={capSegs(0)} caption="第 0 天的股权" />
-          <div className="eq-stats">
-            <Stat label="总股数" value="8,000,000" />
-            <Stat label="公司价值" value="$800" sub="8,000,000 × $0.0001" />
-          </div>
-        </div>
-      </div>
+      <h2>第 1 天：两个人，1 亿股，一文不值</h2>
+      <Facts items={[['总股数', '1 亿股'], ['每股', `$${FOUNDER_PRICE}`], ['整家公司', '$1,000']]} />
+      <Explorer cols={day1Cols()} explain={{
+        aming: <>
+          <p>创始人，CEO。<b>5,500 万股</b>，每股 $0.00001，一共付了 <b>$550</b>。这时公司只是一张注册文件，股票确实一文不值。</p>
+          <p>创始人的股份也要 <b>4 年归属（vesting），1 年 cliff</b>：如果第 8 个月就走了，公司可以按原价把股份买回来。投资人一定会要求这一条。</p>
+          <p>拿到股票 <b>30 天之内</b>，还有一件事要做：83(b)，下一页。</p>
+        </>,
+        beibei: <>
+          <p>创始人，CTO。<b>3,000 万股</b>，付 <b>$300</b>。规则和阿明一样：4 年归属，30 天内交 83(b)。</p>
+        </>,
+        pool: <>
+          <p>为了方便，预留出<b>百分之十五</b>给早期员工的股票池：<b>1,500 万股</b>，现在还不属于任何人。</p>
+          <p>以后招人时，从这里拿出一部分发给员工。员工拿到的是<b>期权</b>：按一个固定价格（行权价）买股票的权利。</p>
+          <p>投资人进来时，一般要求投后留出约 10% 的期权池。第 1 天先留 15%，到种子轮正好是 10%。</p>
+        </>,
+      }} />
     </>
   );
 }
 
 function EightyThreeB() {
-  const [filed, setFiled] = useState<'yes' | 'no'>('no');
-  const rows = useMemo(() => founderVestingWithout83b(4_800_000), []);
+  const [filed, setFiled] = useState<'no' | 'yes'>('no');
+  const rows = useMemo(() => founderVestingWithout83b(55_000_000), []);
   const totalTax = rows.reduce((s, r) => s + r.tax, 0);
+  const fmv = (r: (typeof rows)[number]) => (r.low === r.high ? price(r.low) : `${price(r.low)} → ${price(r.high)}`);
+  const cells: Cell[] = rows.map((r) => ({
+    id: `y${r.year}`, name: `第 ${r.year} 年`, value: r.shares, color: `color-mix(in srgb, var(--eq-aming) ${100 - (r.year - 1) * 16}%, var(--paper))`,
+    big: filed === 'no' ? `交税 ${money(r.tax)}` : '$0', sub: `归属 ${gu(r.shares)} · 409A ${fmv(r)}`,
+  }));
   return (
     <>
-      <h2>83(b)：30 天内，决定一辈子的税</h2>
-      <p className="eq-lede">受限股票默认<b>每归属一批，就按当时的价值算一次工资收入</b>交税。83(b) 让你选择：<b>拿到的那天</b>就按当天的价值交税，以后归属不再交。阿明当天的价值是 $0.0001 × 股数 − 他付的钱 = <b>$0</b>。</p>
-      <Toggle label="83(b)" value={filed} onChange={setFiled} options={[{ id: 'no', label: '阿明没交 83(b)' }, { id: 'yes', label: '阿明 30 天内交了' }]} />
-      {filed === 'no' ? (
-        <>
-          <table className="eq-table">
-            <thead><tr><th>归属</th><th>股数</th><th>当时 409A</th><th>算作收入</th><th>要交的税</th></tr></thead>
-            <tbody>
-              {rows.map((r) => (
-                <tr key={r.year}><td>第 {r.year} 年</td><td>{shares(r.shares)}</td><td>{r.year === 1 ? '$0.30' : r.year === 2 ? '$0.30 → $0.90' : r.year === 3 ? '$0.90' : '$0.90 → $1.60'}</td><td>{money(r.income)}</td><td className="neg">{money(r.tax)}</td></tr>
-              ))}
-              <tr className="eq-sum"><td colSpan={3}>四年合计</td><td>{money(rows.reduce((s, r) => s + r.income, 0))}</td><td className="neg">{money(totalTax)}</td></tr>
-            </tbody>
-          </table>
-          <Note tone="warn">四年里要为<b>纸面财富</b>交约 {money(totalTax)} 的税（按联邦 37% + 加州 12.3%），可手里的股票卖不掉，只能自己掏现金。资本利得和 QSBS 的持有期也要等每一批归属后才开始算。</Note>
-        </>
-      ) : (
-        <>
-          <table className="eq-table">
-            <thead><tr><th>时间</th><th>发生什么</th><th>税</th></tr></thead>
-            <tbody>
-              <tr><td>第 0 天</td><td>按 $0.0001 买 4,800,000 股，当天价值也是 $0.0001，差价 0</td><td>$0</td></tr>
-              <tr><td>第 1–4 年</td><td>每月归属，什么都不用报</td><td>$0</td></tr>
-              <tr><td>卖出时</td><td>整个涨幅都是资本利得；持有期从第 0 天算，QSBS 也从第 0 天算</td><td>见「退出」</td></tr>
-            </tbody>
-          </table>
-          <Note tone="good">一张纸、一个挂号信封，省下约 {money(totalTax)}。</Note>
-        </>
-      )}
-      <p className="muted eq-fine">怎么交：签好的 83(b) 声明（可以用 IRS Form 15620）在拿到股票后 <b>30 天内</b>寄到 IRS，用挂号信留回执，复印一份给公司。错过了没有任何补救。</p>
+      <h2>第 30 天：83(b)，一封信</h2>
+      <p className="eq-lede">阿明的 5,500 万股要分 4 年归属。默认<b>每归属一批，就按当时的 409A 价格算一次收入</b>，交所得税。交了 83(b)，就改成<b>按今天的价格</b>算：今天每股 $0.00001，他也正好付了 $0.00001，差价 0，税是 0，以后归属也不再交。</p>
+      <Toggle label="83(b)" value={filed} onChange={setFiled} options={[{ id: 'no', label: '没交 83(b)' }, { id: 'yes', label: '30 天内交了' }]} />
+      <CompanyBox cols={cells.map(col)} label="阿明的股份，按归属的年份分" />
+      {filed === 'no'
+        ? <Note tone="warn">四年里要为<b>纸面财富</b>交约 <b>{money(totalTax)}</b> 的税（联邦 37% + 加州 12.3%）。股票卖不掉，只能自己掏现金。</Note>
+        : <Note tone="good">一张纸、一个挂号信封，省下约 <b>{money(totalTax)}</b>。以后卖出时，整段涨幅都算资本利得，持有期从今天算。</Note>}
+      <p className="muted eq-fine">怎么交：签好的 83(b) 声明（可以用 IRS Form 15620），拿到股票后 <b>30 天内</b>寄给 IRS，用挂号信留回执，复印一份给公司。错过了没有补救。</p>
     </>
   );
 }
 
 function Seed() {
-  const [where, setWhere] = useState<'pre' | 'post'>('pre');
-  const r = seedRound(where === 'pre');
-  const segs: Seg[] = [
-    { id: 'aming', label: '阿明', value: 4_800_000 }, { id: 'beibei', label: '贝贝', value: 3_200_000 },
-    { id: 'pool', label: '期权池', value: r.pool }, { id: 'seed', label: '种子轮基金', value: r.investor },
-  ];
   return (
     <>
       <h2>第 6 个月：种子轮，投前 $10M，融 $5M</h2>
-      <p className="eq-lede">基金投 $5M，投前估值 $10M，投后 $15M，基金占 1/3。但条款里还有一句：<b>投后要有 10% 的期权池</b>，留着给以后的员工。这 10% 从谁那里出？</p>
-      <Toggle label="期权池" value={where} onChange={setWhere} options={[{ id: 'pre', label: '算在投前（常见）' }, { id: 'post', label: '融资后再加' }]} />
-      <div className="eq-cols">
-        <div>
-          <Stack segs={segs} caption="种子轮之后" />
-          <div className="eq-stats">
-            <Stat label="每股价格" value={price(r.price)} sub="优先股" />
-            <Stat label="基金拿到" value={`${shares(r.investor)} 股`} />
-            <Stat label="创始人股份实际估值" value={money(r.founderValue)} sub={where === 'pre' ? '名义投前 $10M' : ''} />
-          </div>
-        </div>
-        <div>
-          {where === 'pre' ? (
-            <Note tone="warn">期权池算在投前（"option pool shuffle"）：池子是在基金进来之前建的，<b>只稀释创始人</b>。基金照样拿 33.3%，创始人从 100% 变成 56.7%。名义上投前 $10M，实际上创始人的 8,000,000 股只值 <b>$8.5M</b>。</Note>
-          ) : (
-            <Note>如果融资后再加期权池，基金也一起被稀释：基金 30%，创始人 60%，每股 $1.25。所以投资人几乎都会要求算在投前。能谈的是池子的大小：按未来 12–18 个月的招聘计划算，别多给。</Note>
-          )}
-          <ul className="eq-list">
-            <li>基金买的是<b>优先股</b>（Series Seed Preferred）。最重要的一条是<b>1 倍、不参与分配的清算优先权</b>：卖公司时，基金可以先拿回 $5M，或者转成普通股按比例分，二选一取多的。</li>
-            <li>创始人和员工手里的都是<b>普通股</b>。这个区别马上决定下一页的 409A。</li>
-          </ul>
-        </div>
-      </div>
-    </>
-  );
-}
-
-function FourOhNineA() {
-  return (
-    <>
-      <h2>409A：员工的行权价从哪来</h2>
-      <div className="eq-cols">
-        <div>
-          <div className="eq-price-bars">
-            <div><span className="muted">种子轮优先股</span><div className="eq-pbar" style={{ width: '100%', background: COLOR.seed }}><b>{price(SEED_PRICE)}</b></div></div>
-            <div><span className="muted">普通股（409A）</span><div className="eq-pbar" style={{ width: `${(0.30 / SEED_PRICE) * 100}%`, background: COLOR.wang }}><b>$0.30</b></div></div>
-          </div>
-          <p className="muted eq-fine">普通股约是优先股价格的 28%。早期公司常见 20%–40%。</p>
-        </div>
-        <div>
-          <ul className="eq-list">
-            <li>发期权之前，公司请第三方评估<b>普通股</b>的公允价值，这就是 <b>409A 估值</b>。期权的行权价不能低于它；低了，员工要多交 20% 的罚税和利息，锅是公司的。</li>
-            <li>为什么普通股便宜：没有清算优先权、没有投资人的保护条款、也卖不掉。</li>
-            <li>有效期最长 12 个月，遇到下一轮融资这种大事就要重做。</li>
-            <li>对员工：行权价越低越好。所以<b>赶在下一轮融资之前</b>把期权发出去，是公司能给早期员工的实在好处。</li>
-          </ul>
-        </div>
-      </div>
+      <Facts items={[['每股', `${price(SEED_PRICE)}`], ['新发', gu(SEED_SHARES)], ['总股数', gu(SEED_TOTAL)], ['投后估值', money(SEED.pre + SEED.raise)]]} />
+      <Explorer cols={seedCols()} from={valuesOf(day1Cols())} initial="seed" explain={{
+        seed: <>
+          <p>基金投 <b>$5M</b>。投前估值 $10M ÷ 1 亿股 = 每股 <b>$0.10</b>，所以买到 <b>5,000 万股</b>，占投后的 1/3。</p>
+          <p>它买的是<b>优先股</b>，最重要的一条是 <b>1 倍清算优先权</b>：公司被卖掉时，可以先拿回 $5M，或者转成普通股按比例分，二选一取多的。</p>
+        </>,
+        aming: <>
+          <p>股数没变，还是 5,500 万股；比例从 55% 降到 <b>36.7%</b>。这就是<b>稀释</b>。</p>
+          <p>但每股从 $0.00001 变成了 $0.10：按这一轮的价格，他的股份纸面上值 <b>$5.5M</b>。（创始人手里是普通股，实际没那么值钱，见下一页的 409A。）</p>
+        </>,
+        beibei: <><p>3,000 万股，从 30% 降到 <b>20%</b>，纸面上值 <b>$3M</b>。</p></>,
+        pool: <>
+          <p>1,500 万股，正好是投后的 <b>10%</b>。</p>
+          <p>因为它在融资之前就留好了，算在投前估值里，<b>只稀释了创始人，没有稀释投资人</b>。投资人几乎都会这样要求（俗称 option pool shuffle）。创始人能谈的是池子的大小：按未来一两年的招聘计划算，别多留。</p>
+        </>,
+      }} />
     </>
   );
 }
 
 function Wang() {
-  const [months, setMonths] = useState(14);
-  const vf = vestedFraction(months / 12);
-  const t = T.join + months / 12;
-  const lastRound = t >= T.seriesA ? A_PRICE : SEED_PRICE;
-  const paper = WANG.grant * vf * Math.max(0, lastRound - WANG.strike);
-  const W = 520, H = 150, pad = 26;
-  const x = (m: number) => pad + (m / 48) * (W - pad * 2);
-  const y = (f: number) => H - pad - f * (H - pad * 2);
-  const path = Array.from({ length: 49 }, (_, m) => `${m === 0 ? 'M' : 'L'}${x(m)},${y(vestedFraction(m / 12))}${m < 48 ? ` H${x(m + 1)}` : ''}`).join(' ');
   return (
     <>
-      <h2>第 9 个月：小王加入</h2>
-      <p className="eq-lede">第一个工程师小王拿到 <b>100,000 股 ISO 期权</b>，行权价 <b>$0.30</b>（当时的 409A），占公司 {pct(WANG.grant / (8_000_000 + SEED_SHARES + POOL_SHARES), 2)}。全部行权要 <b>$30,000</b>。4 年归属，1 年 cliff。</p>
-      <div className="eq-cols">
-        <div>
-          <svg viewBox={`0 0 ${W} ${H}`} className="eq-chart" role="img" aria-label="归属曲线">
-            <line x1={pad} y1={y(0)} x2={W - pad} y2={y(0)} className="eq-axis" />
-            {[0, 12, 24, 36, 48].map((m) => <text key={m} x={x(m)} y={H - 6} className="eq-tick" textAnchor="middle">{m === 0 ? '入职' : `${m / 12} 年`}</text>)}
-            <path d={path} className="eq-line" />
-            <line x1={x(months)} y1={pad - 8} x2={x(months)} y2={y(0)} className="eq-now" />
-            <circle cx={x(months)} cy={y(vf)} r="5" className="eq-now-dot" />
-          </svg>
-          <label className="eq-slider">
-            <span>入职后第 <b>{months}</b> 个月</span>
-            <input type="range" min={0} max={48} value={months} onChange={(e) => setMonths(Number(e.target.value))} />
-          </label>
-        </div>
-        <div className="eq-stats eq-stats-col">
-          <Stat label="已归属" value={`${shares(WANG.grant * vf)} 股`} sub={months < 12 ? '还没到 cliff' : `${pct(vf, 0)}`} />
-          <Stat label="行权要付" value={dollars(WANG.grant * vf * WANG.strike)} sub="已归属部分 × $0.30" />
-          <Stat label="纸面价值" value={money(paper)} sub={`按最近一轮优先股 ${price(lastRound)} 算，偏乐观`} />
-        </div>
-      </div>
-      <ul className="eq-list">
-        <li>第 12 个月一次归属 25,000 股，之后每月 2,083 股。</li>
-        <li>离职后通常只有 <b>90 天</b>决定要不要行权，不行权就作废；ISO 离职超过 3 个月才行权，会变成 NSO。</li>
-      </ul>
-    </>
-  );
-}
-
-function Early() {
-  return (
-    <>
-      <h2>小王要不要现在就提前行权？</h2>
-      <p className="eq-lede">公司允许 <b>early exercise</b>：还没归属，就先把 100,000 股全部买下来，拿到的是受限股票，然后 30 天内交 83(b)。</p>
-      <div className="eq-cols eq-versus">
-        <div className="eq-card">
-          <h3>A. 现在提前行权 + 83(b)</h3>
-          <ul className="eq-list">
-            <li>现在付 <b>$30,000</b>。</li>
-            <li>行权价 $0.30 = 当天 409A $0.30，差价 0：<b>今天交税 $0</b>，AMT 也是 0。</li>
-            <li>资本利得的持有期、QSBS 的持有期，<b>从今天开始算</b>。</li>
-            <li>离职：没归属的部分公司按 $0.30 买回，钱退给你。</li>
-            <li className="neg">风险：公司倒了，$30,000 就没了，只能算资本损失。</li>
-          </ul>
-        </div>
-        <div className="eq-card">
-          <h3>B. 先不行权，等等看</h3>
-          <ul className="eq-list">
-            <li>现在付 <b>$0</b>，公司倒了也不亏钱。</li>
-            <li>以后再行权：409A 涨到 $0.90，每股差价 $0.60。ISO 要算 <b>AMT</b>，NSO 直接按工资交税。</li>
-            <li>一直等到被收购才套现：差价<b>全部算工资收入</b>，按最高税率交。</li>
-            <li className="neg">离职时 90 天内要掏行权款（可能还有 AMT），掏不出来，期权就作废。</li>
-          </ul>
-        </div>
-      </div>
-      <Note>经验法则：公司越早期、行权总价越小、你越相信这家公司，提前行权越划算。到「退出」那一页，可以切换 A / B 看差多少。</Note>
+      <h2>第 9 个月：第一个员工，小王</h2>
+      <Facts items={[['期权', gu(WANG.grant)], ['行权价', price(WANG.strike)], ['全部行权', dollars(WANG.grant * WANG.strike)], ['归属', '4 年，1 年 cliff']]} />
+      <Explorer cols={wangCols()} from={valuesOf(seedCols())} initial="wang" explain={{
+        wang: <>
+          <p>从期权池拿出 <b>100 万股期权</b>给小王，占公司 {pct(WANG.grant / SEED_TOTAL)}。行权价 <b>$0.03</b>，全部买下来要 $30,000。</p>
+          <p><b>为什么是 $0.03，不是投资人的 $0.10？</b>发期权之前，公司请第三方给<b>普通股</b>估值，叫 <b>409A</b>。普通股没有清算优先权、也卖不掉，通常只值优先股的 20%–40%。行权价不能低于 409A。</p>
+          <p><b>归属：</b>满 1 年一次拿到 25 万股，之后每个月 20,833 股，4 年拿完。离职后通常只有 90 天决定要不要行权。</p>
+          <p><b>要不要现在就提前行权（early exercise）？</b>还没归属，就先把 100 万股全部买下来，30 天内交 83(b)：</p>
+          <div className="eq-table-wrap">
+            <table className="eq-table">
+              <thead><tr><th /><th>现在提前行权 + 83(b)</th><th>先不行权</th></tr></thead>
+              <tbody>
+                <tr><td>现在掏钱</td><td>$30,000</td><td>$0</td></tr>
+                <tr><td>现在交税</td><td>$0（行权价 = 409A，没有差价）</td><td>$0</td></tr>
+                <tr><td>以后卖出</td><td>资本利得；持有满 5 年，QSBS 可能免联邦税</td><td>差价全部算工资收入</td></tr>
+                <tr><td>公司倒闭</td><td className="neg">亏 $30,000</td><td>不亏</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p>最后差多少，到「第 5 年」那一页看。</p>
+        </>,
+        pool: <><p>还剩 <b>1,400 万股</b>，留给之后的员工。公司越往后，409A 越高，后来的人行权价也越高。</p></>,
+        aming: <><p>5,500 万股，36.7%。给员工发期权，用的是早就留好的池子，不会再稀释创始人。</p></>,
+        beibei: <><p>3,000 万股，20%。</p></>,
+        seed: <><p>5,000 万股优先股，33.3%。</p></>,
+      }} />
     </>
   );
 }
@@ -346,163 +244,124 @@ function SeriesA() {
   const vestedAtA = vestedFraction(T.seriesA - T.join) * WANG.grant;
   return (
     <>
-      <h2>第 2 年：A 轮，投前 $40M，融 $10M</h2>
-      <div className="eq-cols">
-        <div>
-          <Stack segs={capSegs(0)} caption="成立" />
-          <Stack segs={capSegs(T.seed)} caption="种子轮后" />
-          <Stack segs={capSegs(T.seriesA)} caption="A 轮后" />
-        </div>
-        <div>
-          <div className="eq-stats">
-            <Stat label="每股价格" value={price(A_PRICE)} sub={`新发 ${shares(A_SHARES)} 股`} />
-            <Stat label="阿明的纸面价值" value={money(4_800_000 * A_PRICE)} sub={`4,800,000 股 × ${price(A_PRICE)}`} />
-          </div>
-          <ul className="eq-list">
-            <li>新股稀释所有人 20%：股数不变，比例变小，每股更值钱。</li>
-            <li><b>清算优先权叠起来了</b>：种子 $5M + A 轮 $10M = <b>$15M</b>。公司卖不到 $15M，普通股可能一分钱都没有。</li>
-            <li>409A 涨到 <b>$0.90</b>，新员工的行权价就是 $0.90。</li>
-            <li>小王如果现在才行权已归属的 {shares(vestedAtA)} 股：付 {dollars(vestedAtA * WANG.strike)}，每股差价 $0.60，共 {dollars(vestedAtA * 0.6)}。ISO 要算进 AMT，NSO 直接当工资交税。提前行权的话，这一步本来是 $0。</li>
-          </ul>
-        </div>
-      </div>
+      <h2>第 2 年：A 轮，投前 $60M，融 $15M</h2>
+      <Facts items={[['每股', price(A_PRICE)], ['新发', gu(A_SHARES)], ['总股数', gu(A_TOTAL)], ['投后估值', money(SERIES_A.pre + SERIES_A.raise)]]} />
+      <Explorer cols={aCols()} from={valuesOf(wangCols())} initial="seriesA" explain={{
+        seriesA: <>
+          <p>A 轮基金投 <b>$15M</b>。投前 $60M ÷ 1.5 亿股 = 每股 <b>$0.40</b>，买到 <b>3,750 万股</b>，占 20%。所有人的比例都被稀释 20%。</p>
+          <p>清算优先权叠起来了：种子 $5M + A 轮 $15M = <b>$20M</b>。公司如果卖不到 $20M，普通股可能一分钱都拿不到。</p>
+        </>,
+        aming: <><p>5,500 万股，现在是 <b>{pct(55_000_000 / A_TOTAL)}</b>。按 $0.40 算，纸面上值 <b>{money(55_000_000 * A_PRICE)}</b>。</p></>,
+        beibei: <><p>3,000 万股，<b>{pct(30_000_000 / A_TOTAL)}</b>，纸面上值 <b>{money(30_000_000 * A_PRICE)}</b>。</p></>,
+        wang: <>
+          <p>100 万股，{pct(WANG.grant / A_TOTAL)}。按 $0.40 算，扣掉行权价，纸面上值 <b>{money(WANG.grant * (A_PRICE - WANG.strike))}</b>。</p>
+          <p>409A 涨到了 <b>$0.12</b>。如果他当初没提前行权，现在才行权已归属的 {gu(vestedAtA)}，每股差价 $0.09，一共 {dollars(vestedAtA * 0.09)} 要算收入（ISO 算进 AMT）。提前行权的话，这一步是 $0。</p>
+        </>,
+        pool: <><p>1,400 万股，{pct(OTHER_OPTIONS / A_TOTAL)}。现在入职的员工，行权价是新的 409A：$0.12。</p></>,
+        seed: <><p>5,000 万股，{pct(SEED_SHARES / A_TOTAL)}。按 $0.40 算，它投的 $5M 纸面上已经值 {money(SEED_SHARES * A_PRICE)}。</p></>,
+      }} />
     </>
   );
 }
 
-const EXITS = [0, 5e6, 12e6, 20e6, 30e6, 50e6, 100e6, 300e6, 1e9];
+const EXITS = [0, 5e6, 15e6, 30e6, 50e6, 100e6, 300e6, 1e9];
+
 function Exit() {
-  const [year, setYear] = useState(5);
   const [ei, setEi] = useState(5);
-  const [early, setEarly] = useState<'early' | 'wait'>('early');
   const exit = EXITS[ei];
-  const s = useMemo(() => scenario(year, exit, early === 'early'), [year, exit, early]);
-  const other = useMemo(() => scenario(year, exit, early !== 'early').people.find((p) => p.id === 'wang')!, [year, exit, early]);
-  const wang = s.people.find((p) => p.id === 'wang')!;
-  const founder = s.people.find((p) => p.id === 'aming')!;
-  const order: HolderId[] = ['aming', 'beibei', 'wang', 'others', 'seed', 'seriesA'];
-  const people = order.map((id) => s.people.find((p) => p.id === id)).filter((p): p is NonNullable<typeof p> => !!p);
-  const notes: { text: ReactNode; tone?: 'warn' | 'good' }[] = [];
-  if (exit === 0) notes.push({ tone: 'warn', text: <>公司倒闭：剩下的钱先还债，然后是优先股，普通股通常是 0。详见下一页。</> });
-  else if (exit <= s.totalPref) notes.push({ tone: 'warn', text: <>卖了 {money(exit)}，还不够付投资人的清算优先权（{money(s.totalPref)}）。投资人拿回本金，<b>创始人和员工一分钱也没有</b>。</> });
-  else if (s.prefOut.length) notes.push({ text: <>{s.prefOut.map((p) => p.name).join('、')}选择不转换，直接拿回本金：按比例分反而更少。其余的钱由普通股（包括转换了的优先股）平分，每股 {price(s.pps)}。</> });
-  else notes.push({ text: <>价格够高，所有优先股都转成普通股，按比例分：每股 {price(s.pps)}。</> });
-  if (year < T.join + 1 && exit > 0) notes.push({ text: <>小王入职才 {Math.round((year - T.join) * 12)} 个月，还没到 cliff，一股都没归属。收购方一般会把他的期权换成自己的，继续算归属。</> });
-  if (exit > s.totalPref && founder.unvested > 1) notes.push({ text: <>创始人才归属了 {pct(vestedFraction(year), 0)}，没归属的 {money(founder.unvested)} 通常换成收购方的股票，继续按时间归属：收购方用它把人留住。表里「现在到手」只算已归属的。</> });
-  if (wang.net != null && other.net != null && wang.vested > 0) {
-    const diff = wang.net - other.net;
-    notes.push({ tone: diff >= 0 ? 'good' : 'warn', text: <>如果小王当初{early === 'early' ? '没有提前行权' : '提前行权了'}，税后会是 {money(other.net)}，{diff >= 0 ? '少' : '多'} {money(Math.abs(diff))}。</> });
-  }
-  return (
-    <>
-      <h2>退出：如果公司被收购</h2>
-      <div className="eq-controls">
-        <label className="eq-slider"><span>退出时间：<b>{yearLabel(year)}</b>{year < T.seriesA ? '（还没融 A 轮）' : ''}</span>
-          <input type="range" min={1} max={8} step={0.5} value={year} onChange={(e) => setYear(Number(e.target.value))} /></label>
-        <label className="eq-slider"><span>收购价：<b>{exit === 0 ? '倒闭' : money(exit)}</b></span>
-          <input type="range" min={0} max={EXITS.length - 1} step={1} value={ei} onChange={(e) => setEi(Number(e.target.value))} /></label>
-        <Toggle label="小王" value={early} onChange={setEarly} options={[{ id: 'early', label: '小王提前行权 + 83(b)' }, { id: 'wait', label: '小王没行权' }]} />
-      </div>
-      <Stack segs={people.map((p) => ({ id: p.id, label: p.name, value: p.total }))} caption={exit > 0 ? `${money(exit)} 怎么分` : undefined} showValue={(v) => money(v)} />
-      <div className="eq-table-wrap">
-        <table className="eq-table eq-results">
-          <thead><tr><th>谁</th><th>占比</th><th>总共</th><th>现在到手</th><th>估算税</th><th>税后</th></tr></thead>
-          <tbody>
-            {people.map((p) => (
-              <tr key={p.id} className={p.id === 'wang' ? 'hl' : ''}>
-                <td><i className="eq-sw" style={{ background: COLOR[p.id] }} />{p.name}</td>
-                <td>{pct(p.pct)}</td>
-                <td>{money(p.total)}</td>
-                <td>{p.unvested > 1 ? <>{money(p.vested)}<span className="muted eq-small"> 未归属 {money(p.unvested)}</span></> : money(p.vested)}</td>
-                <td>{p.tax ? (p.tax.loss ? <span className="muted">亏 {money(p.tax.loss)}</span> : money(p.tax.total)) : <span className="muted">—</span>}</td>
-                <td>{p.net != null ? <b>{money(p.net)}</b> : <span className="muted">{p.id === 'others' ? '各人不同' : `投了 ${money(p.paid)}`}</span>}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
-      </div>
-      <div className="eq-why">
-        {[['阿明', founder], ['小王', wang]].map(([n, p]) => {
-          const q = p as typeof wang;
-          if (!q.tax || !(q.vested > 0 || q.tax.loss)) return null;
-          const t = q.tax;
-          return (
-            <p key={n as string}><b>{n as string}的税：</b>{t.loss
-              ? <>亏了 {money(t.loss)}，算资本损失：先抵资本利得，再抵普通收入每年最多 $3,000。</>
-              : <>{t.note}。联邦 {money(t.federal)}，加州 {money(t.state)}{t.qsbs > 1 ? `；QSBS 在联邦省下约 ${money(t.qsbs)}` : ''}。</>}</p>
-          );
-        })}
-        {notes.map((n, i) => <Note key={i} tone={n.tone}>{n.text}</Note>)}
-      </div>
-      <p className="muted eq-fine">估算税率：联邦普通所得 {pct(RATES.fedOrdinary, 0)}，长期资本利得 20% + 3.8%，QSBS 没免掉的部分 28%；加州 {pct(RATES.ca, 1)}，而且加州不认 QSBS。简化：优先股 1 倍不参与分配、两轮平级；期权池全部发给了员工；没算 FICA、AMT 和交易费用。投资人和其他员工的税不在这里算。</p>
-    </>
-  );
-}
+  const early = useMemo(() => scenario(exit, true), [exit]);
+  const late = useMemo(() => scenario(exit, false), [exit]);
+  const by = (id: string, s = early) => s.people.find((p) => p.id === id)!;
+  const dead = exit === 0;
+  const anyMoney = early.people.some((p) => p.total > 0);
+  const cellOf = (id: CellId, name: string): Cell => {
+    const p = by(id);
+    return { id, name, value: anyMoney ? p.total : p.pct, big: money(p.total), sub: anyMoney ? pct(p.total / exit) : undefined };
+  };
+  const cols: Col[] = [
+    col(cellOf('aming', '阿明')), col(cellOf('beibei', '贝贝')),
+    { id: 'poolcol', cells: [cellOf('wang', '小王'), cellOf('others', '其他员工')] },
+    col(cellOf('seed', '种子基金')), col(cellOf('seriesA', 'A 轮基金')),
+  ];
 
-function Shutdown() {
-  const s = scenario(3, 0, true);
-  const loss = s.people.find((p) => p.id === 'wang')!.tax!.loss!;
-  return (
-    <>
-      <h2>如果公司倒闭</h2>
-      <p className="eq-lede">大多数创业公司的结局。剩下的钱按顺序分：<b>欠的债和员工工资 → 优先股（投资人能拿回多少是多少）→ 普通股</b>。到普通股这里，通常已经是 0。</p>
-      <table className="eq-table">
-        <thead><tr><th>谁</th><th>亏了什么</th><th>税上怎么算</th></tr></thead>
-        <tbody>
-          <tr><td><i className="eq-sw" style={{ background: COLOR.aming }} />阿明、贝贝</td><td>$480 / $320，和几年的时间</td><td>资本损失（创业公司股票可以按 §1244 算普通损失，每年最多 $5 万，夫妻合报 $10 万）</td></tr>
-          <tr><td><i className="eq-sw" style={{ background: COLOR.wang }} />小王（提前行权了）</td><td className="neg">{dollars(loss)}</td><td>资本损失：先抵当年的资本利得，再抵普通收入每年最多 $3,000，剩下的往后年份结转</td></tr>
-          <tr><td><i className="eq-sw" style={{ background: COLOR.wang }} />小王（没行权）</td><td>什么钱都没花</td><td>期权作废，没有损失可以抵</td></tr>
-          <tr><td><i className="eq-sw" style={{ background: COLOR.others }} />其他员工</td><td>同上，看有没有行权</td><td>—</td></tr>
-          <tr><td><i className="eq-sw" style={{ background: COLOR.seed }} />两家基金</td><td className="neg">$15M</td><td>风投就是靠少数大成功，覆盖大多数失败</td></tr>
-        </tbody>
-      </table>
-      <Note>所以提前行权的代价，是拿真金白银赌公司活下来。上一页切到「倒闭」可以对比。</Note>
-    </>
-  );
-}
+  const prefOut = early.people.filter((p) => p.converted === false);
+  const headline = dead ? <>公司倒闭：大多数创业公司的结局。剩下的钱先还债、发工资，再还投资人，到普通股这里通常是 0。</>
+    : exit <= PREF_STACK ? <>卖 {money(exit)}，还不够付投资人的 {money(PREF_STACK)} 清算优先权：两家基金按投资额分走全部，<b>创始人和员工一分钱都没有</b>。</>
+    : prefOut.length ? <>{prefOut.map((p) => p.name).join('、')}选择直接拿回本金（转成普通股反而更少）。剩下的钱按股数平分，每股 {price(early.pps)}。</>
+    : <>价格够高，两家基金都转成普通股，所有人按股数平分：每股 <b>{price(early.pps)}</b>。</>;
 
-function Checklist() {
+  const founder = (p: PersonResult, sh: number) => (
+    p.total <= 0 ? (
+      <p>{dead ? '公司倒闭' : `卖 ${money(exit)} 不够付清算优先权`}，普通股 $0。当初的 {dollars(p.paid)} 没了；创业公司的股票亏损可以按 §1244 算普通损失抵税。真正亏掉的是几年时间。</p>
+    ) : (<>
+      <p>{gu(sh)} × 每股 {price(early.pps)} = <b>{money(p.total)}</b>。</p>
+      <p>税：{p.tax!.note}。联邦 {money(p.tax!.federal)}，加州 {money(p.tax!.state)}（加州不认 QSBS）{p.tax!.qsbs > 1 ? `；QSBS 在联邦省下约 ${money(p.tax!.qsbs)}` : ''}。</p>
+      <p>税后：<b>{money(p.net!)}</b>。</p>
+    </>)
+  );
+  const fund = (id: 'seed' | 'seriesA') => {
+    const p = by(id);
+    return <p>投了 {money(p.paid)}。{p.total <= 0 ? '一分钱没拿回来。' : <>{p.converted ? '转成普通股，按股数分' : exit <= PREF_STACK ? '钱不够，两家基金按投资额比例分' : '不转换，按 1 倍清算优先权拿回本金'}：<b>{money(p.total)}</b>（{(p.total / p.paid).toFixed(1)} 倍）。</>}{dead ? '风投靠少数几家大成功，覆盖大多数失败。' : ''}</p>;
+  };
+  const w1 = by('wang'), w2 = by('wang', late);
+  const wangRow = (label: string, f: (p: PersonResult) => ReactNode) => <tr><td>{label}</td><td>{f(w1)}</td><td>{f(w2)}</td></tr>;
+
   return (
     <>
-      <h2>清单</h2>
-      <div className="eq-cols eq-versus">
-        <div className="eq-card">
-          <h3>创始人</h3>
-          <ul className="eq-list eq-check">
-            <li>第 0 天按极低的价格买股，带 vesting，<b>30 天内交 83(b)</b>。</li>
-            <li>发期权之前先做 409A；每次融资关账后马上重做。</li>
-            <li>期权池按招聘计划算，别在 shuffle 里多让。</li>
-            <li>开放 early exercise，把离职行权窗口延长到几年。</li>
-            <li>算清楚清算优先权：低价被收购时，你和员工能拿多少。</li>
-          </ul>
-        </div>
-        <div className="eq-card">
-          <h3>员工</h3>
-          <ul className="eq-list eq-check">
-            <li>问五个数：股数、完全稀释后的总股数、行权价、最近一轮价格、清算优先权总额。</li>
-            <li>公司早期、行权价低：考虑提前行权 + 83(b)。</li>
-            <li>记住离职后的 90 天。</li>
-            <li>卖之前看持有期：ISO 要授予满 2 年、行权满 1 年；QSBS 3 / 4 / 5 年。</li>
-            <li>金额大了，先找税务师。</li>
-          </ul>
-        </div>
-      </div>
-      <p className="muted eq-fine">本例数字：普通股 {shares(8_000_000)} 股 · 种子轮 {shares(SEED_SHARES)} 股 @ {price(SEED_PRICE)} · 期权池 {shares(POOL_SHARES)} 股（小王 {shares(WANG.grant)}，其他员工 {shares(OTHER_OPTIONS)}）· A 轮 {shares(A_SHARES)} 股 @ {price(A_PRICE)} · 创始人买入价 ${FOUNDER_PRICE}。</p>
+      <h2>第 5 年：公司被收购，或者倒闭</h2>
+      <label className="eq-slider">
+        <span>收购价：<b>{dead ? '倒闭' : money(exit)}</b></span>
+        <input type="range" min={0} max={EXITS.length - 1} step={1} value={ei} onChange={(e) => setEi(Number(e.target.value))} aria-valuetext={dead ? '倒闭' : money(exit)} />
+      </label>
+      <Note tone={exit <= PREF_STACK ? 'warn' : undefined}>{headline}</Note>
+      <Explorer cols={cols} initial="wang" hint="点一下方块，看这个人拿多少、交多少税" explain={{
+        aming: founder(by('aming'), 55_000_000),
+        beibei: founder(by('beibei'), 30_000_000),
+        wang: <>
+          <p>他当初有两个选择，结果对比（第 9 个月入职，到现在都已归属）：</p>
+          <div className="eq-table-wrap">
+            <table className="eq-table">
+              <thead><tr><th /><th>提前行权 + 83(b)</th><th>没行权</th></tr></thead>
+              <tbody>
+                {wangRow('卖出所得', (p) => money(p.total))}
+                {wangRow('当初掏的钱', (p) => (p.paid ? money(p.paid) : '$0'))}
+                {wangRow('税', (p) => (p.tax!.loss ? <span className="muted">亏损可抵税</span> : money(p.tax!.total)))}
+                <tr className="eq-sum"><td>最后剩下</td><td className={w1.net! < 0 ? 'neg' : ''}>{money(w1.net!)}</td><td>{money(w2.net!)}</td></tr>
+              </tbody>
+            </table>
+          </div>
+          <p className="muted eq-small-p">{w1.total > 0 ? <>提前行权：{w1.tax!.note}。没行权：{w2.tax!.note}。</> : <>公司{dead ? '倒闭' : '卖的钱不够付清算优先权'}：提前行权的 $30,000 没了，只能算资本损失（每年最多抵 $3,000 普通收入，剩下的往后结转）；没行权的什么都没花。</>}</p>
+        </>,
+        others: <p>其余 1,400 万股期权分给了其他员工，每人数量不同。按每股 {price(early.pps)} 减去行权价 $0.03，差价合计 <b>{money(by('others').total)}</b>；没提前行权的，这笔钱算工资收入交税。</p>,
+        seed: fund('seed'),
+        seriesA: fund('seriesA'),
+      }} />
+      <p className="muted eq-fine">估算税率：联邦普通所得 {pct(RATES.fedOrdinary, 0)}，长期资本利得 20% + 3.8%，QSBS 没免掉的部分 28%；加州 {pct(RATES.ca)}，加州不认 QSBS。简化：优先股 1 倍、不参与分配、两轮平级；期权池全部按 $0.03 发给了员工；没算 FICA、AMT 和交易费用。</p>
     </>
   );
 }
 
 export const EQUITY_DECK: Slide[] = [
-  { id: 'cover', title: '一家公司的股票', render: (nav) => <Cover nav={nav} /> },
-  { id: 'timeline', title: '整条时间线', render: (nav) => <Timeline nav={nav} /> },
-  { id: 'day0', title: '第 0 天：成立公司', render: () => <Day0 /> },
-  { id: '83b', title: '83(b)', render: () => <EightyThreeB /> },
-  { id: 'seed', title: '种子轮', render: () => <Seed /> },
-  { id: '409a', title: '409A', render: () => <FourOhNineA /> },
-  { id: 'wang', title: '小王加入', render: () => <Wang /> },
-  { id: 'early', title: '提前行权？', render: () => <Early /> },
-  { id: 'seriesA', title: 'A 轮', render: () => <SeriesA /> },
-  { id: 'exit', title: '被收购', render: () => <Exit /> },
-  { id: 'shutdown', title: '倒闭', render: () => <Shutdown /> },
-  { id: 'checklist', title: '清单', render: () => <Checklist /> },
+  { id: 'day1', when: '第 1 天', short: '成立', title: '第 1 天：成立公司', render: () => <Day1 /> },
+  { id: '83b', when: '第 30 天', short: '83(b)', title: '第 30 天：83(b)', render: () => <EightyThreeB /> },
+  { id: 'seed', when: '第 6 个月', short: '种子轮', title: '第 6 个月：种子轮', render: () => <Seed /> },
+  { id: 'wang', when: '第 9 个月', short: '小王加入', title: '第 9 个月：第一个员工', render: () => <Wang /> },
+  { id: 'seriesA', when: '第 2 年', short: 'A 轮', title: '第 2 年：A 轮', render: () => <SeriesA /> },
+  { id: 'exit', when: '第 5 年', short: '退出', title: '第 5 年：收购或倒闭', render: () => <Exit /> },
 ];
+
+/** The timeline across the top: one stop per slide. */
+export function TimelineStrip({ slideId, nav }: { slideId: string; nav: (id: string) => void }) {
+  const idx = EQUITY_DECK.findIndex((s) => s.id === slideId);
+  return (
+    <ol className="eq-strip" aria-label="时间线">
+      {EQUITY_DECK.map((s, i) => (
+        <li key={s.id} className={i === idx ? 'on' : i < idx ? 'past' : ''}>
+          <button type="button" onClick={() => nav(s.id)} aria-current={i === idx ? 'step' : undefined}>
+            <span className="eq-dot" /><span className="eq-when">{s.when}</span><span className="eq-what">{s.short}</span>
+          </button>
+        </li>
+      ))}
+    </ol>
+  );
+}
