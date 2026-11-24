@@ -53,7 +53,10 @@ const payload = all.map((q) => ({ id: q.id, ...q.data }));
     let store: Storage | null = null;
     try { store = window.sessionStorage; store.getItem(KEY); } catch { store = null; }
 
-    let chosen = store ? store.getItem(KEY) : null;
+    // `?quote=<id>` previews a specific entry (and pins it for the session).
+    const wanted = new URLSearchParams(location.search).get('quote');
+    let chosen = wanted && entries.some((e) => e.id === wanted) ? wanted : store ? store.getItem(KEY) : null;
+    if (wanted && chosen === wanted) { try { store?.setItem(KEY, wanted); } catch {} }
     if (!chosen || !entries.some((e) => e.id === chosen)) {
       chosen = entries[Math.floor(Math.random() * entries.length)].id;
       try { store?.setItem(KEY, chosen!); } catch {}
